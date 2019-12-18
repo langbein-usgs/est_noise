@@ -1,0 +1,109 @@
+Various bug fixes
+
+version 20160301  relative to 20151217
+In bust_5,  -- The median routine would stop if there was no data in the specified interval-- bust_5 would crash
+     Fixed by specifing a median of zero when there is no data in interval under examination
+
+est_noise7.22 --  
+ 1  For the legacy-mode (quadature covariance) AND when dec .ne. 0  AND when the exponential 
+   time constant is being estimated, there was an artifical offset introduced in the resid.out file in
+   both the predicted and residuals...  This should be fixed as the A_orig matrix, prior to
+   outputting the residual wasn't correctly being modified (modify_A routine) because the number of
+   observations, ic was being correctly passed through the common statement;  Line numbers ~1735 changed
+   in est_noise7.22
+
+2  Note the for intel compiled program on Mac, that estimating PL index yield an "illegal instruction"
+   and program crashes.  Works OK with gfortran, though. This seems to occur using 2-color EDM data and
+   independent of whether covariance is additive or quadrature. After fiddling with the dimensions
+   of makeMatrix, and band_pass_filt subroutines, the programs had problems compiling either with gfortran
+   or intel, depending on the dimension statemments. With gfortran, compile errors consisted of
+   "RIP relative reference out of range ".  So, for arrays that were originally dimensioned as 65536, I reduced
+    them by a factor of two to 32768.  
+
+3  For infrequent instances of BP noise and using the "fast" version of creating and evaluating the data
+   covariance matrix, est_noise would not provide reliable results --- This would be evident either that
+   A)  the output has a lot of NaN in the columns representing the determinant and/or the misfit of
+   of the data to the model (chi^2)  or B)  the MLE value is wildly different than simpler models of noise;
+   that is a model with the BP component. With the "c" or cholesky option, BP noise modeling worked fine.
+   To try to get around this, I implimented DFT (and its inverse) to compute
+   the inverse filter (finv in funmin).  The apparent problem, I believe, is that the filter function of
+   noise composed of BP noise is oscilatory. Inverting that filter-function, especially by de-convolution, would
+   amplify those oscillations without bound (the near-zero crossing points, when inverted, become unbounded).
+   The "badness" of the oscillations is tested by convolving
+   the filter function with its inverse (a test feature in funmin) and it would go unbounded. I tested
+   various DFTs (with different tapers and no-taper). Although convoluting the inverse filter with the filter
+   provided a better match to the expected delta function, it wasn't always perfect.  Consequently, the
+   results of modeling data error (some, but not all) would converge, but the MLEs and the amplitudes were not
+   consistent with the results obtained from cholesky decomposition.  Consequently, I abandoned the DFT
+   approach (the code is commented-out) and I will provide a warning in the manual that, should the
+   BP modeling either not work or provides obviously in correct results, that the user needs to switch
+   to the cholesky mode.  In addition, the example script, EstNoiseAll.sh has been modified --- it will run the "fast"
+   version of the covariance for BP noise, but if that fails, it will rerun using cholesky decomposition.
+
+4  For the 'f' fast option of noise modeling and simultaneouly estimating the time-constants of exponentials
+   or omori function, the code would not consistently converge.  It worked fine in the 'c', cholesky and 'n',
+   legacy/quadrature mode.  This has been fixed.... For the 'f' version, the wrong A-matrix was being modified.
+
+Version 20160401
+est_noise7.22
+1  At times, Nelder/Mead doesn't find the optimal solution -- it could exceed the number of iterations or, it
+   claims convergence, but after testing through "dithering" the optimal solution, a better solution is found.
+   If after dithering, a better solution is found, then the program is instructed to JUMP backwards, and
+   re-run Nelder/Mead once more.  This is flagged with a iFlagReLoop variable.
+2  Noted that offsets specified for the last observation would stop the program; revised if statement for -ge to
+   -gt to allow last observation to be an offset point.
+3  This is an additional feature.  For both the white noise and the first colored noise, the program can, if desired
+   provide a suggested input for the amplitudes of white and colored noise. It is ad-hoc, but is probably gets
+   one in the neighborhood and, consequently, it could speed-up the computations as the initial guess is closer
+   to the trueth.  To invoke this feature, when either white or First power law amplitude is requested, enter
+   "-99999.0 float".
+
+Version 20160601
+1  Fixed GMT formated output in est_noise
+2  Changed maximum variance allowable in compare_wander2 Changed maximum variance allowable in compare_wander
+3  Added new feature to EstNoiseAll.sh script to limit the number of noise models tested
+   with est_noise.  This new feature is the -S argument.
+
+Version 20160801
+1  Modify the EstNoiseAll.sh script such that FLRW is used that the default with BPx noise. However, if
+   PL noise is desired, use the -P flag.
+
+Version 20170217
+1  Noted that for some cases, est_noise would continuously loop on dithering the optimal solution
+   (needed to estimate error bars on noise parameters). Earlier versions would test the number of dithered
+   attempts, but I had forgot to count the number of attempts; this has been corrected.
+2 Extend range of "time.f" subroutine from a limit of ~2017 to about 2040.
+3 Increased dimensions such that est_noise can analyze 32 years of daily observations (rather than 22 years)
+
+Version 20170721
+1  In bust_5, modified the time format in reject.out such that it becomes, more or less, human
+   readable.
+2  CRITICAL!!!  In original code of est_noise7.22, the gauss-markov parameter was set to 0.9 rather
+   than 0.0 for the second filter.  This would impact results for FLRW noise models or any noise model
+   for which the index of the second power-law was held fixed
+3  For ModType=f (fast), fix the output of max.dat to reflect the actual number of observations analyzed
+
+Version 20170901
+1  Wrote a report, Threshold_dMLE.pdf, that discusses how to identify the optimum noise model after
+   using est_noise to test various models of noise. It strongly cautions one not to rely on the estimates
+   of error bar for rate obtained from any Gauss-Markov model where the power spectra flattens at the lowest
+   frequency.
+2  Modified cleanEst.sh, script, in example0 to NOT compute rates and sinusoids if desired. The new script,
+   at least for now, is called cleanEst_special.sh
+
+Version 20171025
+1  Fixed bug in NedlerMeadSimplex script computing rtol using RMS. Eliminated possibility of getting negative
+   rtol from a negative denominator.
+2  Revised report, Threshold_dMLE.pdf, using more simulations (5000 vs a few hundred)
+
+Version 20190101
+  Updated 20190101 EstNoiseAll.sh script --  output from time dependent models are push to the directy from which
+   EstNoiseAll.sh was invoked
+  To the cleanEst.sh script, added another option for different sampling intervals.  Default is daily sampling;
+  In cleanEst.sh  revise plotting of clean data;
+  Fixed time bug in adjust_1 as it out adjusted data to a one day resolution
+
+Next version
+  revised bust_5 program to run more efficiently;  old version did a complete sort of data which
+    is not required to determine various, percentile ranges. 
+  psd_calc7  fixed scaling for GM freq.

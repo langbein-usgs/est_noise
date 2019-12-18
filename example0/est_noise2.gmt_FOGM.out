@@ -1,0 +1,75 @@
+  
+  Cross correlation matrix
+           1  cross correlation    1.000000     -9.4522875E-06 -3.6302627E-08
+  0.0000000E+00  0.0000000E+00  0.0000000E+00  0.0000000E+00
+           2  cross correlation  -9.4522875E-06   1.000000     -2.2347256E-08
+  0.0000000E+00  0.0000000E+00  0.0000000E+00  0.0000000E+00
+           3  cross correlation  -3.6302627E-08 -2.2347256E-08   1.000000    
+  0.0000000E+00  0.0000000E+00  0.0000000E+00  0.0000000E+00
+           4  cross correlation   0.0000000E+00  0.0000000E+00  0.0000000E+00
+  0.0000000E+00  0.0000000E+00  0.0000000E+00  0.0000000E+00
+           5  cross correlation   0.0000000E+00  0.0000000E+00  0.0000000E+00
+  0.0000000E+00  0.0000000E+00  0.0000000E+00  0.0000000E+00
+           6  cross correlation   0.0000000E+00  0.0000000E+00  0.0000000E+00
+  0.0000000E+00  0.0000000E+00  0.0000000E+00  0.0000000E+00
+           7  cross correlation   0.0000000E+00  0.0000000E+00  0.0000000E+00
+  0.0000000E+00  0.0000000E+00  0.0000000E+00  0.0000000E+00
+ MLE best is    4077.16332039288     
+  
+  
+  row number for optimal solution is          77
+  nmod=           8
+         0.047 +/-      0.000     33.696 +/-      0.000      2.760 +/-      0.000     -0.378 +/-      0.000     -0.023 +/-      0.000      0.006 +/-      0.000     -9.585 +/-      0.000    -10.893 +/-      0.000
+  4.7111437E-02  0.0000000E+00   33.69608      0.0000000E+00   2.760278    
+  0.0000000E+00 -0.3775599      0.0000000E+00 -2.2588974E-02  0.0000000E+00
+  6.0873576E-03  0.0000000E+00  -9.584735      0.0000000E+00  -10.89285    
+  0.0000000E+00
+  Eigenvalues            1  0.106051836488545                2
+   3.36134083326216                3   4.81724486558359                4
+   4.87101325090458                5   16.2192535966693                6
+   21.7131844843428                7   64.4183854477727                8
+   70.2606714206504     
+  Using            8  out of           8  eigenvalues
+       0.4167       3.8120       2.0000       0.1800       0.0000       0.0001       2.0000      -2111.321     4360.150    -4077.163        0.207
+ 
+  number of rows is          79
+  4.7111437E-02  0.5313255       33.69608       3.070111       2.760278    
+  0.2482984     -0.3775599      0.2487409     -2.2588974E-02  0.1244819    
+  6.0873576E-03  0.1248991      -9.584735      0.4554313      -10.89285    
+  0.4552759    
+  Update A_orig matrix
+ ic=        4362
+  
+  Residualdata in resid.out
+  col 1 & 2, time; 3 is residual, 4 is calculated, 5 is data
+  
+  
+  
+ Nomimal value for baseline   1      0.05 +/-       0.53
+ Rate in units per year           5.6173 +/-           0.5118
+ Period of  365.250 days,  cos amp=         2.76 +/-      0.25  sin amp=        -0.38 +/-      0.25  magnitude=         2.79 +/-      0.25
+ Period of  182.625 days,  cos amp=        -0.02 +/-      0.12  sin amp=         0.01 +/-      0.12  magnitude=         0.02 +/-      0.12
+ Offset number   1 at 1965-01-01T00:00:00.0 is      -9.5847 +/-     0.4554
+ Offset number   2 at 1971-09-23T00:00:00.0 is     -10.8929 +/-     0.4553
+  
+  
+  
+  AIC=    8176.32664078577     
+  BIC=    8246.51418656213     
+  Best fitting solutions
+  MLE=   -4077.16332039288     
+  white noise=   0.4166830      +/-  3.2628035E-05
+  Bandpass filter amplitude=   0.0000000E+00  +/-  0.0000000E+00
+  power law noise 1
+     amplitude=    3.811966      +/-  2.9849575E-04
+     exponent=    2.000000      +/-  0.0000000E+00
+     G-M freq=   0.1800080      +/-  7.0477865E-05
+  power law noise 2
+     amplitude=   9.9999997E-05  +/-  0.0000000E+00
+     exponent=    2.000000      +/-  0.0000000E+00
+  
+  Residuals in resid.out and/or resid_dec.out
+  Model covariance and cross correlation in covar.out
+  Journal of input parameter in estin.jrn
+  History of estimating exp/Omori time constants, if requested in tauexp.out
+ Total execution time               17.45 sec

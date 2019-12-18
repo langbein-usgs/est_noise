@@ -1,0 +1,75 @@
+  Calculating power law covariance for first set
+  Calculating power law covariance for second set
+  Number of loops for downhill simplex           0
+  ModType f  calling funmin
+  
+  list of trial covariance parameters
+    white noise     PL_1 amp     PL_1 exp      GM freq       BP amp      PL_2 amp      PL_2 exp  determinant  chi^2        MLE           cpu 
+       1.0000       1.0000       1.0000       0.0000       0.0000       1.0000       2.0000       1423.897     3569.620    -8486.170        3.168
+ tau=   0.54E-02   tau=   0.62E-02   tau= 
+ MLE best is   -8486.17031883141     
+  
+  
+  row number for optimal solution is           1
+  nmod=          11
+        54.422 +/-      0.000   -101.161 +/-      0.000     13.936 +/-      0.000      0.640 +/-      0.000     -0.579 +/-      0.000      0.010 +/-      0.000     -0.065 +/-      0.000     -6.433 +/-      0.000     23.597 +/-      0.000     -2.588 +/-      0.000     17.398 +/-      0.000
+   54.42228      0.0000000E+00  -101.1608      0.0000000E+00   13.93589    
+  0.0000000E+00  0.6399871      0.0000000E+00 -0.5793662      0.0000000E+00
+  9.5651019E-03  0.0000000E+00 -6.4728536E-02  0.0000000E+00  -6.432926    
+  0.0000000E+00   23.59745      0.0000000E+00  -2.587801      0.0000000E+00
+   17.39779      0.0000000E+00
+  Eigenvalues            1  0.197033718453936                2
+  0.611598017751525                3   1.06645641914459                4
+   2.35974099320234                5   5.67793899724880                6
+   7.68153679649268                7   88.9042666968502                8
+   115.468041045257                9   120.398652527781               10
+   298.171560026142               11   300.387234296396     
+  Using           11  out of          11  eigenvalues
+       1.0000       1.0000       1.0000       0.0000       0.0000       1.0000       2.0000       1423.897     3569.620    -8486.170        0.484
+ tau=   0.54E-02   tau=   0.62E-02   tau= 
+ 
+  number of rows is           3
+   54.42228      0.4743280      -101.1608       1.277099       13.93589    
+   2.120205      0.6399871      9.3490727E-02 -0.5793662      9.4387025E-02
+  9.5651019E-03  5.8153566E-02 -6.4728536E-02  5.8495339E-02  -6.432926    
+  0.7230113       23.59745      0.8348725      -2.587801      0.6014035    
+   17.39779      0.6751726    
+  Update A_orig matrix
+ ic=        5743
+  
+  Residualdata in resid.out
+  col 1 & 2, time; 3 is residual, 4 is calculated, 5 is data
+  
+  
+  
+ Nomimal value for baseline   1     54.42 +/-       0.47
+ Rate in units per year         -12.6972 +/-           0.1603
+ Rate change number   1 between  2000     1.000 and  2007   120.000 is           1.9021 +/-           0.2894
+ Period of  365.250 days,  cos amp=         0.64 +/-      0.09  sin amp=        -0.58 +/-      0.09  magnitude=         0.86 +/-      0.09
+ Period of  182.625 days,  cos amp=         0.01 +/-      0.06  sin amp=        -0.06 +/-      0.06  magnitude=         0.07 +/-      0.06
+ Offset number     1 at  2003   356.000 is      -6.43 +/-     0.72
+ Offset number     2 at  2004   272.000 is      23.60 +/-     0.83
+ Exponential number     1 at  2003   356.000 is      -2.59 +/-     0.60  Time constant is:  0.54000E-02 yrs
+ Exponential number     2 at  2004   272.000 is      17.40 +/-     0.68  Time constant is:  0.61746E-02 yrs
+  
+  
+  
+  AIC=   -16950.3406376628     
+  BIC=   -16877.1275334148     
+  Best fitting solutions
+  MLE=    8486.17031883141     
+  white noise=    1.000000      +/-  0.0000000E+00
+  Bandpass filter amplitude=   0.0000000E+00  +/-  0.0000000E+00
+  power law noise 1
+     amplitude=    1.000000      +/-  0.0000000E+00
+     exponent=    1.000000      +/-  0.0000000E+00
+     G-M freq=   0.0000000E+00  +/-  0.0000000E+00
+  power law noise 2
+     amplitude=    1.000000      +/-  0.0000000E+00
+     exponent=    2.000000      +/-  0.0000000E+00
+  
+  Residuals in resid.out and/or resid_dec.out
+  Model covariance and cross correlation in covar.out
+  Journal of input parameter in estin.jrn
+  History of estimating exp/Omori time constants, if requested in tauexp.out
+ Total execution time                3.71 sec

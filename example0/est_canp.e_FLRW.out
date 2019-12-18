@@ -1,0 +1,75 @@
+  0.0000000E+00  0.0000000E+00  0.0000000E+00  0.0000000E+00
+           4  cross correlation   0.0000000E+00  0.0000000E+00  0.0000000E+00
+  0.0000000E+00  0.0000000E+00  0.0000000E+00  0.0000000E+00
+           5  cross correlation   0.0000000E+00  0.0000000E+00  0.0000000E+00
+  0.0000000E+00  0.0000000E+00  0.0000000E+00  0.0000000E+00
+           6  cross correlation   0.0000000E+00  0.0000000E+00  0.0000000E+00
+  0.0000000E+00  0.0000000E+00  0.0000000E+00  0.0000000E+00
+           7  cross correlation   0.0000000E+00  0.0000000E+00  0.0000000E+00
+  0.0000000E+00  0.0000000E+00  0.0000000E+00  0.0000000E+00
+ MLE best is    7660.89157569693     
+  
+  
+  row number for optimal solution is          57
+  nmod=          11
+        54.517 +/-      0.000   -101.609 +/-      0.000     13.270 +/-      0.000      0.642 +/-      0.000     -0.560 +/-      0.000      0.001 +/-      0.000     -0.051 +/-      0.000     -7.773 +/-      0.000     23.653 +/-      0.000     -1.557 +/-      0.000     17.167 +/-      0.000
+   54.51663      0.0000000E+00  -101.6095      0.0000000E+00   13.27026    
+  0.0000000E+00  0.6416611      0.0000000E+00 -0.5596516      0.0000000E+00
+  8.1538077E-04  0.0000000E+00 -5.1194333E-02  0.0000000E+00  -7.773122    
+  0.0000000E+00   23.65329      0.0000000E+00  -1.557288      0.0000000E+00
+   17.16697      0.0000000E+00
+  Eigenvalues            1  0.591301066311814                2
+   1.62767660624739                3   2.12904478067418                4
+   5.73145596956777                5   14.8630809801478                6
+   20.5955429270550                7   254.265070369130                8
+   318.095945486771                9   329.047494299955               10
+   718.611378923689               11   722.047001605754     
+  Using           11  out of          11  eigenvalues
+       0.7283       0.7614       1.0000       0.0000       0.0000       0.4728       2.0000       -429.824     5683.478    -7660.892        0.676
+ tau=   0.54E-02   tau=   0.62E-02   tau= 
+ 
+  number of rows is          59
+   54.51663      0.3008567      -101.6095      0.7279631       13.27026    
+   1.233135      0.6416611      5.6441467E-02 -0.5596516      5.6938183E-02
+  8.1538077E-04  3.7490126E-02 -5.1194333E-02  3.7667278E-02  -7.773122    
+  0.5365046       23.65329      0.5512729      -1.557288      0.4058270    
+   17.16697      0.4143697    
+  Update A_orig matrix
+ ic=        5712
+  
+  Residualdata in resid.out
+  col 1 & 2, time; 3 is residual, 4 is calculated, 5 is data
+  
+  
+  
+ Nomimal value for baseline   1     54.52 +/-       0.30
+ Rate in units per year         -12.7536 +/-           0.0914
+ Rate change number   1 between  2000     1.000 and  2007   120.000 is           1.8113 +/-           0.1683
+ Period of  365.250 days,  cos amp=         0.64 +/-      0.06  sin amp=        -0.56 +/-      0.06  magnitude=         0.85 +/-      0.06
+ Period of  182.625 days,  cos amp=         0.00 +/-      0.04  sin amp=        -0.05 +/-      0.04  magnitude=         0.05 +/-      0.04
+ Offset number     1 at  2003   356.000 is      -7.77 +/-     0.54
+ Offset number     2 at  2004   272.000 is      23.65 +/-     0.55
+ Exponential number     1 at  2003   356.000 is      -1.56 +/-     0.41  Time constant is:  0.54000E-02 yrs
+ Exponential number     2 at  2004   272.000 is      17.17 +/-     0.41  Time constant is:  0.61746E-02 yrs
+  
+  
+  
+  AIC=    15349.7831513939     
+  BIC=    15442.8876969871     
+  Best fitting solutions
+  MLE=   -7660.89157569693     
+  white noise=   0.7283409      +/-  4.1606385E-05
+  Bandpass filter amplitude=   0.0000000E+00  +/-  0.0000000E+00
+  power law noise 1
+     amplitude=   0.7613577      +/-  4.3492939E-05
+     exponent=    1.000000      +/-  0.0000000E+00
+     G-M freq=   0.0000000E+00  +/-  0.0000000E+00
+  power law noise 2
+     amplitude=   0.4727927      +/-  1.3504249E-04
+     exponent=    2.000000      +/-  0.0000000E+00
+  
+  Residuals in resid.out and/or resid_dec.out
+  Model covariance and cross correlation in covar.out
+  Journal of input parameter in estin.jrn
+  History of estimating exp/Omori time constants, if requested in tauexp.out
+ Total execution time               48.71 sec

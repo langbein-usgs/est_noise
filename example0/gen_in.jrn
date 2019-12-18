@@ -1,0 +1,13 @@
+n
+   0.1000000E+01     # sampling interval in days
+      12.0000000     # time series length in years
+gmt
+          2.000     # input noise 1 exp term
+          4.000     # input noise 1 amp. term
+          0.080     # input noise 1 GM term
+          2.000     # input noise 2 exp term
+          0.000     # input noise 2 amp. term
+          0.500     # input white noise
+  0.500000000       2.00000000    
+           1
+          0.000     # Input Band Pass amp

@@ -1,0 +1,485 @@
+  Program estimates the power spectral density (PSD)
+   of data.  PSD functions can be a combination of:
+   1) white noise
+    2) Simple power law noise P/f^n
+   3) a Gauss Markov version P/(fa^n + f^2)
+       where fa=alpha/2*pi
+   4) A second power law
+   5) Band-pass filtered noise
+  
+  While estimating the PSD function, program also estimates
+   various parameters that describe the time series including
+   1) DC term
+   2) rate
+   3) sinusoidal amplitudes of specified frequencies
+   4) rate changes
+   5) offset
+   6) simple exponential and log(t) function
+   7) user supplied function or data
+  
+  Program can handle data in various formats
+  
+  A journal file consisting of typed input
+   is created in estin.jrn
+ Input the data type for  processing
+  otr=data
+        format of year, day of year, data, error bar
+  otd=data
+        format of YearMnDa,  data, error bar
+  otx=data
+        format of year mo da,  data, error bar
+  mjd=data
+        Modified Julian day, data, error bar
+ For all of the above, the da is double precision
+     which allows decimal days to accomodate seconds
+  
+  gmt=data with GMT format for time
+         year-mo-daThr:mn:secs.x data, error bar
+  input number of time series
+    program will estimate only one set of PSD functions
+  input the period of interest
+  start and stop times; year day_of_yr year day_of_yr
+   "day_of_yr" may be decimal day
+  Day numbers from 1960    13516.000000000000        19559.000000000000     
+  
+  Input the parameters of time series to be estimated
+  
+  Will rate be estimated? y/n
+  rate renomalization is    8.27241611    
+  
+  Rate changes:
+   time is the "hinge point"
+  Input the number of rate changes in data
+  
+  Input the number of periodicities in the data
+  Input the period (in days) of            1  period
+  Input the period (in days) of            2  period
+  
+  Offset:  specify first day after offset
+  Input the number of offsets
+  Offset time           1  year day_of_yr 
+   "day_of_yr" may be decimal day
+  Offset at    16063.000000000000     
+  Offset time           2  year day_of_yr 
+   "day_of_yr" may be decimal day
+  Offset at    16343.000000000000     
+  
+  Input the number of exponentials in time series
+  Exponential time           1  year day_of_yr 
+   "day_of_yr" may be decimal day
+  Exponential starting at    16062.000000000000     
+  Input the time constant in years and fix/float
+  Input the type of function; e for 1-exp(-t/tau)
+       or                     m for log10(1.0 + t/tau)
+  Exponential time           2  year day_of_yr 
+   "day_of_yr" may be decimal day
+  Exponential starting at    16343.000000000000     
+  Input the time constant in years and fix/float
+  Input the type of function; e for 1-exp(-t/tau)
+       or                     m for log10(1.0 + t/tau)
+  The number of exponential time constants that are fixed:           2
+  Input the format style of baseline data (otr, otx, otd, mjd, or gmt)
+  Input name of file for baseline number            1
+  column of A matrix prior to input pressure data          10
+  Number of files of Auxillary data (pressure)
+  Number of data read is         4836
+  Number of model parameters is           10
+  
+   prob1.out; time, data, and A matrix  aux data excluded
+   prob2.out has stuff in cronological and aux. data 
+  
+  Average Sampling interval:     1.02337122      days
+  Standard deviation of Ave. interval:   0.351829290      days
+  Shortest Sampling interval:    1.00000000      days
+  Longest Sampling Interval:     20.0000000      days
+  
+  Input the minimum sampling interval in days to use
+  Number of points in time series for analysis is        4949
+  
+  Input the type Noise model construction
+  n or q = noise components are summed as squares
+    as in est_noise6.x (Langbein, 2004)
+  a = noise component are simple sums
+    automatically switches between cholesky decomposition
+     or computing inverse using combo of inverse    convoluton and Bos et al (2012) for missing data
+  c = noise component simple sums
+      forces inversion using cholesky decomposition
+  f = noise component simple sums
+     forces combo of inverse convolution and     and Bos et al (2012) for missing data
+  
+  Do you want to substitute real data with random numbers? y/n
+  Estimate of white noise component of data is:  0.854192317    
+  methods to decimate data
+  0 = no decimation
+  1 = keep 2, skip 1, keep 2, skip 1
+  2 = keep 2, skip 1, keep 1, skip 2, keep 2, skip 1...
+  3 = keep 2, skip 1, keep 1, skip 2, keep 1, skip 3, keep 2 skip 1...
+  4 or more...make it option 3
+ input choice, BUT is noise model is simple sums, then ignore
+        4948        4836         113
+  Estimated number of missing data is          113
+  Estimated percenta of data gaps is   2.28375101    
+  Eigenvalues            1   2.5821012803648014                2   9.9603987431188763                3   178.31346979153443                4   1410.5284152773365                5   2144.1007843852954                6   2376.4873774371449                7   2448.4748769918360                8   2491.3759004415765                9   2547.5118156425478               10   151796.96717546959     
+  Using           10  out of          10  eigenvalues
+  RMS fit using white noise model is   1.51703739    
+  Log MLE for white noise error model is   -8872.43555    
+  
+ Nomimal value for baseline   1     87.41 +/-       0.07
+ Rate in units per year         -12.4225 +/-           0.0140
+ Period of  365.250 days,  cos amp=         0.57 +/-      0.02  sin amp=        -0.78 +/-      0.02  magnitude=         0.96 +/-      0.02
+ Period of  182.625 days,  cos amp=        -0.06 +/-      0.02  sin amp=        -0.13 +/-      0.02  magnitude=         0.14 +/-      0.02
+ Offset number     1 at  2003   357.000 is       5.11 +/-     0.56
+ Offset number     2 at  2004   272.000 is     -10.79 +/-     0.35
+ Exponential number     1 at  2003   356.000 is      -3.42 +/-     0.16  Time constant is:  0.10000E-03 yrs
+ Exponential number     2 at  2004   272.000 is      19.10 +/-     0.11  Time constant is:  0.10000E-03 yrs
+  Number of missing data are         113
+  percentage of data gaps   2.28328943    
+  sampling interval in yrs    2.7378507871321013E-003
+  
+   Input the initial parameters of the PSD and whether   the item is "fix" or "float"
+    if "fix", then the item is not estimated
+    if "float", then the item is estimated
+  
+  Input the white noise "instrument precision" and fix/float
+   Suggested input is   0.854192317      enter -99999.0 to use suggested value
+  Input the amplitude first Power law function and fix/float
+  To use default value, enter -99999.0
+  Input the exponent 1 < n < 3 and fix/float
+  Input the time constant alpha in c/yr and fix/float
+  
+  Input the parameters for band-passed filtered noise
+  Input low and high freq stop band in c/yr
+  low frequency stop band is   0.500000000      c/yr
+  high frequency stop band is    2.00000000      c/yr
+  number of poles between 1 and 4
+  Input the amplitude and fix/float
+  Input the exponent of second Power Law function fix/float
+  Input the amplitude of second PL function fix/float
+  
+  Sometimes, it may be necessary to add white noise to data so
+  that a better estimate of long period PSD parameters can be made.
+ This is especially true for data that is predominantly power noise
+  Enter value of white noise to be added (nominal it should be 0)
+  Calculating power law covariance for second set
+  Number of loops for downhill simplex           2
+  ModType f  calling funmin
+  
+  list of trial covariance parameters
+    white noise     PL_1 amp     PL_1 exp      GM freq       BP amp      PL_2 amp      PL_2 exp  determinant  chi^2        MLE           cpu 
+       1.0000       1.0000       2.0000       0.0000       0.0000       0.0001       2.0000        248.008     3824.215    -6604.102        0.953
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.7000       1.0000       2.0000       0.0000       0.0000       0.0001       2.0000      -1374.377     7473.291    -6806.256        0.867
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       1.0000       1.9500       2.0000       0.0000       0.0000       0.0001       2.0000        472.317     3496.121    -6664.365        0.904
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       1.0000       1.0000       2.4000       0.0000       0.0000       0.0001       2.0000        139.836     4019.172    -6593.409        0.863
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+  Initial solutions for Amoeba
+    6604.102     1.00   1.00   2.00   0.00   0.00   0.00   2.00
+    6806.256     0.70   1.00   2.00   0.00   0.00   0.00   2.00
+    6664.365     1.00   1.95   2.00   0.00   0.00   0.00   2.00
+    6593.409     1.00   1.00   2.40   0.00   0.00   0.00   2.00
+  Tolerance of mle    4.99999987E-06
+       1.1500       1.4750       2.2000       0.0000       0.0000       0.0001       2.0000        913.473     2907.912    -6811.416        0.887
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8125       1.1187       2.0500       0.0000       0.0000       0.0001       2.0000       -689.025     5630.972    -6570.448        0.850
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.9062       0.5844       2.2250       0.0000       0.0000       0.0001       2.0000       -359.351     4960.599    -6564.935        0.896
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8594       0.0984       2.3375       0.0000       0.0000       0.0001       2.0000       -715.037     6656.363    -7057.131        0.885
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8594       0.8516       2.3375       0.0000       0.0000       0.0001       2.0000       -581.314     5409.162    -6567.254        0.875
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.7891       0.7773       2.1063       0.0000       0.0000       0.0001       2.0000       -935.738     6243.788    -6630.142        0.887
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.9473       0.9443       2.3266       0.0000       0.0000       0.0001       2.0000       -107.103     4444.860    -6559.313        0.906
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.9502       0.6308       2.4195       0.0000       0.0000       0.0001       2.0000       -156.283     4566.181    -6570.794        0.867
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8469       0.9968       2.1424       0.0000       0.0000       0.0001       2.0000       -566.269     5356.649    -6556.042        0.854
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.9205       0.8370       2.1782       0.0000       0.0000       0.0001       2.0000       -225.381     4661.139    -6549.175        0.914
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.9511       0.8296       2.0986       0.0000       0.0000       0.0001       2.0000        -53.971     4342.221    -6561.126        0.855
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.9042       1.0968       2.2111       0.0000       0.0000       0.0001       2.0000       -265.350     4734.899    -6546.086        0.854
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.9032       1.3531       2.2041       0.0000       0.0000       0.0001       2.0000       -217.485     4647.904    -6550.454        0.863
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8622       0.9931       2.1026       0.0000       0.0000       0.0001       2.0000       -471.094     5147.488    -6546.637        0.883
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.9200       0.9651       2.1747       0.0000       0.0000       0.0001       2.0000       -200.692     4608.320    -6547.455        0.887
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8830       1.1090       2.1551       0.0000       0.0000       0.0001       2.0000       -353.703     4907.149    -6543.859        0.900
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8642       1.2451       2.1435       0.0000       0.0000       0.0001       2.0000       -417.545     5041.409    -6547.146        0.867
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8647       1.1169       2.1470       0.0000       0.0000       0.0001       2.0000       -445.025     5095.872    -6546.898        0.895
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8924       1.0410       2.1609       0.0000       0.0000       0.0001       2.0000       -321.693     4842.581    -6543.584        0.848
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.9062       1.0030       2.1678       0.0000       0.0000       0.0001       2.0000       -260.906     4723.166    -6544.664        0.852
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.9087       1.1269       2.2122       0.0000       0.0000       0.0001       2.0000       -237.182     4680.428    -6547.019        0.869
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8738       1.0265       2.1300       0.0000       0.0000       0.0001       2.0000       -411.218     5023.125    -6544.331        0.920
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8725       1.0399       2.1174       0.0000       0.0000       0.0001       2.0000       -410.939     5021.712    -6543.904        0.906
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8870       1.0817       2.1517       0.0000       0.0000       0.0001       2.0000       -337.642     4874.112    -6543.401        0.848
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8936       1.1092       2.1626       0.0000       0.0000       0.0001       2.0000       -301.466     4802.674    -6543.858        0.875
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8949       1.0959       2.1751       0.0000       0.0000       0.0001       2.0000       -301.539     4803.601    -6544.248        0.926
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8781       1.0539       2.1318       0.0000       0.0000       0.0001       2.0000       -383.318     4965.612    -6543.475        0.852
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8872       1.0338       2.1447       0.0000       0.0000       0.0001       2.0000       -344.513     4887.415    -6543.181        0.898
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8894       0.9961       2.1395       0.0000       0.0000       0.0001       2.0000       -340.094     4878.475    -6543.130        0.857
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8810       1.0453       2.1311       0.0000       0.0000       0.0001       2.0000       -369.566     4937.390    -6543.116        0.881
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8754       1.0475       2.1162       0.0000       0.0000       0.0001       2.0000       -393.478     4985.497    -6543.257        0.906
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8896       1.0346       2.1452       0.0000       0.0000       0.0001       2.0000       -331.960     4862.147    -6543.101        0.846
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8954       1.0250       2.1519       0.0000       0.0000       0.0001       2.0000       -306.389     4811.507    -6543.352        0.871
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8865       0.9972       2.1320       0.0000       0.0000       0.0001       2.0000       -352.136     4902.327    -6543.015        0.883
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8863       0.9550       2.1222       0.0000       0.0000       0.0001       2.0000       -359.739     4917.972    -6543.234        0.914
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+  
+  Best fitting solutions
+  MLE=   -6543.0145410008054     
+  white noise=   0.886521935    
+  Bandpass filter amplitude=    0.00000000    
+  power law noise 1
+     amplitude=   0.997229815    
+     exponent=    2.13200521    
+     G-M freq=    0.00000000    
+  power law noise 2
+     amplitude=    9.99999975E-05
+     exponent=    2.00000000    
+  
+       1.0638       0.9972       2.1320       0.0000       0.0000       0.0001       2.0000        491.951     3462.019    -6666.947        0.885
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8865       1.9446       2.1320       0.0000       0.0000       0.0001       2.0000       -143.185     4532.523    -6567.063        0.816
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8865       0.9972       1.7320       0.0000       0.0000       0.0001       2.0000       -175.878     4557.171    -6546.694        0.863
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+  Initial solutions for Amoeba
+    6543.015     0.89   1.00   2.13   0.00   0.00   0.00   2.00
+    6666.947     1.06   1.00   2.13   0.00   0.00   0.00   2.00
+    6567.063     0.89   1.94   2.13   0.00   0.00   0.00   2.00
+    6546.694     0.89   1.00   1.73   0.00   0.00   0.00   2.00
+  Tolerance of mle    2.49999994E-06
+       0.7979       1.4709       1.9320       0.0000       0.0000       0.0001       2.0000       -599.658     5435.775    -6562.216        0.896
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8422       0.7604       1.8320       0.0000       0.0000       0.0001       2.0000       -545.172     5324.642    -6561.136        0.900
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.9087       0.6420       1.8820       0.0000       0.0000       0.0001       2.0000       -253.920     4752.407    -6566.270        0.918
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8256       1.2637       1.9195       0.0000       0.0000       0.0001       2.0000       -507.383     5219.735    -6546.471        0.861
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8782       1.2489       1.9758       0.0000       0.0000       0.0001       2.0000       -266.918     4725.873    -6540.006        0.863
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8962       1.4931       2.0476       0.0000       0.0000       0.0001       2.0000       -149.898     4513.463    -6550.820        0.879
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8519       1.2563       2.1476       0.0000       0.0000       0.0001       2.0000       -482.003     5179.055    -6551.512        0.889
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8779       1.0620       1.8359       0.0000       0.0000       0.0001       2.0000       -253.368     4697.312    -6539.275        0.912
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.9085       1.0222       2.0121       0.0000       0.0000       0.0001       2.0000       -190.586     4580.422    -6543.612        0.848
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8670       1.1429       1.9658       0.0000       0.0000       0.0001       2.0000       -349.517     4888.469    -6538.704        0.914
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8463       1.2033       1.9426       0.0000       0.0000       0.0001       2.0000       -428.638     5051.241    -6540.969        0.898
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8683       1.2283       1.8227       0.0000       0.0000       0.0001       2.0000       -237.219     4663.912    -6538.724        0.908
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8675       1.0922       1.8243       0.0000       0.0000       0.0001       2.0000       -289.654     4767.302    -6537.984        0.881
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8621       1.0138       1.7486       0.0000       0.0000       0.0001       2.0000       -302.882     4798.785    -6540.498        0.945
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8625       1.2007       1.8885       0.0000       0.0000       0.0001       2.0000       -315.226     4817.724    -6537.623        0.891
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8548       1.2701       1.9148       0.0000       0.0000       0.0001       2.0000       -348.214     4886.022    -6538.784        0.902
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8644       1.1038       1.9279       0.0000       0.0000       0.0001       2.0000       -356.585     4901.608    -6538.205        0.896
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8637       1.1269       1.8375       0.0000       0.0000       0.0001       2.0000       -304.822     4796.532    -6537.431        0.896
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8620       1.1188       1.7733       0.0000       0.0000       0.0001       2.0000       -278.363     4745.215    -6538.231        0.920
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8646       1.1580       1.8112       0.0000       0.0000       0.0001       2.0000       -273.461     4734.484    -6537.768        0.871
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8616       1.1967       1.8564       0.0000       0.0000       0.0001       2.0000       -302.448     4791.702    -6537.390        0.869
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8587       1.2489       1.8724       0.0000       0.0000       0.0001       2.0000       -309.772     4807.113    -6537.772        0.908
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8616       1.1831       1.8856       0.0000       0.0000       0.0001       2.0000       -323.975     4835.010    -6537.517        0.912
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8622       1.1530       1.8455       0.0000       0.0000       0.0001       2.0000       -308.020     4802.662    -6537.298        0.941
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8620       1.1291       1.8240       0.0000       0.0000       0.0001       2.0000       -304.595     4796.064    -6537.424        0.928
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8630       1.1467       1.8269       0.0000       0.0000       0.0001       2.0000       -295.422     4777.715    -6537.422        0.924
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8616       1.1848       1.8457       0.0000       0.0000       0.0001       2.0000       -300.524     4787.729    -6537.328        0.949
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8612       1.1939       1.8603       0.0000       0.0000       0.0001       2.0000       -307.856     4802.479    -6537.370        0.928
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8617       1.1675       1.8475       0.0000       0.0000       0.0001       2.0000       -306.976     4800.547    -6537.285        0.938
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8617       1.1528       1.8431       0.0000       0.0000       0.0001       2.0000       -309.313     4805.214    -6537.281        0.930
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8621       1.1484       1.8370       0.0000       0.0000       0.0001       2.0000       -305.090     4796.839    -6537.317        0.934
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+  
+  Best fitting solutions
+  MLE=   -6537.2813359368629     
+  white noise=   0.861678720    
+  Bandpass filter amplitude=    0.00000000    
+  power law noise 1
+     amplitude=    1.15284240    
+     exponent=    1.84310818    
+     G-M freq=    0.00000000    
+  power law noise 2
+     amplitude=    9.99999975E-05
+     exponent=    2.00000000    
+  
+       0.8617       1.1528       1.8431       0.0000       0.0000       0.0001       2.0000       -309.313     4805.214    -6537.281        0.928
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+  Start the covariance calculations for noise model
+  best estimate  0.861678720       dither   9.99999978E-03
+  best estimate   1.15284240       dither   9.99999978E-03
+  best estimate   1.84310818       dither   5.00000007E-02
+  best estimate   0.00000000       dither   5.00000007E-02
+  best estimate   0.00000000       dither   5.00000007E-02
+  best estimate   9.99999975E-05   dither   5.00000007E-02
+  best estimate   2.00000000       dither  0.100000001    
+       0.8531       1.1528       1.8431       0.0000       0.0000       0.0001       2.0000       -353.941     4894.674    -6537.383        0.893
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8703       1.1528       1.8431       0.0000       0.0000       0.0001       2.0000       -265.093     4718.208    -6537.998        0.945
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8617       1.1413       1.8431       0.0000       0.0000       0.0001       2.0000       -313.251     4813.122    -6537.296        0.904
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8617       1.1644       1.8431       0.0000       0.0000       0.0001       2.0000       -305.377     4797.350    -6537.284        0.918
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8617       1.1528       1.7510       0.0000       0.0000       0.0001       2.0000       -252.582     4694.747    -6538.778        0.951
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+  Dither changed to    3.00000012E-02
+       0.8617       1.1528       1.7878       0.0000       0.0000       0.0001       2.0000       -276.123     4739.929    -6537.828        0.934
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+  Dither changed to    1.80000011E-02
+       0.8617       1.1528       1.8099       0.0000       0.0000       0.0001       2.0000       -289.697     4766.401    -6537.490        0.947
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8617       1.1528       1.8763       0.0000       0.0000       0.0001       2.0000       -328.065     4842.960    -6537.402        0.938
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8703       1.1644       1.8431       0.0000       0.0000       0.0001       2.0000       -261.193     4710.531    -6538.059        0.941
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8531       1.1644       1.8431       0.0000       0.0000       0.0001       2.0000       -349.969     4886.618    -6537.327        0.982
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8703       1.1413       1.8431       0.0000       0.0000       0.0001       2.0000       -268.995     4725.929    -6537.956        0.994
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8531       1.1413       1.8431       0.0000       0.0000       0.0001       2.0000       -357.916     4902.778    -6537.460        0.924
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8703       1.1528       1.8763       0.0000       0.0000       0.0001       2.0000       -283.673     4754.886    -6537.757        0.898
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8531       1.1528       1.8763       0.0000       0.0000       0.0001       2.0000       -372.867     4933.528    -6537.884        0.922
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8703       1.1528       1.8099       0.0000       0.0000       0.0001       2.0000       -245.656     4680.497    -6538.580        0.906
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8531       1.1528       1.8099       0.0000       0.0000       0.0001       2.0000       -334.144     4854.722    -6537.204        0.936
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8617       1.1644       1.8763       0.0000       0.0000       0.0001       2.0000       -324.302     4835.427    -6537.398        0.938
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8617       1.1413       1.8763       0.0000       0.0000       0.0001       2.0000       -331.830     4850.536    -6537.424        0.889
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8617       1.1644       1.8099       0.0000       0.0000       0.0001       2.0000       -285.582     4758.195    -6537.502        0.924
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+       0.8617       1.1413       1.8099       0.0000       0.0000       0.0001       2.0000       -293.816     4774.656    -6537.499        0.879
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+  
+  Inverse covariance matrix
+           1 acov=    352192416.       595.174133       1314.33301       4.59163468E-41   2.46370796E+12   0.00000000      -1.70640475E-28
+           2 acov=    595.174133       196751280.       19.2862797       2.11699336E+13   0.00000000      -1.26975051E-26   4.59163468E-41
+           3 acov=    1314.33301       19.2862797       23758332.0       0.00000000      -6.37482812E-31   4.59163468E-41  -1.70667823E-28
+           4 acov=    4.59163468E-41   3.76419412E+12   0.00000000      -4.20462862E-28   4.59163468E-41  -1.26983926E-26   4.59163468E-41
+           5 acov=    2.46375802E+12   0.00000000      -4.81106328E-34   4.59163468E-41  -6.37540740E-31   4.59163468E-41   2.11699316E+13
+           6 acov=    0.00000000      -3.61497051E-31   4.59163468E-41  -4.20514477E-28   4.59163468E-41   8.20026173E+12   0.00000000    
+           7 acov=   -4.57972599E-34   4.59163468E-41  -4.81122858E-34   4.59163468E-41   3.18199041E+15   0.00000000      -6.46992091E-34
+  The eigenvalues    23758316.0       196751296.       352192416.    
+  ier=           0
+  
+  the covariance matrix
+           1  cov=    2.83935697E-09  -8.58908010E-15  -1.57076012E-13   4.59163468E-41  -3.51857771E-28   4.59163468E-41   2.46373863E+12
+           2  cov=   -8.58908010E-15   5.08255971E-09   7.20721012E-16  -4.96403147E-29   4.59163468E-41   2.46373836E+12   0.00000000    
+           3  cov=   -1.57076012E-13   7.20721012E-16   4.20905337E-08   4.59163468E-41   2.46370560E+12   0.00000000      -6.95260710E-32
+           4  cov=    4.59163468E-41  -4.31329285E-34   4.59163468E-41   2.46370429E+12   0.00000000      -2.24746472E-27   4.59163468E-41
+           5  cov=   -2.03699817E-31   4.59163468E-41   3.25724364E+13   0.00000000      -4.19279571E-28   4.59163468E-41  -6.95342524E-32
+           6  cov=    4.59163468E-41   1.36678369E+13   0.00000000      -3.51831964E-28   4.59163468E-41  -2.24765577E-27   4.59163468E-41
+           7  cov=    1.45360253E+13   0.00000000      -4.96366073E-29   4.59163468E-41  -4.19335038E-28   4.59163468E-41   2.46374701E+12
+  
+  Cross correlation matrix
+           1  cross correlation    1.00000000      -2.26097313E-06  -1.43683756E-05   4.59163468E-41   2.46370796E+12   0.00000000      -1.70640475E-28
+           2  cross correlation   -2.26097313E-06   1.00000000       4.92758048E-08   2.11699336E+13   0.00000000      -1.26975051E-26   4.59163468E-41
+           3  cross correlation   -1.43683756E-05   4.92758048E-08   1.00000000       0.00000000      -6.37482812E-31   4.59163468E-41  -1.70667823E-28
+           4  cross correlation    4.59163468E-41   3.76419412E+12   0.00000000      -4.20462862E-28   4.59163468E-41  -1.26983926E-26   4.59163468E-41
+           5  cross correlation    2.46375802E+12   0.00000000      -4.81106328E-34   4.59163468E-41  -6.37540740E-31   4.59163468E-41   2.11699316E+13
+           6  cross correlation    0.00000000      -3.61497051E-31   4.59163468E-41  -4.20514477E-28   4.59163468E-41   8.20026173E+12   0.00000000    
+           7  cross correlation   -4.57972599E-34   4.59163468E-41  -4.81122858E-34   4.59163468E-41   3.18199041E+15   0.00000000      -6.46992091E-34
+ MLE best is    6537.2813359368629     
+  
+  
+  row number for optimal solution is          74
+  nmod=          10
+        82.331 +/-      0.000    -96.684 +/-      0.000      0.635 +/-      0.000     -0.580 +/-      0.000     -0.000 +/-      0.000     -0.062 +/-      0.000     -5.755 +/-      0.000     -2.492 +/-      0.000     -1.260 +/-      0.000     15.958 +/-      0.000
+   82.3308640       0.00000000      -96.6837234       0.00000000      0.634586692       0.00000000     -0.580119967       0.00000000      -3.20575316E-04   0.00000000      -6.18408173E-02   0.00000000      -5.75487518       0.00000000      -2.49186158       0.00000000      -1.25972950       0.00000000       15.9578199       0.00000000    
+  Eigenvalues            1  0.18788071045529506                2  0.38196467026372449                3  0.65210925533817521                4   10.133166790258899                5   60.129998170539210                6   71.329161791298390                7   208.59790264996099                8   218.89451237746309                9   607.35870429943998               10   617.43808026578063     
+  Using           10  out of          10  eigenvalues
+       0.8617       1.1528       1.8431       0.0000       0.0000       0.0001       2.0000       -309.313     4805.214    -6537.281        0.906
+ tau=   0.10E-03   tau=   0.10E-03   tau= 
+
+  number of rows is          76
+   82.3308640      0.835228145      -96.6837234       2.03381085      0.634586692       7.03370273E-02 -0.580119967       7.06168115E-02  -3.20575316E-04   4.08515483E-02  -6.18408173E-02   4.10623252E-02  -5.75487518       1.47401392      -2.49186158       1.43026888      -1.25972950      0.529530287       15.9578199      0.519565940    
+  Update A_orig matrix
+ ic=        4836
+  
+  Residualdata in resid.out
+  col 1 & 2, time; 3 is residual, 4 is calculated, 5 is data
+  
+  
+  
+ Nomimal value for baseline   1     82.33 +/-       0.84
+ Rate in units per year         -11.6875 +/-           0.2459
+ Period of  365.250 days,  cos amp=         0.63 +/-      0.07  sin amp=        -0.58 +/-      0.07  magnitude=         0.86 +/-      0.07
+ Period of  182.625 days,  cos amp=        -0.00 +/-      0.04  sin amp=        -0.06 +/-      0.04  magnitude=         0.06 +/-      0.04
+ Offset number     1 at  2003   357.000 is      -5.75 +/-     1.47
+ Offset number     2 at  2004   272.000 is      -2.49 +/-     1.43
+ Exponential number     1 at  2003   356.000 is      -1.26 +/-     0.53  Time constant is:  0.10000E-03 yrs
+ Exponential number     2 at  2004   272.000 is      15.96 +/-     0.52  Time constant is:  0.10000E-03 yrs
+  
+  
+  
+  AIC=    13100.562671873726     
+  BIC=    13184.852627012886     
+  Best fitting solutions
+  MLE=   -6537.2813359368629     
+  white noise=   0.861678720      +/-   5.32856175E-05
+  Bandpass filter amplitude=    0.00000000      +/-   0.00000000    
+  power law noise 1
+     amplitude=    1.15284240      +/-   7.12920737E-05
+     exponent=    1.84310818      +/-   2.05159769E-04
+     G-M freq=    0.00000000      +/-   0.00000000    
+  power law noise 2
+     amplitude=    9.99999975E-05  +/-   0.00000000    
+     exponent=    2.00000000      +/-   0.00000000    
+  
+  Residuals in resid.out and/or resid_dec.out
+  Model covariance and cross correlation in covar.out
+  Journal of input parameter in estin.jrn
+  History of estimating exp/Omori time constants, if requested in tauexp.out
+ Total execution time               85.62 sec
