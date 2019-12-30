@@ -37,7 +37,7 @@ c  swave dim 3*n+15
       if (amp_pl .eq. 0) amp_pl=0.00001
       print*,' Input frequency (radians/yr) for G-M part'
       read(5,*)fgm
-      fgm=fgm/tsam
+c      fgm=fgm/tsam
 c      psd_db=2.8384+20.*alog10(amp_pl) - 8.0*fexp
 c      psd_db=5.0*fexp1*alog10(fs)-7.399*fexp1-10*alog10(fs)+2.076
       psd_db=10.0*alog10(2.0)-10.*fexp1*alog10(2.0*3.1415926)

@@ -106,4 +106,3 @@ Version 20190101
 Next version
   revised bust_5 program to run more efficiently;  old version did a complete sort of data which
     is not required to determine various, percentile ranges. 
-  psd_calc7  fixed scaling for GM freq.
