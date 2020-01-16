@@ -26,7 +26,7 @@ if [ "$#" -lt 1  ]
 then
    echo  " "
    echo "  Script removes outliers from GPS time series"
-   echo " Usage:  cleanEst.sh -d data -f format_type [-b start_time -b end_time -O off_file -E edit_file -T exp_file -S sine_period_file -n noiseType -i sample_interval_days]"
+   echo " Usage:  cleanEst.sh -d data -f format_type [-b start_time -b end_time -O off_file -E edit_file -T exp_file -S sine_period_file -n noiseType -i sample_interval_days -D number_of_draconic(yr)_periods ]"
    echo "   options -b -e and -S not implimented "
    echo "   only accepts otr and gmt formats"
    echo "   noiseType is a additive (default) or q, quadrature"
@@ -57,9 +57,10 @@ netd=otr
 ntype=a
 tsamDay=1     #  default sampling interval of data --- in days <----  This could be changed if needed
 bpfilt=`echo 0.5 2`   #  set-up limits of bp filtered noise
+nDracPer=0     # number of draconic periods to include
 
 
-while getopts d:f:E:O:T:n:i: option 
+while getopts d:f:E:O:T:n:i:D: option 
 do
 
      case "$option"
@@ -71,6 +72,7 @@ do
           T)  trdfile=$OPTARG;;
           n)  ntype=$OPTARG;;
           i)  tsamDay=$OPTARG;;
+          D)  nDracPer=$OPTARG;;
          \?)  echo "Incomplete set of arguements; type cleanEst.sh without arguments to get documentation"
               exit 1;;
      esac
@@ -250,6 +252,20 @@ cat > sea.in <<EOF
 365.25
 182.625
 EOF
+
+#  get draconic periods;  Nominally, the period is 346.62 days, but I've seen
+#    estimates of 350 days
+if [ "$nDracPer" -gt 0 ]
+then
+  k=1
+  while [ "$k" -le "$nDracPer" ]
+  do
+    echo $k | awk '{print 346.62/$1}' >> sea.in
+    k=`expr $k + 1`
+  done
+
+fi
+
 
 wc -l sea.in | awk '{print $1 }' > tmp
 mv sea.in tmp1
