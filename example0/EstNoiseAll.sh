@@ -7,7 +7,7 @@ if [ "$#" -lt 1  ]
 then
    echo  " "
    echo "  Script determines parameters of noise model using maximum likelihood"
-   echo " Usage:  EstNoise.sh -d data  [ -h ] [-S 0/1/2 ] [ -P ]"
+   echo " Usage:  EstNoise.sh -d data  [ -h ] [-S 0/1/2 ] [ -P ] [ -m expmax]"
    echo "   Steps through and evaluates a sequence of noise models likely"
    echo "     to model the background noise of GNSS data"
    echo "   Initially, evaluates random walk and flicker (not the combo)"
@@ -27,6 +27,9 @@ then
    echo "    3 Tests only FL, RW, PL, and FLRW noise models"
    echo " -P If P is set, then when Bandpass filtered noise is evaluated"
    echo "     then use PL as instead of FLRW; FLRW is default if -P isn't set"
+   echo " -m expmax  Maximum allowed power-law index for first power-law model"
+   echo "     default is 3. Used occassionally to limit size of Pl index"
+   echo "     Some data appear to have indices > 2.5 which may be unrealistic"
    echo " -h --  provides more documentation of algorithm"
 
    echo " This script requires cleanEst.sh to be run immediately prior to this one"
@@ -38,7 +41,8 @@ source /home/langbein/.bashrc
 progs=/Users/john/proglib/est_noise20151128/bin
 progs=/Users/john/Desktop/est_noise20151217/bin
 progs=/Users/john/proglib/est_noise20160201/bin
-progs=/home/langbein/proglib/est_noiseBeta/bin
+progs=/Users/john/proglib/est_noiseBeta/bin
+progs=/home/langbein/proglib/est_noiseBetaX/bin
 # defaults
 nett=otr
 netd=otr
@@ -47,6 +51,7 @@ bpother=no   #  By default, use FLRW to as the base noise model to test the pres
 ntype=a
 tsamDay=0     #  default sampling interval of data --- in days <----  This could be changed if needed
 Nnoise=0      # Default on noise models being tested; Does 8 models
+expmax=3    #  default value of power law index
 
 skip=0  #  This is for testing; normaly set to zero
 
@@ -56,17 +61,16 @@ nsim=201    #  Number of simulations for compare_wander.
 ###
 
 
-while getopts d:hS:P option 
+while getopts d:hS:Pm: option 
 do
 
      case "$option"
      in
           d)  data=$OPTARG;;
-#          f)  netd=$OPTARG;;
           h)  help=yes;;
           S) Nnoise=$OPTARG;;
-#          n)  ntype=$OPTARG;;
           P) bpother=yes;;
+          m) expmax=$OPTARG;;
          \?)  echo "Incomplete set of arguements; type EstNoiseAll.sh without arguments to get documentation"
               exit 1;;
      esac
@@ -235,7 +239,7 @@ cp data.cl data.in
 cat > est_RW.in <<EOF
 -99999.  float
 -99999.    float
-2    fix
+2    fix  $expmax
 0    fix
 $bpfilt
 1
@@ -247,7 +251,7 @@ EOF
 cat > est_FL.in <<EOF
 -99999.  float
 -99999.    float
-1    fix
+1    fix  $expmax
 0    fix
 $bpfilt
 1
@@ -259,7 +263,7 @@ EOF
 cat > est_PL.in <<EOF
 sig  float
 plamp1    float
-plexp1    float
+plexp1    float  $expmax
 0    fix
 $bpfilt
 1
@@ -271,7 +275,7 @@ EOF
 cat > est_FLRW.in <<EOF
 sig  float
 plamp1    float
-1    fix
+1    fix  $expmax
 0    fix
 $bpfilt
 1
@@ -284,7 +288,7 @@ EOF
 cat > est_FOGM.in <<EOF
 sig  float
 plamp1    float
-2    fix
+2    fix  $expmax
 0.2    float
 $bpfilt
 1
@@ -297,7 +301,7 @@ EOF
 cat > est_GM.in <<EOF
 sig  float
 plamp1    float
-plexp1    float
+plexp1    float  $expmax
 0.2    float
 $bpfilt
 1
@@ -310,7 +314,7 @@ EOF
 cat > est_BP.in <<EOF
 sig  float
 plamp1    float
-plexp1    fix
+plexp1    fix  $expmax
 0   fix
 $bpfilt
 np
@@ -323,7 +327,7 @@ EOF
 cat > est_BPPL.in <<EOF
 sig  float
 plamp1    float
-plexp1    float
+plexp1    float  $expmax
 0 fix
 $bpfilt
 np
@@ -336,7 +340,7 @@ EOF
 cat > est_BPFLRW.in <<EOF
 sig  float
 plamp1    float
-1    fix
+1    fix  $expmax
 0 fix
 $bpfilt
 np
@@ -371,7 +375,7 @@ echo $MOD
 file=est2_"$MOD".out
 if [ "$skip" -eq 0 ]      
 then
-  time "$progs"/est_noise7.22 < est2.in > $file
+  time "$progs"/est_noise7.30 < est2.in > $file
   cp resid.out resid_"$data"_"$MOD".out
   tail -75 $file > est_"$data"_"$MOD".out
   cp resid.out resid"$MOD".out
@@ -417,6 +421,8 @@ EOF
 
 ####   Plot the wander
 ls -lt wander.out 
+sed '/Nan/d' wander.out | sed '/nan/d' | sed '/NAN/d' | sed '/Inf/d' > junk
+mv junk wander.out
 tmin=`head -1 wander.out | awk '{print $1}'`
 tmax=`tail -1 wander.out | awk '{print (int($1/1000) + 1)*1000}'`
 
@@ -494,7 +500,7 @@ echo $MOD
 file=est2_"$MOD".out
 if [ "$skip" -eq 0 ]
 then
-  time "$progs"/est_noise7.22 < est2.in > $file
+  time "$progs"/est_noise7.30 < est2.in > $file
   cp resid.out resid_"$data"_"$MOD".out
   tail -75 $file > est_"$data"_"$MOD".out
   cp resid.out resid"$MOD".out
@@ -587,7 +593,8 @@ $ntype
 $bpfilt
 $np
 EOF
-
+sed '/Nan/d' wander.out | sed '/nan/d' | sed '/NAN/d' | sed '/Inf/d' > junk
+mv junk wander.out
 awk '{print $2 }' wander.out > junk
 awk '{print $7 }' wander.out >> junk
 awk '{print $8 }' wander.out >> junk
@@ -649,7 +656,7 @@ echo $MOD
 file=est2_"$MOD".out
 if [ "$skip" -eq 0 ]
 then
-  time "$progs"/est_noise7.22 < est2.in > $file
+  time "$progs"/est_noise7.30 < est2.in > $file
   cp resid.out resid_"$data"_"$MOD".out
   tail -75 $file > est_"$data"_"$MOD".out
   cp resid.out resid"$MOD".out
@@ -681,6 +688,8 @@ dbic=`echo $BIC $BIC0 | awk '{print $1-$2}'`
 whpl=$wh
 plamppl=$plamp1
 plexppl=$plexp1
+#  save this MLE for comparison with BP filtered noise
+MLE0x=$MLE
 
 cp resid"$MOD".out resid.out
 cp max"$MOD".dat max.dat
@@ -694,6 +703,8 @@ $bpfilt
 $np
 EOF
 
+sed '/Nan/d' wander.out | sed '/nan/d' | sed '/NAN/d' | sed '/Inf/d' > junk
+mv junk wander.out
 awk '{print $2 }' wander.out > junk
 awk '{print $7 }' wander.out >> junk
 awk '{print $8 }' wander.out >> junk
@@ -763,7 +774,7 @@ echo $MOD
 file=est2_"$MOD".out
 if [ "$skip" -eq 0 ]
 then
-  time "$progs"/est_noise7.22 < est2.in > $file
+  time "$progs"/est_noise7.30 < est2.in > $file
   cp resid.out resid_"$data"_"$MOD".out
   tail -75 $file > est_"$data"_"$MOD".out
   cp resid.out resid"$MOD".out
@@ -809,6 +820,8 @@ $bpfilt
 $np
 EOF
 
+sed '/Nan/d' wander.out | sed '/nan/d' | sed '/NAN/d' | sed '/Inf/d' > junk
+mv junk wander.out
 awk '{print $2 }' wander.out > junk
 awk '{print $7 }' wander.out >> junk
 awk '{print $8 }' wander.out >> junk
@@ -872,7 +885,7 @@ echo $MOD
 file=est2_"$MOD".out
 if [ "$skip" -eq 0 ]
 then
-  time "$progs"/est_noise7.22 < est2.in > $file
+  time "$progs"/est_noise7.30 < est2.in > $file
   cp resid.out resid_"$data"_"$MOD".out
   tail -75 $file > est_"$data"_"$MOD".out
   cp resid.out resid"$MOD".out
@@ -915,6 +928,8 @@ $bpfilt
 $np
 EOF
 
+sed '/Nan/d' wander.out | sed '/nan/d' | sed '/NAN/d' | sed '/Inf/d' > junk
+mv junk wander.out
 awk '{print $2 }' wander.out > junk
 awk '{print $7 }' wander.out >> junk
 awk '{print $8 }' wander.out >> junk
@@ -977,7 +992,7 @@ echo $MOD
 file=est2_"$MOD".out
 if [ "$skip" -eq 0 ]
 then
-  time "$progs"/est_noise7.22 < est2.in > $file
+  time "$progs"/est_noise7.30 < est2.in > $file
   cp resid.out resid_"$data"_"$MOD".out
   tail -75 $file > est_"$data"_"$MOD".out
   cp resid.out resid"$MOD".out
@@ -1019,6 +1034,8 @@ $bpfilt
 $np
 EOF
 
+sed '/Nan/d' wander.out | sed '/nan/d' | sed '/NAN/d' | sed '/Inf/d' > junk
+mv junk wander.out
 awk '{print $2 }' wander.out > junk
 awk '{print $7 }' wander.out >> junk
 awk '{print $8 }' wander.out >> junk
@@ -1095,7 +1112,7 @@ echo $MOD
 file=est2_"$MOD".out
 if [ "$skip" -eq 0 ]
 then
-  time "$progs"/est_noise7.22 < est2.in > $file
+  time "$progs"/est_noise7.30 < est2.in > $file
   cp resid.out resid_"$data"_"$MOD".out
   tail -75 $file > est_"$data"_"$MOD".out
   cp resid.out resid"$MOD".out
@@ -1107,7 +1124,8 @@ if [ "$Mtype" = "f" ]
 then
   ReDo=0
   MLE=`grep "MLE=" $file | tail -1 | awk '{printf "%.2f\n", $2}'`
-  if [ "$MLE" = "Infinity" -o "$MLE" = "-Infinity" -o "$MLE" = "NaN" -o "$MLE" = "Nan" -o "$MLE" = "nan" -o "$MLE" = "inf" ]
+  MLEI=`grep "MLE=" $file | tail -1 | awk '{print int($2)}'`
+  if [ "$MLE" = "Infinity" -o "$MLE" = "-Infinity" -o "$MLE" = "NaN" -o "$MLE" = "Nan" -o "$MLE" = "nan" -o "$MLE" = "inf -o "$MLEI" -gt 1000000" ]
   then
     ReDo=1
   else 
@@ -1128,7 +1146,7 @@ then
    lne=`expr $lne + 2 `
    sed -n ''$lne',$p' est2.in >> est2a.in
    mv $file "$file"_NoGo
-   time "$progs"/est_noise7.22 < est2a.in > $file
+   time "$progs"/est_noise7.30 < est2a.in > $file
    cp resid.out resid_"$data"_"$MOD".out
    tail -75 $file > est_"$data"_"$MOD".out
    cp resid.out resid"$MOD".out
@@ -1184,7 +1202,7 @@ echo $MOD
 file=est2_"$MOD".out
 if [ "$skip" -eq 0 ]
 then
-  time "$progs"/est_noise7.22 < est2.in > $file
+  time "$progs"/est_noise7.30 < est2.in > $file
   cp resid.out resid_"$data"_"$MOD".out
   tail -75 $file > est_"$data"_"$MOD".out
   cp resid.out resid"$MOD".out
@@ -1196,7 +1214,8 @@ if [ "$Mtype" = "f" ]
 then
   ReDo=0
   MLE=`grep "MLE=" $file | tail -1 | awk '{printf "%.2f\n", $2}'`
-  if [ "$MLE" = "Infinity" -o "$MLE" = "-Infinity" -o "$MLE" = "NaN" -o "$MLE" = "Nan" -o "$MLE" = "nan" -o "$MLE" = "inf" ]
+  MLEI=`grep "MLE=" $file | tail -1 | awk '{print int($2)}'`
+  if [ "$MLE" = "Infinity" -o "$MLE" = "-Infinity" -o "$MLE" = "NaN" -o "$MLE" = "Nan" -o "$MLE" = "nan" -o "$MLE" = "inf -o "$MLEI" -gt 1000000" ]
   then
     ReDo=1
   else 
@@ -1217,7 +1236,7 @@ then
    lne=`expr $lne + 2 `
    sed -n ''$lne',$p' est2.in >> est2a.in
    mv $file "$file"_NoGo
-   time "$progs"/est_noise7.22 < est2a.in > $file
+   time "$progs"/est_noise7.30 < est2a.in > $file
    cp resid.out resid_"$data"_"$MOD".out
    tail -75 $file > est_"$data"_"$MOD".out
    cp resid.out resid"$MOD".out
@@ -1275,7 +1294,7 @@ echo $MOD
 file=est2_"$MOD".out
 if [ "$skip" -eq 0 ]
 then
-  time "$progs"/est_noise7.22 < est2.in > $file
+  time "$progs"/est_noise7.30 < est2.in > $file
   cp resid.out resid_"$data"_"$MOD".out
   tail -75 $file > est_"$data"_"$MOD".out
   cp resid.out resid"$MOD".out
@@ -1287,7 +1306,8 @@ if [ "$Mtype" = "f" ]
 then
   ReDo=0
   MLE=`grep "MLE=" $file | tail -1 | awk '{printf "%.2f\n", $2}'`
-  if [ "$MLE" = "Infinity" -o "$MLE" = "-Infinity" -o "$MLE" = "NaN" -o "$MLE" = "Nan" -o "$MLE" = "nan" -o "$MLE" = "inf" ]
+  MLEI=`grep "MLE=" $file | tail -1 | awk '{print int($2)}'`
+  if [ "$MLE" = "Infinity" -o "$MLE" = "-Infinity" -o "$MLE" = "NaN" -o "$MLE" = "Nan" -o "$MLE" = "nan" -o "$MLE" = "inf -o "$MLEI" -gt 1000000" ]
   then
     ReDo=1
   else 
@@ -1308,7 +1328,7 @@ then
    lne=`expr $lne + 2 `
    sed -n ''$lne',$p' est2.in >> est2a.in
    mv $file "$file"_NoGo
-   time "$progs"/est_noise7.22 < est2a.in > $file
+   time "$progs"/est_noise7.30 < est2a.in > $file
    cp resid.out resid_"$data"_"$MOD".out
    tail -75 $file > est_"$data"_"$MOD".out
    cp resid.out resid"$MOD".out
@@ -1367,7 +1387,7 @@ echo $MOD
 file=est2_"$MOD".out
 if [ "$skip" -eq 0 ]
 then
-  time "$progs"/est_noise7.22 < est2.in > $file
+  time "$progs"/est_noise7.30 < est2.in > $file
   cp resid.out resid_"$data"_"$MOD".out
   tail -75 $file > est_"$data"_"$MOD".out
   cp resid.out resid"$MOD".out
@@ -1379,7 +1399,8 @@ if [ "$Mtype" = "f" ]
 then
   ReDo=0
   MLE=`grep "MLE=" $file | tail -1 | awk '{printf "%.2f\n", $2}'`
-  if [ "$MLE" = "Infinity" -o "$MLE" = "-Infinity" -o "$MLE" = "NaN" -o "$MLE" = "Nan" -o "$MLE" = "nan" -o "$MLE" = "inf" ]
+  MLEI=`grep "MLE=" $file | tail -1 | awk '{print int($2)}'`
+  if [ "$MLE" = "Infinity" -o "$MLE" = "-Infinity" -o "$MLE" = "NaN" -o "$MLE" = "Nan" -o "$MLE" = "nan" -o "$MLE" = "inf -o "$MLEI" -gt 1000000" ]
   then
     ReDo=1
   else 
@@ -1400,7 +1421,7 @@ then
    lne=`expr $lne + 2 `
    sed -n ''$lne',$p' est2.in >> est2a.in
    mv $file "$file"_NoGo
-   time "$progs"/est_noise7.22 < est2a.in > $file
+   time "$progs"/est_noise7.30 < est2a.in > $file
    cp resid.out resid_"$data"_"$MOD".out
    tail -75 $file > est_"$data"_"$MOD".out
    cp resid.out resid"$MOD".out
@@ -1488,6 +1509,8 @@ $bpfilt
 $np
 EOF
 
+sed '/Nan/d' wander.out | sed '/nan/d' | sed '/NAN/d' | sed '/Inf/d' > junk
+mv junk wander.out
 awk '{print $2 }' wander.out > junk
 awk '{print $7 }' wander.out >> junk
 awk '{print $8 }' wander.out >> junk
@@ -1564,7 +1587,7 @@ echo $MOD
 file=est2_"$MOD".out
 if [ "$skip" -eq 0 ]
 then
-  time "$progs"/est_noise7.22 < est2.in > $file
+  time "$progs"/est_noise7.30 < est2.in > $file
   cp resid.out resid_"$data"_"$MOD".out
   tail -75 $file > est_"$data"_"$MOD".out
   cp resid.out resid"$MOD".out
@@ -1576,12 +1599,13 @@ if [ "$Mtype" = "f" ]
 then
   ReDo=0
   MLE=`grep "MLE=" $file | tail -1 | awk '{printf "%.2f\n", $2}'`
-  if [ "$MLE" = "Infinity" -o "$MLE" = "-Infinity" -o "$MLE" = "NaN" -o "$MLE" = "Nan" -o "$MLE" = "nan" -o "$MLE" = "inf" ]
+  MLEI=`grep "MLE=" $file | tail -1 | awk '{print int($2)}'`
+  if [ "$MLE" = "Infinity" -o "$MLE" = "-Infinity" -o "$MLE" = "NaN" -o "$MLE" = "Nan" -o "$MLE" = "nan" -o "$MLE" = "inf -o "$MLEI" -gt 1000000" ]
   then
     ReDo=1
   else 
-    echo $MLE $MLE0
-    DiffMLE=`echo $MLE $MLE0 | awk '{print int(sqrt(($1-$2)**2))}'`
+    echo $MLE $MLE0x
+    DiffMLE=`echo $MLE $MLE0x | awk '{print int(sqrt(($1-$2)**2))}'`
     echo $DiffMLE
     if [ "$DiffMLE" -gt 1000 ]
     then
@@ -1597,7 +1621,7 @@ then
    lne=`expr $lne + 2 `
    sed -n ''$lne',$p' est2.in >> est2a.in
    mv $file "$file"_NoGo
-   time "$progs"/est_noise7.22 < est2a.in > $file
+   time "$progs"/est_noise7.30 < est2a.in > $file
    cp resid.out resid_"$data"_"$MOD".out
    tail -75 $file > est_"$data"_"$MOD".out
    cp resid.out resid"$MOD".out
@@ -1650,7 +1674,7 @@ echo $MOD
 file=est2_"$MOD".out
 if [ "$skip" -eq 0 ]
 then
-  time "$progs"/est_noise7.22 < est2.in > $file
+  time "$progs"/est_noise7.30 < est2.in > $file
   cp resid.out resid_"$data"_"$MOD".out
   tail -75 $file > est_"$data"_"$MOD".out
   cp resid.out resid"$MOD".out
@@ -1662,12 +1686,13 @@ if [ "$Mtype" = "f" ]
 then
   ReDo=0
   MLE=`grep "MLE=" $file | tail -1 | awk '{printf "%.2f\n", $2}'`
-  if [ "$MLE" = "Infinity" -o "$MLE" = "-Infinity" -o "$MLE" = "NaN" -o "$MLE" = "Nan" -o "$MLE" = "nan" -o "$MLE" = "inf" ]
+  MLEI=`grep "MLE=" $file | tail -1 | awk '{print int($2)}'`
+  if [ "$MLE" = "Infinity" -o "$MLE" = "-Infinity" -o "$MLE" = "NaN" -o "$MLE" = "Nan" -o "$MLE" = "nan" -o "$MLE" = "inf -o "$MLEI" -gt 1000000" ]
   then
     ReDo=1
   else 
-    echo $MLE $MLE0
-    DiffMLE=`echo $MLE $MLE0 | awk '{print int(sqrt(($1-$2)**2))}'`
+    echo $MLE $MLE0x
+    DiffMLE=`echo $MLE $MLE0x | awk '{print int(sqrt(($1-$2)**2))}'`
     echo $DiffMLE
     if [ "$DiffMLE" -gt 1000 ]
     then
@@ -1683,7 +1708,7 @@ then
    lne=`expr $lne + 2 `
    sed -n ''$lne',$p' est2.in >> est2a.in
    mv $file "$file"_NoGo
-   time "$progs"/est_noise7.22 < est2a.in > $file
+   time "$progs"/est_noise7.30 < est2a.in > $file
    cp resid.out resid_"$data"_"$MOD".out
    tail -75 $file > est_"$data"_"$MOD".out
    cp resid.out resid"$MOD".out
@@ -1736,7 +1761,7 @@ echo $MOD
 file=est2_"$MOD".out
 if [ "$skip" -eq 0 ]
 then
-  time "$progs"/est_noise7.22 < est2.in > $file
+  time "$progs"/est_noise7.30 < est2.in > $file
   cp resid.out resid_"$data"_"$MOD".out
   tail -75 $file > est_"$data"_"$MOD".out
   cp resid.out resid"$MOD".out
@@ -1748,12 +1773,13 @@ if [ "$Mtype" = "f" ]
 then
   ReDo=0
   MLE=`grep "MLE=" $file | tail -1 | awk '{printf "%.2f\n", $2}'`
-  if [ "$MLE" = "Infinity" -o "$MLE" = "-Infinity" -o "$MLE" = "NaN" -o "$MLE" = "Nan" -o "$MLE" = "nan" -o "$MLE" = "inf" ]
+  MLEI=`grep "MLE=" $file | tail -1 | awk '{print int($2)}'`
+  if [ "$MLE" = "Infinity" -o "$MLE" = "-Infinity" -o "$MLE" = "NaN" -o "$MLE" = "Nan" -o "$MLE" = "nan" -o "$MLE" = "inf -o "$MLEI" -gt 1000000" ]
   then
     ReDo=1
   else 
-    echo $MLE $MLE0
-    DiffMLE=`echo $MLE $MLE0 | awk '{print int(sqrt(($1-$2)**2))}'`
+    echo $MLE $MLE0x
+    DiffMLE=`echo $MLE $MLE0x | awk '{print int(sqrt(($1-$2)**2))}'`
     echo $DiffMLE
     if [ "$DiffMLE" -gt 1000 ]
     then
@@ -1769,7 +1795,7 @@ then
    lne=`expr $lne + 2 `
    sed -n ''$lne',$p' est2.in >> est2a.in
    mv $file "$file"_NoGo
-   time "$progs"/est_noise7.22 < est2a.in > $file
+   time "$progs"/est_noise7.30 < est2a.in > $file
    cp resid.out resid_"$data"_"$MOD".out
    tail -75 $file > est_"$data"_"$MOD".out
    cp resid.out resid"$MOD".out
@@ -1822,7 +1848,7 @@ echo $MOD
 file=est2_"$MOD".out
 if [ "$skip" -eq 0 ]
 then
-  time "$progs"/est_noise7.22 < est2.in > $file
+  time "$progs"/est_noise7.30 < est2.in > $file
   cp resid.out resid_"$data"_"$MOD".out
   tail -75 $file > est_"$data"_"$MOD".out
   cp resid.out resid"$MOD".out
@@ -1834,12 +1860,13 @@ if [ "$Mtype" = "f" ]
 then
   ReDo=0
   MLE=`grep "MLE=" $file | tail -1 | awk '{printf "%.2f\n", $2}'`
-  if [ "$MLE" = "Infinity" -o "$MLE" = "-Infinity" -o "$MLE" = "NaN" -o "$MLE" = "Nan" -o "$MLE" = "nan" -o "$MLE" = "inf" ]
+  MLEI=`grep "MLE=" $file | tail -1 | awk '{print int($2)}'`
+  if [ "$MLE" = "Infinity" -o "$MLE" = "-Infinity" -o "$MLE" = "NaN" -o "$MLE" = "Nan" -o "$MLE" = "nan" -o "$MLE" = "inf -o "$MLEI" -gt 1000000" ]
   then
     ReDo=1
   else 
-    echo $MLE $MLE0
-    DiffMLE=`echo $MLE $MLE0 | awk '{print int(sqrt(($1-$2)**2))}'`
+    echo $MLE $MLE0x
+    DiffMLE=`echo $MLE $MLE0x | awk '{print int(sqrt(($1-$2)**2))}'`
     echo $DiffMLE
     if [ "$DiffMLE" -gt 1000 ]
     then
@@ -1855,7 +1882,7 @@ then
    lne=`expr $lne + 2 `
    sed -n ''$lne',$p' est2.in >> est2a.in
    mv $file "$file"_NoGo
-   time "$progs"/est_noise7.22 < est2a.in > $file
+   time "$progs"/est_noise7.30 < est2a.in > $file
    cp resid.out resid_"$data"_"$MOD".out
    tail -75 $file > est_"$data"_"$MOD".out
    cp resid.out resid"$MOD".out
@@ -1942,6 +1969,8 @@ $bpfilt
 $np
 EOF
 
+sed '/Nan/d' wander.out | sed '/nan/d' | sed '/NAN/d' | sed '/Inf/d' > junk
+mv junk wander.out
 awk '{print $2 }' wander.out > junk
 awk '{print $7 }' wander.out >> junk
 awk '{print $8 }' wander.out >> junk
@@ -2016,7 +2045,7 @@ echo $MOD
 file=est2_"$MOD".out
 if [ "$skip" -eq 0 ]
 then
-  time "$progs"/est_noise7.22 < est2.in > $file
+  time "$progs"/est_noise7.30 < est2.in > $file
   cp resid.out resid_"$data"_"$MOD".out
   tail -75 $file > est_"$data"_"$MOD".out
   cp resid.out resid"$MOD".out
@@ -2028,12 +2057,13 @@ if [ "$Mtype" = "f" ]
 then
   ReDo=0
   MLE=`grep "MLE=" $file | tail -1 | awk '{printf "%.2f\n", $2}'`
-  if [ "$MLE" = "Infinity" -o "$MLE" = "-Infinity" -o "$MLE" = "NaN" -o "$MLE" = "Nan" -o "$MLE" = "nan" -o "$MLE" = "inf" ]
+  MLEI=`grep "MLE=" $file | tail -1 | awk '{print int($2)}'`
+  if [ "$MLE" = "Infinity" -o "$MLE" = "-Infinity" -o "$MLE" = "NaN" -o "$MLE" = "Nan" -o "$MLE" = "nan" -o "$MLE" = "inf -o "$MLEI" -gt 1000000" ]
   then
     ReDo=1
   else 
-    echo $MLE $MLE0
-    DiffMLE=`echo $MLE $MLE0 | awk '{print int(sqrt(($1-$2)**2))}'`
+    echo $MLE $MLE0x
+    DiffMLE=`echo $MLE $MLE0x | awk '{print int(sqrt(($1-$2)**2))}'`
     echo $DiffMLE
     if [ "$DiffMLE" -gt 1000 ]
     then
@@ -2049,7 +2079,7 @@ then
    lne=`expr $lne + 2 `
    sed -n ''$lne',$p' est2.in >> est2a.in
    mv $file "$file"_NoGo
-   time "$progs"/est_noise7.22 < est2a.in > $file
+   time "$progs"/est_noise7.30 < est2a.in > $file
    cp resid.out resid_"$data"_"$MOD".out
    tail -75 $file > est_"$data"_"$MOD".out
    cp resid.out resid"$MOD".out
@@ -2103,7 +2133,7 @@ echo $MOD
 file=est2_"$MOD".out
 if [ "$skip" -eq 0 ]
 then
-  time "$progs"/est_noise7.22 < est2.in > $file
+  time "$progs"/est_noise7.30 < est2.in > $file
   cp resid.out resid_"$data"_"$MOD".out
   tail -75 $file > est_"$data"_"$MOD".out
   cp resid.out resid"$MOD".out
@@ -2115,12 +2145,13 @@ if [ "$Mtype" = "f" ]
 then
   ReDo=0
   MLE=`grep "MLE=" $file | tail -1 | awk '{printf "%.2f\n", $2}'`
-  if [ "$MLE" = "Infinity" -o "$MLE" = "-Infinity" -o "$MLE" = "NaN" -o "$MLE" = "Nan" -o "$MLE" = "nan" -o "$MLE" = "inf" ]
+  MLEI=`grep "MLE=" $file | tail -1 | awk '{print int($2)}'`
+  if [ "$MLE" = "Infinity" -o "$MLE" = "-Infinity" -o "$MLE" = "NaN" -o "$MLE" = "Nan" -o "$MLE" = "nan" -o "$MLE" = "inf -o "$MLEI" -gt 1000000" ]
   then
     ReDo=1
   else 
-    echo $MLE $MLE0
-    DiffMLE=`echo $MLE $MLE0 | awk '{print int(sqrt(($1-$2)**2))}'`
+    echo $MLE $MLE0x
+    DiffMLE=`echo $MLE $MLE0x | awk '{print int(sqrt(($1-$2)**2))}'`
     echo $DiffMLE
     if [ "$DiffMLE" -gt 1000 ]
     then
@@ -2136,7 +2167,7 @@ then
    lne=`expr $lne + 2 `
    sed -n ''$lne',$p' est2.in >> est2a.in
    mv $file "$file"_NoGo
-   time "$progs"/est_noise7.22 < est2a.in > $file
+   time "$progs"/est_noise7.30 < est2a.in > $file
    cp resid.out resid_"$data"_"$MOD".out
    tail -75 $file > est_"$data"_"$MOD".out
    cp resid.out resid"$MOD".out
@@ -2190,7 +2221,7 @@ echo $MOD
 file=est2_"$MOD".out
 if [ "$skip" -eq 0 ]
 then
-  time "$progs"/est_noise7.22 < est2.in > $file
+  time "$progs"/est_noise7.30 < est2.in > $file
   cp resid.out resid_"$data"_"$MOD".out
   tail -75 $file > est_"$data"_"$MOD".out
   cp resid.out resid"$MOD".out
@@ -2202,12 +2233,13 @@ if [ "$Mtype" = "f" ]
 then
   ReDo=0
   MLE=`grep "MLE=" $file | tail -1 | awk '{printf "%.2f\n", $2}'`
-  if [ "$MLE" = "Infinity" -o "$MLE" = "-Infinity" -o "$MLE" = "NaN" -o "$MLE" = "Nan" -o "$MLE" = "nan" -o "$MLE" = "inf" ]
+  MLEI=`grep "MLE=" $file | tail -1 | awk '{print int($2)}'`
+  if [ "$MLE" = "Infinity" -o "$MLE" = "-Infinity" -o "$MLE" = "NaN" -o "$MLE" = "Nan" -o "$MLE" = "nan" -o "$MLE" = "inf -o "$MLEI" -gt 1000000" ]
   then
     ReDo=1
   else 
-    echo $MLE $MLE0
-    DiffMLE=`echo $MLE $MLE0 | awk '{print int(sqrt(($1-$2)**2))}'`
+    echo $MLE $MLE0x
+    DiffMLE=`echo $MLE $MLE0x | awk '{print int(sqrt(($1-$2)**2))}'`
     echo $DiffMLE
     if [ "$DiffMLE" -gt 1000 ]
     then
@@ -2223,7 +2255,7 @@ then
    lne=`expr $lne + 2 `
    sed -n ''$lne',$p' est2.in >> est2a.in
    mv $file "$file"_NoGo
-   time "$progs"/est_noise7.22 < est2a.in > $file
+   time "$progs"/est_noise7.30 < est2a.in > $file
    cp resid.out resid_"$data"_"$MOD".out
    tail -75 $file > est_"$data"_"$MOD".out
    cp resid.out resid"$MOD".out
@@ -2277,7 +2309,7 @@ echo $MOD
 file=est2_"$MOD".out
 if [ "$skip" -eq 0 ]
 then
-  time "$progs"/est_noise7.22 < est2.in > $file
+  time "$progs"/est_noise7.30 < est2.in > $file
   cp resid.out resid_"$data"_"$MOD".out
   tail -75 $file > est_"$data"_"$MOD".out
   cp resid.out resid"$MOD".out
@@ -2289,12 +2321,13 @@ if [ "$Mtype" = "f" ]
 then
   ReDo=0
   MLE=`grep "MLE=" $file | tail -1 | awk '{printf "%.2f\n", $2}'`
-  if [ "$MLE" = "Infinity" -o "$MLE" = "-Infinity" -o "$MLE" = "NaN" -o "$MLE" = "Nan" -o "$MLE" = "nan" -o "$MLE" = "inf" ]
+  MLEI=`grep "MLE=" $file | tail -1 | awk '{print int($2)}'`
+  if [ "$MLE" = "Infinity" -o "$MLE" = "-Infinity" -o "$MLE" = "NaN" -o "$MLE" = "Nan" -o "$MLE" = "nan" -o "$MLE" = "inf -o "$MLEI" -gt 1000000" ]
   then
     ReDo=1
   else 
-    echo $MLE $MLE0
-    DiffMLE=`echo $MLE $MLE0 | awk '{print int(sqrt(($1-$2)**2))}'`
+    echo $MLE $MLE0x
+    DiffMLE=`echo $MLE $MLE0x | awk '{print int(sqrt(($1-$2)**2))}'`
     echo $DiffMLE
     if [ "$DiffMLE" -gt 1000 ]
     then
@@ -2310,7 +2343,7 @@ then
    lne=`expr $lne + 2 `
    sed -n ''$lne',$p' est2.in >> est2a.in
    mv $file "$file"_NoGo
-   time "$progs"/est_noise7.22 < est2a.in > $file
+   time "$progs"/est_noise7.30 < est2a.in > $file
    cp resid.out resid_"$data"_"$MOD".out
    tail -75 $file > est_"$data"_"$MOD".out
    cp resid.out resid"$MOD".out
@@ -2397,6 +2430,8 @@ $bpfilt
 $np
 EOF
 
+sed '/Nan/d' wander.out | sed '/nan/d' | sed '/NAN/d' | sed '/Inf/d' > junk
+mv junk wander.out
 awk '{print $2 }' wander.out > junk
 awk '{print $7 }' wander.out >> junk
 awk '{print $8 }' wander.out >> junk

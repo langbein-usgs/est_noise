@@ -25,11 +25,11 @@ c  the temporal correlations; either by adding several independent noise sources
 c   in the original est_noise6/compare_wander6, ie quadrature, or adding the filter functions
 c    representing different noise and convolving with a single random noise generator,
 c    known as 'additive noise' compatable with est_noise7.2x with 'a'.
-      dimension d(11687), tim_wan(150),wan_dat(150),H(131072),
+      dimension d(12687), tim_wan(150),wan_dat(150),H(131072),
      & ran1(131072),ran(131072),dat(131072),wan_sim(150)
       dimension save_wan(501,150),temp(501)
       double precision pl1(131072),pl2(131072),wh(131072),bp(131072),
-     &  t(11687),timex,t0
+     &  t(12687),timex,t0
       double precision dt_sam
       character*20 filename,name
       character*132 string
@@ -44,7 +44,7 @@ c    known as 'additive noise' compatable with est_noise7.2x with 'a'.
       max_wan=150
       max_flt=131072
       max_time=max_flt
-      max_data=11687
+      max_data=12687
       max_loop=501
 c missing data
       fmiss=99999.

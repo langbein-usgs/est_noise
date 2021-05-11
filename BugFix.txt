@@ -97,14 +97,16 @@ Version 20171025
 2  Revised report, Threshold_dMLE.pdf, using more simulations (5000 vs a few hundred)
 
 Version 20190101
-  Updated 20190101 EstNoiseAll.sh script --  output from time dependent models are push to the directy from which
+  Updated 20190101 EstNoiseAll.sh script --  output from time dependent models are push to the directory from which
    EstNoiseAll.sh was invoked
   To the cleanEst.sh script, added another option for different sampling intervals.  Default is daily sampling;
-  In cleanEst.sh  revise plotting of clean data;
-  Fixed time bug in adjust_1 as it out adjusted data to a one day resolution
 
-Next version
-  revised bust_5 program to run more efficiently;  old version did a complete sort of data which
-    is not required to determine various, percentile ranges. 
-  To the script cleanEst.sh (and EstNoiseAll.sh) add option to compute amplitudes of the yearly draconic periods;
-    operationally, I doubt it will be useful.
+Version 20210501
+1  When comparing rate and its uncertainty with Hector using GGM noise, found that est_noise (and Simon Williams'
+  cats underestimated the rate uncertainty and provided 'uncorrected' rates. Modified est_noise for
+  the additive covariance matrix to insert 'pseudo' missing data prior to the time series with a
+  length of 3/alpha (alpha being the GGM freq in rad/yr).  This resolves the differences
+  between Hector and est_noise.  Note that this is not implemented for the legacy, quadrature covariance; at least
+  not yet
+2 To cleanEst.sh  added -M option where one can specify the noise model (and its parameters); the default
+  (ie, with no -M) is a generic, GPS noise model of RW+FL+WN noise.

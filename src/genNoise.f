@@ -13,6 +13,10 @@ c  ic and max_data are number of data and the dimensions of arrays
      &  ran4(32768)
       double precision t(max_data),dt_sam,f1(32768),f2(32768),
      & f3(32768),f4(32768),rnx,ZBQLNOR
+c      dimension d(max_data),ran1(2097151),ran2(2097151),ran3(2097151),
+c     &  ran4(2097151)
+c      double precision t(max_data),dt_sam,f1(2097151),f2(2097151),
+c     & f3(2097151),f4(2097151),rnx,ZBQLNOR
       character*1 ModType
  
         print*,' Program creates colored noise with'

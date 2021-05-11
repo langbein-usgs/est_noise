@@ -1,7 +1,8 @@
 #!/bin/sh
 
 #  script used to compile est_noise
-
+#  modify the gfortran call for mac to include "legacy" to compile the dfft stuff  (-std=legacy)
+#   May need to do this for linux, too
 if [ "$#" -ne 2 ]
 then
   echo Script used to compile est_noise
@@ -13,7 +14,7 @@ then
   exit
 fi
 
-ver=7.22
+ver=7.30
 
 file=`echo "-o bin/est_noise"$ver" ./src/est_noise"$ver".f ./src/time.f  ./src/funmin"$ver".f ./src/dfft.f ./src/NedlerMeadSimplex"$ver".f  ./src/modify.f ./src/NedlerMeadSimplexEXP"$ver".f" ./src/filterfunc.f ./src/genNoise.f src/randnor.f ./src/GetData.f  `
 #file=`echo "-o bin/est_noise"$ver" ./src/est_noise"$ver".f ./src/time.f  ./src/funmin"$ver"_test2.f ./src/dfft.f ./src/NedlerMeadSimplex"$ver".f  ./src/modify.f ./src/NedlerMeadSimplexEXP"$ver".f" ./src/filterfunc.f ./src/genNoise.f src/randnor.f ./src/GetData.f  `
@@ -89,18 +90,22 @@ then
     echo compiler is gfortran
      echo compile est_noise
 #     gfortran $file -O3 -framework Accelerate -mcmodel=medium  -Wl,-stack_size,0x80000000
-     gfortran $file -O3 -framework Accelerate -mcmodel=medium  -Wa,-q
+#  currently works 
+     gfortran $file -O3 -framework Accelerate -mcmodel=medium  -Wa,-q -w -std=legacy
+#  use with valgrind
+#     gfortran $file -O0 -g -framework Accelerate  -mcmodel=medium -Wl,-stack_size,0x80000000   #  -Wa,-q
+#     exit
 #    gfortran $file -O3 -framework Accelerate -mdynamic-no-pic
      echo compile psd_calc7
-    gfortran $filepsd -O3  -Wa,-q
+    gfortran $filepsd -O3  -Wa,-q -w -std=legacy
      echo compile gen_noise
-    gfortran $filegen -O3  -Wa,-q
+    gfortran $filegen -O3  -Wa,-q -w -std=legacy
      echo compile compare_wander
-    gfortran $filewand -O3  -Wa,-q
+    gfortran $filewand -O3  -Wa,-q -w -std=legacy
      echo compile bust_5  
-    gfortran $filebust -O3  -Wa,-q
+    gfortran $filebust -O3  -Wa,-q -w -std=legacy
      echo compile adjust
-    gfortran $fileadj -O3  -Wa,-q
+    gfortran $fileadj -O3  -Wa,-q -w -std=legacy
   elif [ "$2" = "i" ]
   then
     echo compiler is intel ifort

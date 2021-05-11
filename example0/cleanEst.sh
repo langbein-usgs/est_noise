@@ -6,7 +6,7 @@
 #      times of offsets
 #      intervals of rate changes
 #      periods of sinusoid beyand the 365 and 182 day periods
-#      expontial and/or Omori law function
+#      exponential and/or Omori law function
 #    And known periods of data to be deleted
 #
 #    Program uses est_noise7 to estimate trends and other functions
@@ -26,24 +26,29 @@ if [ "$#" -lt 1  ]
 then
    echo  " "
    echo "  Script removes outliers from GPS time series"
-   echo " Usage:  cleanEst.sh -d data -f format_type [-b start_time -b end_time -O off_file -E edit_file -T exp_file -S sine_period_file -n noiseType -i sample_interval_days -D number_of_draconic(yr)_periods ]"
-   echo "   options -b -e and -S not implimented "
+   echo " Usage:  cleanEst.sh -d data -f format_type [-b start_time -b end_time -O off_file -E edit_file -T exp_file -S sine_period_file -n noiseType -i sample_interval_days -M noise_model_file]"
+   echo "   options -b and -e not implimented "
    echo "   only accepts otr and gmt formats"
    echo "   noiseType is a additive (default) or q, quadrature"
    echo "   exp file can accept a list of rate change intervals, and/or"
    echo "     exponentials/omori law trends"
    echo "   default sample interval is 1 day"
+   echo "   -M (file) option to use noise model that differs from the default"
+   echo "     of a unit of each of white, flicker and random walk"
+   echo "     that is a nominal characterization of GPS noise"
+   echo "     for daily observations"
+   echo "   -S (file) list additional periods (other than 365.25 and 182.625 days)"
+   echo "      to estimate their amplitudes/phases"
    exit
 fi
 
 #  Provide location where the executables are located
-#source /Users/john/.bashrc
 source /home/langbein/.bashrc
 progs=/Users/john/proglib/est_noise20151128/bin
 progs=/Users/john/Desktop/est_noise20151217/bin
 progs=/Users/john/proglib/est_noise20160201/bin
 progs=/Users/john/proglib/est_noiseBeta/bin
-progs=/home/langbein/proglib/est_noiseBeta/bin
+progs=/home/langbein/proglib/est_noiseBetaX/bin
 #  defaults 
 
 
@@ -57,10 +62,10 @@ netd=otr
 ntype=a
 tsamDay=1     #  default sampling interval of data --- in days <----  This could be changed if needed
 bpfilt=`echo 0.5 2`   #  set-up limits of bp filtered noise
-nDracPer=0     # number of draconic periods to include
+noisefile=NO
+sinefile=NO
 
-
-while getopts d:f:E:O:T:n:i:D: option 
+while getopts d:f:E:O:T:n:i:M:S: option 
 do
 
      case "$option"
@@ -72,7 +77,8 @@ do
           T)  trdfile=$OPTARG;;
           n)  ntype=$OPTARG;;
           i)  tsamDay=$OPTARG;;
-          D)  nDracPer=$OPTARG;;
+          M)  noisefile=$OPTARG;;
+          S)  sinefile=$OPTARG;;
          \?)  echo "Incomplete set of arguements; type cleanEst.sh without arguments to get documentation"
               exit 1;;
      esac
@@ -97,7 +103,6 @@ cp $data /tmp/SCRATCH/"$data"/data.in
 
 
 cd /tmp/SCRATCH/"$data"
-
 #   Store the noise model type for future use
 rm -f modtype.dat
 echo $ntype > modtype.dat
@@ -253,19 +258,10 @@ cat > sea.in <<EOF
 182.625
 EOF
 
-#  get draconic periods;  Nominally, the period is 346.62 days, but I've seen
-#    estimates of 350 days
-if [ "$nDracPer" -gt 0 ]
+if [ "$sineFile" != "NO"  ]
 then
-  k=1
-  while [ "$k" -le "$nDracPer" ]
-  do
-    echo $k | awk '{print 346.62/$1}' >> sea.in
-    k=`expr $k + 1`
-  done
-
+   cat "$here"/"$sineFile" >> sea.in
 fi
-
 
 wc -l sea.in | awk '{print $1 }' > tmp
 mv sea.in tmp1
@@ -357,18 +353,47 @@ EOF
 #
 ######
 cp est0.in est1.in
-cat >> est1.in <<EOF
+
+if [ "$noisefile" != "NO" ]
+then
+#  query noise file
+   wn=`grep "wn" "$here"/$noisefile | awk '{print $2}'`
+   plamp1=`grep "plamp1" "$here"/$noisefile | awk '{print $2}'`
+   plexp1=`grep "plexp1" "$here"/$noisefile | awk '{print $2}'`
+   gm=`grep "gm" "$here"/$noisefile | awk '{print $2}'`
+   np=`grep "np" "$here"/$noisefile | awk '{print $2}'`
+   bpamp=`grep "bpamp" "$here"/$noisefile | awk '{print $2}'`
+   plamp2=`grep "plamp2" "$here"/$noisefile | awk '{print $2}'`
+   plexp2=`grep "plexp2" "$here"/$noisefile | awk '{print $2}'`
+   cat >> est1.in <<EOF
+$wn  fix    #white noise
+$plamp1   fix    # plamp1
+$plexp1   fix  3.0  # plexp1
+$gm   fix    # GM 
+0.50000        2.00000    #  bandpass filter elements
+$np    # number of poles
+$bpamp fix    #  BP amplitude
+$plexp2   fix   #plexp2
+$plamp2   fix   #plam2
+0.0   # additive white noise
+EOF
+else
+
+#  assumes combo of white, flicker and RW
+  cat >> est1.in <<EOF
 1.0   fix    #white noise
 1.0   fix    # plamp1
-1.0   fix    # plexp1
+1.0   fix   3.0  # plexp1
 0.0   fix    # GM 
 0.50000        2.00000    #  bandpass filter elements
 1    # number of poles
  0.000 fix    #  BP amplitude
 2.0   fix   #plexp2
-0.0   fix   #plam2
+1.0   fix   #plam2
 0.0   # additive white noise
 EOF
+
+fi
 
 ###############
 #####
@@ -376,7 +401,7 @@ EOF
 ####
 ################
 echo 7723957 > seed.dat
-time "$progs"/est_noise7.22 < est1.in > est1.out
+time "$progs"/est_noise7.30 < est1.in > est1.out
 tr -cd '\11\12\15\40-\176' < est1.out > est1a.out
 mv est1a.out est1.out
 
@@ -435,7 +460,7 @@ do
    then
      off=`grep "Offset number" est1.out | tail -"$noff" | sed -n ''$n'p' | awk '{print $7}'`
    fi
-   echo $toff $off
+   echo OFFSET $toff $off
    cat >> adj.in <<EOF
 o
 $toff
@@ -557,6 +582,7 @@ $tsamDay
 4      #   IQR for rejections
 EOF
 
+cp data.cl data.detrend.cl
 ###################
 #######
 #######
@@ -577,7 +603,7 @@ EOF
 
 cp data.cl data.in
 
-time "$progs"/est_noise7.22 < est1.in > est1.out
+time "$progs"/est_noise7.30 < est1.in > est1.out
 tr -cd '\11\12\15\40-\176' < est1.out > est1a.out
 mv est1a.out est1.out
 
@@ -612,7 +638,105 @@ then
 fi
 
 #  Save detrended time-series (and cleaned)
-#cp data.cl data.detrend.cl
+cp data.cl data.detrend.cl
+
+######
+##  Rebuild adj.in file for future use
+#####
+rm -f adj.in
+
+Rate=`grep "Rate in units per year" est1.out | tail -1 | awk '{print $6}'`
+cat > adj.in <<EOF
+R
+$Rate
+EOF
+
+
+nsea=`head -1 sea.in`
+n=1
+while [ "$n" -le "$nsea" ]
+do
+   ln=`expr $n + 1`
+   per=`sed -n ''$ln'p' sea.in`
+#   echo $per
+   grep "Period of" est1.out | tail -"$nsea" | sed -n ''$n'p' > junk
+   camp=`awk '{print $7}' junk`
+   samp=`awk '{print $12}' junk`
+#   echo $camp $samp
+   cat >> adj.in <<EOF
+s
+$tstart
+$per $camp $samp
+EOF
+   n=$ln
+done
+
+
+noff=0
+noff=`head -1 off.in`
+noff=`wc -l off.in | awk '{print $1-1}'`
+n=1
+while [ "$n" -le "$noff" ]
+do
+   ln=`expr $n + 1`
+   toff=`sed -n ''$ln'p' off.in`
+   if [ "$netd" = "otr" ]
+   then
+     off=`grep "Offset number" est1.out | tail -"$noff" | sed -n ''$n'p' | awk '{print $8}'`
+   fi
+   if [ "$netd" = "gmt" ]
+   then
+     off=`grep "Offset number" est1.out | tail -"$noff" | sed -n ''$n'p' | awk '{print $7}'`
+   fi
+   echo OFFSET $toff $off
+   cat >> adj.in <<EOF
+o
+$toff
+$off
+EOF
+   n=$ln
+done
+
+
+nexp=`head -1 exp.in| awk '{print $1}'`
+
+n=1
+while [ "$n" -le "$nexp" ]
+do
+  grep "Exponential number" est1.out | tail -"$nexp" |  sed -n ''$n'p'
+  ln=`echo $n | awk '{print 1 + $1*3}'`
+  tp=`sed -n ''$ln'p' exp.in`
+  ln=`echo $n | awk '{print 1 + $1*3-2}'`
+  texp=`sed -n ''$ln'p' exp.in`
+  if [ "$nett" = "otr" ]
+  then
+    amp=`grep "Exponential number" est1.out | tail -"$nexp" |  sed -n ''$n'p' | awk '{print $8}'`
+    tau=`grep "Exponential number" est1.out | tail -"$nexp" |  sed -n ''$n'p' | awk '{print $14}'`
+  fi
+  cat >> adj.in <<EOF
+$tp
+$texp
+$tau $amp
+EOF
+  n=`expr $n + 1 `
+done
+
+nrate=`head -1 rate.in | awk '{print $1}'`
+
+n=1
+while [ "$n" -le "$nrate" ]
+do
+   rate=`grep "Rate change number" est1.out | tail -"$nrate" | sed -n ''$n'p' | awk '{print $12}'`
+   ln=`expr $n + 1 `
+   trate=`sed -n ''$ln'p' rate.in`
+   cat >> adj.in <<EOF
+r
+$trate
+$rate
+EOF
+   n=`expr $n + 1`
+done
+#cat adj.in
 
 
 

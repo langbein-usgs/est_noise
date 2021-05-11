@@ -334,6 +334,7 @@ c   double precision
       common /ModFit1a/t_start,t_stop
 c  single precision
       common /ModFit2/x,e,bexp
+      common /ModFit2a/expmax
 c integer
       common /ModFit3/max_data,max_mod,ic,nmod,n_exp,nmiss,irowmiss,
      & max_time,ipl_flag_1,ipl_flag_2,ibp_flag,nmiss_max

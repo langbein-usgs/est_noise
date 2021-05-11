@@ -254,14 +254,6 @@ c  amp is the amplitude of filter.
 c
 c  Modified May 19, 2015 to use fftpack from netlib.org instead of
 c   realft from Numerical Recipes
-c
-c  Modify Aug 2020 to chose whether to use the invFFT or convolution
-c   to generate the BP filter function.
-c  Convolution seems to smooth-out the jitter seem in the BP impulse response
-c   from the invFFT seen in the time-domain
-c
-c  for now, the choice is hard wired; (if convolution is deemed better,
-c    then it should be possible to compile without the FFT (and invFFT) routines)
 
 c      dimension H(nmax)
 c      double complex hc(nmax),h1,h2,h3,h4
@@ -272,28 +264,16 @@ c      double precision Fi(nmax),ts,wsave(196623),a(32768),b(32768)
 cc  swave dim 3*n+15  196623
       double complex hc(32768),h1,h2,h3,h4
       double precision Fi(nmax),ts,wsave(98319),a(32768),b(32768)
-     &, sumF,c(32768),d(32768),ddd(32768)
+     &, sumF
 c  swave dim 3*n+15  196623
 
 
-
-      print*,'In BP_filt v3',ts,fl,fh,np,nmax,npts,amp
-c  fix bug;
-      len=npts+100
-
-c  chose between fft and convolution;
-c   ifft=1 --- convolution
-c   ifft=0 --- invFFT
-      ifft=1
-
-
-      if ((ifft .eq. 0 ) .or. (ifft .eq. 1)) then
-c
-c  Do invFFT
-c
       fh=fh*ts
       fl=fl*ts
       fn=0.5
+      print*,'In BP_filt v2',ts,fl,fh,np,nmax,npts,amp
+c  fix bug;
+      len=npts+100
       nf=int(len/2)
       nf=int((log(float(len/2))/log(2.))+0)
       nf=nf+1
@@ -350,13 +330,7 @@ c      end do
 c
 c  smooth Fi output using npoint smoother
 c
-      npoint=3
-c      do 61 i=1,len
-c        wsave(i)=Fi(i)
-c61    continue
-c      do 62 i=2,len-1
-c        Fi(i)=(wsave(i-1)+wsave(i)+wsave(i+1))/3.0
-c62    continue
+
       npoint=3
       nptt=int(npoint/2)
       do i=1,len
@@ -375,108 +349,13 @@ c        if ((i .gt. nptt) .and. (i .lt. len-nptt)) then
           end if
         end do
         Fi(i)=sumF/float(nsum)
-        write(46,460)i,wsave(i),Fi(i),wsave(i)-Fi(i),nsum
-460     format(i8,1x,3d15.6,i6)
+c        write(46,460)i,wsave(i),Fi(i),wsave(i)-Fi(i),nsum
+c460     format(i8,1x,3d15.6,i6)
 c        end if
-      end do
+        end do
 c        do i=1,len
 c          Fi(i)=wsave(i)
 c        end do
-      fmax=-99999.
-      fmin=999999. 
-      do i=1,len
-        if (Fi(i) .gt. fmax) then
-          fmax=Fi(i)
-          imax=i
-        end if
-        if (Fi(i) .lt. fmin) then
-          fmin=Fi(i)
-          imin=i
-        end if
-      end do
-      rng1=fmax-fmin
-      print*,' invFFT range, max, min, point;',
-     &   rng1,fmax,imax,fmin,imin      
-      end if
-
-      if (ifft .eq. 1) then
-c
-c  choice is convolution
-c
-      tpi=2.0*3.14159265
-      wl=tpi*fl
-      wh=tpi*fh
-      npts2=1*npts
-      if (npts2+2 .gt. nmax) then
-        print*,' Number of data is 2x of nmax',nmax
-        stop
-      end if
-      print*,' convolve --- bp in radians/yr',wl,wh, npts,nmax,ts
-      do i=1,npts2+2
-        a(i)=exp(-wl*float(i-1)*ts)
-        b(i)=exp(-wh*float(i-1)*ts)
-      end do
-      call convolv1(npts2+2,a,b,c,nmax,nmax)
-c  take 1st derivative
-c   will need to fiddle with delta to get proper scaling --- delta could be delta=ts
-      delta=sqrt(ts)
-      do i=1,npts2
-        if (i .eq. 1) d(i)=(c(i)/2.)*delta
-        if (i .ne. 1) 
-     &   d(i)=(c(i) - c(i-1))*delta
-c        d(i)=(c(i+1)-c(i))*1.0
-c        if (i .ge. 2) d(i)=(c(i+1)-c(i-1))*1.0/2.0
-c        write(8,100)i,d(i)
-        Fi(i)=d(i)
-      end do
-      if (np .ge. 2 ) then
-        do j=2,np
-          call convolv1(npts2,d,Fi,ddd,nmax,nmax)
-          do i=1,npts
-            Fi(i)=ddd(i)
-          end do
-        end do
-
-      end if
-      fMax=-99999.
-      fMin=99999.
-      do i=1,npts
-        if (Fi(i) .ge. fMax) then
-          fMax=Fi(i)
-          imax=i
-        end if
-        if (Fi(i) .lt. fMin) then
-          fMin=Fi(i)
-          imin=i
-        end if
-      end do
-      rng2=fMax-fMin
-      print*,' convolution range, max, min, point;',
-     &   rng2,fMax,imax,fMin,imin   
-      ratio=rng1/rng2
-      print*,"  Ratio between invFFT and conv.", ratio   
-      do i=1,npts
-        write(45,*)i,Fi(i)*ratio
-        Fi(i)=Fi(i)*ratio
-      end do
-
-      end if
-
-      return
-      end
-      subroutine convolv1(npts,H,din,dout,maxtime,maxdata)
-c
-c  H is filter
-c  din and dout are input and output time serier
-      double precision din(maxdata),dout(maxdata)
-      double precision H(maxtime)
-
-      do 52 i=1,npts
-        dout(i)=0.0
-        do 53 j=1,i
-        dout(i)=dout(i)+din(j)*H(i-j+1)
-53      continue
-52    continue
       return
       end
       subroutine makeMatrix(irow,max,f,covar,nobs,iflip,mmax,nmax)
@@ -679,6 +558,26 @@ c  flip around the axis from lower left to upper right....
 52    continue
 c50    continue
       end if
+      return
+      end
+      subroutine convolv1(npts,H,din,dout,maxtime,maxdata)
+c
+c  H is filter
+c  din and dout are input and output time series
+      double precision din(maxdata),dout(maxdata)
+      double precision H(maxtime)
+c      print*,npts
+
+      do 52 i=1,npts
+        dout(i)=0.0
+        do 53 j=1,i
+        dout(i)=dout(i)+din(j)*H(i-j+1)
+53      continue
+52    continue
+c      do i=1,npts
+c        write(6,100)i,H(i),din(i),dout(i)
+c      end do
+c100   format(i4,f10.5,1x,f10.5,f10.5)
       return
       end
 

@@ -1,9 +1,9 @@
 c  generates a time series of correlated noise.
-       double precision dt_sam, t(131072),dec_timed
-       dimension d(131072)
+       double precision dt_sam, t(1531072),dec_timed
+       dimension d(1531072)
        character*1 ModType
        character*3 net
-       max_time=131072
+       max_time=1531072
       open(1,file="seed.dat")
        read(1,*)iseed
       open(25,file='gen_in.jrn')
