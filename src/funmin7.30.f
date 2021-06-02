@@ -238,6 +238,9 @@ c        if ((iswt .eq. 1) .and. (sig4 .gt. 0.0)) then
 c  extend time series by 3/sig4 (sig4 is ggm in rad/year)
 c           print*,' orig kkmax=', kkmax,t_small,sig4
            kkmax=kmax+ifix(3*1/(sngl(t_small)*sig4))
+c  what happens when sig4 is very close to zero and requests something
+c    that exceeds array size..... put limit on kkmax.
+           if (kkmax .gt. max_time) kkmax=max_time
            irowOffset=kkmax-kmax
 c            print*,' kkmax=', kkmax, 'irowOffset=',irowOffset
            if (kkmax .gt. max_time ) then

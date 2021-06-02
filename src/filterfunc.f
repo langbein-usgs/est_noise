@@ -375,7 +375,7 @@ c        if ((i .gt. nptt) .and. (i .lt. len-nptt)) then
           end if
         end do
         Fi(i)=sumF/float(nsum)
-        write(46,460)i,wsave(i),Fi(i),wsave(i)-Fi(i),nsum
+c        write(46,460)i,wsave(i),Fi(i),wsave(i)-Fi(i),nsum
 460     format(i8,1x,3d15.6,i6)
 c        end if
       end do
@@ -456,7 +456,7 @@ c        write(8,100)i,d(i)
       ratio=rng1/rng2
       print*,"  Ratio between invFFT and conv.", ratio   
       do i=1,npts
-        write(45,*)i,Fi(i)*ratio
+c        write(45,*)i,Fi(i)*ratio
         Fi(i)=Fi(i)*ratio
       end do
 
