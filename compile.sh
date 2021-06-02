@@ -40,26 +40,27 @@ then
     echo compiler is gfortran
 
      echo compile est_noise7
-###########  UNCOMMENT ONE OF THE TW NEXT LINES
+###########  UNCOMMENT ONE THESE NEXT LINES
 #     gfortran $file -L/usr/lib -lopenblas -mcmodel=medium -O3
 #  this seems to work for CentOS
-     gfortran $file -L/usr/lib64 -lopenblas -mcmodel=medium -O3    ## CentOS
+     gfortran $file -L/usr/lib64 -lopenblas -mcmodel=medium -O3 -w -std=legacy    ## CentOS
 #  This seems to work for ubuntu
-#     gfortran $file -static -L/usr/lib -lopenblas -mcmodel=medium -O3 -lpthread   ## Ubuntu
+#     gfortran $file  -L/usr/lib -lopenblas -mcmodel=large -O3  -w -std=legacy   ## Ubuntu
 ################################
 #     gfortran $file lib/libopenblas.so -mcmodel=medium -O3   ####### Not used!
      echo compile psd_calc7
-    gfortran $filepsd -O3 -mcmodel=medium
+    gfortran $filepsd -O3 -mcmodel=large -w -std=legacy
      echo compile gen_noise
-    gfortran $filegen -O3 -mcmodel=medium
+    gfortran $filegen -O3 -mcmodel=large -w -std=legacy
      echo compile compare_wander
-    gfortran $filewand -O3 -mcmodel=medium
+    gfortran $filewand -O3 -mcmodel=large -w -std=legacy
      echo compile bust_5
-    gfortran $filebust -O3
+    gfortran $filebust -O3 -w -std=legacy
      echo compile adjust
-    gfortran $fileadj -O3
+    gfortran $fileadj -O3 -w -std=legacy
   elif [ "$2" = "i" ]
   then
+#    note --- for ubuntu --- try changing to  -mcmodel large
     echo compiler is intel ifort
      echo compile est_noise7
     MKLPATH=/opt/intel/mkl/lib/intel64
