@@ -82,7 +82,7 @@ c  double precision
       md=max_data
       maxnmod=max_parm
       mmax=max_time
-
+      irowOffset=0
       nexp=n_exp
 c      print*,'Modtype=', Modtype
 
@@ -235,9 +235,28 @@ c  create first power law and GM filter
         irowOffset=0
 c        if ((iswt .eq. 1) .and. (sig4 .gt. 0.0)) then
         if ( (sig4 .gt. 0.0) .and. (ModType .eq. 'c')) then
+c  normally, create 'ghost' data preceding actual time series for GM
+c     for GM noise
+c   But, for sig4 roughly equal to the length of the time series, it
+c    is close to PL noise and those ghost data aren't needed to compute
+c    an accurate covariance matrix
+          ttlen=(t_year(jmax)-t_year(1))
+          fxlow=1/ttlen
+          extend=3.0
+c  compare sig4 to ttlen
+         fnaught=sig4/6.28
+         if (fnaught .lt. fxlow) then
+           extend=-1.5*(fxlow-fnaught)+3
+           if (fnaught .lt. 0.5*fxlow) extend=0
+         end if
+c   check to see if sig4 could make covariance matrix exceed dimensions
+          if (sig4 .lt. 3/((float(max_time-kmax)*sngl(t_small)) ))
+     &       sig4=3.10/((float(max_time-kmax)*sngl(t_small)) )
 c  extend time series by 3/sig4 (sig4 is ggm in rad/year)
 c           print*,' orig kkmax=', kkmax,t_small,sig4
-           kkmax=kmax+ifix(3*1/(sngl(t_small)*sig4))
+           kkmax=kmax+ifix(extend*1/(sngl(t_small)*sig4))
+c           print*,sig4,kkmax,kkmax-kmax,kmax, max_time
+c           print*,fxlow,fnaught," extend", extend
 c  what happens when sig4 is very close to zero and requests something
 c    that exceeds array size..... put limit on kkmax.
            if (kkmax .gt. max_time) kkmax=max_time
@@ -454,6 +473,7 @@ c           print*,i,ix
 c  bail-out if nerror not equal 0
       if (nerror .ne. 0) then
       print*,' covariance is singular, nerror=',nerror
+c      print*,sig1,sig2,sig3,sig4,sig5,sig6,sig7
 
       
       sig1_new=sig1*1.26

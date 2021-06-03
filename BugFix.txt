@@ -110,3 +110,6 @@ Version 20210501
   not yet
 2 To cleanEst.sh  added -M option where one can specify the noise model (and its parameters); the default
   (ie, with no -M) is a generic, GPS noise model of RW+FL+WN noise.
+
+Version 20210601
+1 various fixes in funmin in cholesky decomposition introduced in version20210501

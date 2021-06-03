@@ -26,7 +26,7 @@ if [ "$#" -lt 1  ]
 then
    echo  " "
    echo "  Script removes outliers from GPS time series"
-   echo " Usage:  cleanEst.sh -d data -f format_type [-b start_time -b end_time -O off_file -E edit_file -T exp_file -S sine_period_file -n noiseType -i sample_interval_days -M noise_model_file]"
+   echo " Usage:  cleanEst.sh -d data -f format_type [-b start_time -b end_time -O off_file -E edit_file -T exp_file -S sine_period_file -n noiseType -i sample_interval_days -M noise_model_file -n a_or_c_f_n]"
    echo "   options -b and -e not implimented "
    echo "   only accepts otr and gmt formats"
    echo "   noiseType is a additive (default) or q, quadrature"
@@ -39,16 +39,20 @@ then
    echo "     for daily observations"
    echo "   -S (file) list additional periods (other than 365.25 and 182.625 days)"
    echo "      to estimate their amplitudes/phases"
+   echo "   -n default is a -- additive covariance that will use f or c"
+   echo "      f -  fast covariance; c - cholesky decomposition or"
+   echo "      n -- legacy mode using quadrature covariance"
+   echo "      the default is a "
    exit
 fi
 
 #  Provide location where the executables are located
-source /home/langbein/.bashrc
+#source /home/langbein/.bashrc
 progs=/Users/john/proglib/est_noise20151128/bin
 progs=/Users/john/Desktop/est_noise20151217/bin
 progs=/Users/john/proglib/est_noise20160201/bin
 progs=/Users/john/proglib/est_noiseBeta/bin
-progs=/home/langbein/proglib/est_noiseBetaX/bin
+#progs=/home/langbein/proglib/est_noiseBeta/bin
 #  defaults 
 
 
