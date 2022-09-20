@@ -67,7 +67,7 @@ ntype=a
 tsamDay=1     #  default sampling interval of data --- in days <----  This could be changed if needed
 bpfilt=`echo 0.5 2`   #  set-up limits of bp filtered noise
 noisefile=NO
-sinefile=NO
+sineFile=NO
 
 while getopts d:f:E:O:T:n:i:M:S: option 
 do
@@ -82,12 +82,11 @@ do
           n)  ntype=$OPTARG;;
           i)  tsamDay=$OPTARG;;
           M)  noisefile=$OPTARG;;
-          S)  sinefile=$OPTARG;;
+          S)  sineFile=$OPTARG;;
          \?)  echo "Incomplete set of arguements; type cleanEst.sh without arguments to get documentation"
               exit 1;;
      esac
 done
-
 here=`pwd`
 mkdir /tmp/SCRATCH
 mkdir /tmp/SCRATCH/"$data"
@@ -264,7 +263,7 @@ EOF
 
 if [ "$sineFile" != "NO"  ]
 then
-   cat "$here"/"$sineFile" >> sea.in
+   awk '{print $1}'  "$here"/"$sineFile" >> sea.in
 fi
 
 wc -l sea.in | awk '{print $1 }' > tmp
