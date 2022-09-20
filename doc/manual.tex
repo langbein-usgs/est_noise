@@ -17,7 +17,8 @@ US Geological Survey \\
 Menlo Park, CA \\
 langbein@usgs.gov}
 %\date{July 14, 2016} 
-\date{May 15, 2021}                                          % Activate to display a given date or no date
+%\date{May 15, 2021}   
+\date{Sept 20, 2022}                                        % Activate to display a given date or no date
 
 \begin{document}
 \maketitle
@@ -30,7 +31,7 @@ provide unbiased estimates of the parameters that model the time-dependence of t
 The optimization is measured using the maximum likelihood estimator.  Although this code was written primarily for
 GNSS observations of positions, it can be applied to other time series, too.
 
-\textit{est\_noise7.3x} is an update of my older program, \textit{est\_noise6.50}.  There are several improvements:
+\textit{est\_noise7.30} is an update of my older program, \textit{est\_noise6.50} and fixes a problem found in \textit{est\_noise7.22}.  There are several improvements:
 \begin{enumerate}
 \item {It provides a mechanism to analyze large data sets rapidly. For data with no gaps in the time series, the speed-up
 can be up to a factor of 50. Typically, for many GPS time series, which have a few gaps, the speed-up is about a factor of 8.}
@@ -51,7 +52,8 @@ of the time series. Neglecting this caused the old version to underestimate the 
 For other noise models, this has not been a problem.
 
 Included in the top directory for \textit{est\_noise} is a file called \texttt{BugFix.txt} which provides the changes in version 7 of  \textit{est\_noise} in
-chronological order.  There have been numerous enhancements, mostly to the scripts that can be used to "drive" \textit{est\_noise}.
+chronological order.  There have been numerous enhancements, mostly to the scripts (found in the \texttt{example0} directory)
+that can be used to "drive" \textit{est\_noise}.
 
 The development and discussion of \textit{est\_noise} can be found in the references. 
 
@@ -61,8 +63,9 @@ The following types of time dependence are included with \textit{est\_noise};  r
 exponential, $1-e^{-t/{\tau}}$, and Omori decay, $log(1 + t/{\tau})$. In addition, more functions can be added.  For instance,
 some observations of interest, such a borehole strainmeter data, one might include the dependence of another set of observations such as atmospheric pressure. The pressure data can be used as another time-dependent function and the
 program finds the admittance (or gain) of the pressure upon the strain data. Specifying these functions is done by answering
-questions that the program asks. You will need to know the times of the offsets, the time of the start of the exponential trend,
-and the period of time spanning the rate change.  More information will be provided later in the manual.
+questions that the program asks. The times of the offsets, the time of the start of the exponential trend,
+and the period of time spanning the rate change need to be provided as part of the input.  
+More information will be provided later in the manual.
 
 \subsection{Noise models for temporal correlations}
 
@@ -92,7 +95,7 @@ that can impact the computational requirements.  It customary to assume that eac
 and add them in quadrature, which has been done with the legacy program \textit{est\_noise6.50} and is offered
 as one option in \textit{est\_noise7.3x}.  Alternatively, each of these noise models is represented by
 a time-domain equivalent, or filter functions.  These filters can be added together to form the covariance
-matrix. Computationally, this offers some advantages that is incorporated in \textit{est\_noise7.3x}.
+matrix. Computationally, this offers some advantages that are incorporated in \textit{est\_noise7.3x}.
 
 \subsection{Related programs}
 
@@ -109,7 +112,7 @@ above.
 specified amplitudes. This is used in companion with \textit{bust\_5}.
 \end{description}
 
-In the \texttt{example0} directory, I provide 3 scripts that combine the use of all of these programs to remove outliers
+In the \texttt{example0} directory, I provide 5 scripts that combine the use of all of these programs to remove outliers
 and to perform the time series analysis to extract trends and the background noise of the data. 
 
 Finally, \textit{Bos et al.} (2012) provides an alternative to \textit{est\_noise} and that code can be found
@@ -151,7 +154,7 @@ For compiling on a Mac, you will need Apple's Xcode installed which is obtained 
 With the Intel option, \textit{i},
 this requires Intel Fortran and their Math Kernal Library.  Otherwise, you'll need \textit{gfortran} which can
 be obtained at \texttt{http://hpc.sourceforge.net/} or via \texttt{brew install gfortran}, assuming that the \texttt{brew} package
-manager has been installed.
+manager has been installed. Likewise, \textit{openblas} can be obtained with the command  \texttt{brew install openblas}.
 
 For compiling on Linux either Intel Fortran or \textit{gfortran} will work.  If the Intel compiler with MKL
 is not available, then gfortran is easily obtained (if not already installed).  Depending on the Linux
@@ -174,7 +177,7 @@ If not present, you can simply download the openblas libraries using a package i
 is \texttt{sudo yum install openblas}, which is used with the CentOS dialect of Linux. IN ADDITION, you will need to
 \textit{comment-out} one of two lines in compile.sh script near line 40.
 
-Note for ubuntu OS:  For this OS, I downloaded openblas from 
+Note for ubuntu OS:  For this OS, I downloaded \textit{openblas} from 
 \\
 \texttt{http://www.openblas.net/} (look for download tab near top
 of page) and follow the install instructions 
@@ -189,7 +192,8 @@ versions of compilers and the versions of your OS, you may need to change the va
 to not only successfully compile \textit{est\_noise}, but to get it to run, too. In the \texttt{compile.sh} script, you will
 see a number of "commented-out" compile statements; these might provide you some hints about what you might
 need to change to get the program(s) to work. Recently, for gfortran, I had to add an additional option of \texttt{-std=legacy}
-to the compilation since the FFT subroutines are written either for Fortran 77 or Fortran 66.
+to the compilation since the FFT subroutines are written either for Fortran 77 or Fortran 66. Finally, as of this writing, Sept. 2022, 
+I have not tested the Intel compile as over the past few years, Intel has made changes with the distribution of their software.
 
 \section{Initial test}
 
@@ -216,10 +220,10 @@ is contained in the following sections.
 \section{Input files}
 
 At the minimum, \textit{est\_noise} requires two input files, one \texttt{seed.dat}, which is a single integer number
-to act as a seed to a random number generator, and a file of data.  When the program is run, it will start
+to act as a seed for a random number generator, and a file of data.  When the program is run, it will start
 asking questions on the standard output and responses are required to be typed into the
-standard input. Your answers are recorded in a journal file which you
-can re-use after changing its name. This section is broken into two parts, the first part discusses formats, in particular
+standard input. The answers are recorded in a journal file which
+can be re-used after changing its name. This section is broken into two parts, the first part discusses formats, in particular
 for the data and specifying time, and the second part documents the questions and answers required by
 \textit{est\_noise}
 
@@ -229,7 +233,7 @@ for the data and specifying time, and the second part documents the questions an
 are specified by:
 \begin{itemize}
 \item \texttt{otr} Time is specified as year, and day of year ranging from 1 to 365 (or 366 for leap year). Finer resolution
-is specified as fraction of a day.  For instance, 1515 and 10 seconds on 1, December 2015 is \texttt{2015 335.635532407}. These are read and stored as double precision values.
+is specified as fraction of a day.  For instance, 1515 and 10 seconds on 1, December 2015 is \texttt{2015 335.635532407}. These are read and stored as double precision values. This format has been well tested.
 \item \texttt{otd} Time is specified as year, month, and day of month.  Month is a number from 1 to 12. For 
 1515 and 10 seconds on 1, December 2015, it is specified as \texttt{20151201.635532407}
 \item \texttt{otx} Time is specified as year, month, and day of month.  Month is a number from 1 to 12. For 
@@ -241,9 +245,9 @@ Therefore, 1515 and 10 seconds on 1, December 2015, it is specified as \texttt{2
 
 The time series of data requires a time stamp, using one of 5 formats, the observation, followed by its "error". Actually,
 that last column, although required by the \texttt{read} statement, is not used. Some thought is needed with
-regards to the data-value.  Although the program is written for double precision, the Fortran format statements
-provide limited resolution. For instance, if the actual scale of the variations in the observations are a few
-millimeters, I suggest that the observations be scaled to millimeters and not meters. 
+regards to the data-value.  Although the program is written for double precision arithmetic, the Fortran format statements
+provide limited resolution. For instance, if the actual scale of the variations in the observations is a few
+millimeters, then it is best to scale the data to tmillimeters and not meters. 
 
 
 \subsection{\textit{est\_noise} questions and responses}
@@ -343,7 +347,7 @@ covariance matrix.
 ask a set of questions that specify the parameters of a noise model. Synthetic data are created with the same
 sampling interval as the data, then at time when data are \textit{missing}, the synthetic data are deleted. \textbf{Note that
 this option has not been tested with the current version of \textit{est\_noise7.sx} but had been used extensively in
-the past. Use with caution!}
+the past. Use with caution!}  Instead, use the program \textit{gen\_noise7.02} to provide synthetic data.
 
 \item[Decimation type]  Typically, this will be \texttt{0}, but one can put anything between \texttt{0} and \texttt{3}.
 With \texttt{0}, all measurements are used.  Otherwise, the data will be decimated using the following, ad-hoc schedule:
@@ -354,7 +358,7 @@ With \texttt{0}, all measurements are used.  Otherwise, the data will be decimat
 \end{description}
 If \textit{Type of error model} is anything but \texttt{n}, the \textit{decimation type} defaults to \texttt{0}, or no decimation.
 
-\item[White noise amplitude] Set-up the parameters to model the white noise component. Two entries are required
+\item[White noise amplitude] Set-up the parameters to estimate the white noise component. Two entries are required
 with the first being a \textit{guess} at the value of the white noise and the second being \texttt{float} or \texttt{fix}.
 If \texttt{float}, the program will find the optimal value of white noise that maximizes the log-likelihood. If \texttt{fix},
 the program holds the value of white noise \textit{fixed}.  As an option, one can let \textit{est\_noise} make the guess
@@ -379,10 +383,9 @@ $3$ is a reasonable choice. See equation~1.
 
 \item[Gauss Markov frequency] Continuation of the set-up of the first power-law/Gauss Markov noise model.
 Two entries are required
-with the first being a \textit{guess} at the ${\alpha}/{2{\pi}}$ frequency and the second being \texttt{float} or \texttt{fix}.
+with the first being a \textit{guess} at the ${\alpha}$ (radians/yr) and the second being \texttt{float} or \texttt{fix}.
 If \texttt{float}, the program will find the optimal value G-M frequency that maximizes the log-likelihood. If \texttt{fix},
 the program holds the G-M frequency \textit{fixed}.   See equation~1. In most cases, your entry will be \texttt{0 fix}.
-Note that the unit of ${\alpha}$ is radians/year.
 
 \item[Bandpass filter limits] Pass-band for band-pass filtered noise model in units of cycles/year. Two numbers are
 required. For typical seasonal noise, use \texttt{0.5 2.0}.  See equation~2.
@@ -396,7 +399,7 @@ the program holds the amplitude  \textit{fixed}.  If bandpass filtered noise is 
 
 \item[Index of second power law noise model] Set-up of the second power-law noise model.
 Two entries are required
-with the first being a \textit{guess} at the of power law index and the second being \texttt{float} or \texttt{fix}.
+with the first being a \textit{guess} for the of power law index and the second being \texttt{float} or \texttt{fix}.
 If \texttt{float}, the program will find the optimal value of the index of power-law noise that maximizes the log-likelihood. If \texttt{fix},
 the program holds the index of power-law noise \textit{fixed}.  If the index, $\beta=1$, then this is considered
 as flicker noise and if $\beta=2$, then this is considered
@@ -440,14 +443,15 @@ The program provides several outputs, with the standard out being the most infor
 when running the program in batch mode, one should direct the standard output to a file. An example
 is shown in the \texttt{./example} directory where \textit{est\_noise} was run as \\
 \texttt{../bin/est\_noise7.30 < est\_canp.in > est\_canp.out} \\
-In addition to the standard output are \texttt{resid.out} and \texttt{covar.out} which augments the information
+In addition to the standard output, there are other files, \texttt{resid.out} and \texttt{covar.out} which augments the information
 presented by the standard output. Specifically, each line in \texttt{resid.out} is the time, the difference
 between the observed and predicted observation, the predicted value from the model, and the observation.
 \texttt{covar.out} provides the covariance between the parameters of the time-dependent model and, secondly,
 their cross correlations.  For \textit{trouble-shooting}, a file, \texttt{tauexp.out} is provided showing the estimates
 of time-constants if the program is required to estimate these terms for either an exponential or logarithmic trend.
 
-The standard output is divided roughly into four sections: Some statistics of the sampling of the data; The estimates
+The standard output is divided roughly into four sections: Some statistics of the data including number of observations,
+sampling interval, and number of gaps; The estimates
 of the parameters of the time-dependent model \textit{assuming that the data are temporally independent, Gaussian
 distributed}; A sequence of trials of noise parameters as the program iterates to an optimal value of log-likelihood;
 And finally a section listing the estimates of the parameters of the time-dependent model and the accompanying
@@ -457,7 +461,7 @@ The various statistics compiled from the raw data include the number of points, 
 the number of missing data, and an estimate of the white noise component made by taking the differences
 between adjacent observations.
 
-The program then assumes that the data covariance is a diagonal matrix and carries out the least-squares analysis
+Initially, the program then assumes that the data covariance is a diagonal matrix and carries out the least-squares analysis
 to estimate the size of each parameter and its standard error.  The standard error is rescaled based upon the
 standard deviation of the fit of the model to the data, assuming a diagonal covariance matrix. (Presumably,
 these would be the values you would get by plugging the data and the design matrix into spreadsheet).
@@ -527,16 +531,18 @@ modeled noise and time dependence.
 
 \section{Sample scripts}
 
-In the directory \texttt{example0}, I provide three scripts to analyze two different time series. Each script should be
-sufficiently documented such that they could be reused for other applications.  However, to see the results,
+In the directory \texttt{example0}, I provide five scripts to analyze two different time series. Each script should be
+sufficiently documented such that they could be reused for other applications. Documentation is obtained by
+typing the name of the script. However, to see the results,
 they do need the GMT plotting library; \textit{www.soest.hawaii.edu/gmt/}. These scripts however, use an older version
 of GMT, which is version 4. (\textit{ftp://ftp.soest.hawaii.edu/gmt/legacy})
 
-The three scripts are:
+The five scripts are:
 \begin{description}
 \item[cleanEst.sh] This should be used first as it 1) makes a preliminary estimate of the parameters of the time dependence of the 
 data using a default, \textit{canned} noise model that is roughly appropriate for continuous GNSS data; 2) detrends those data, 3) removes the outliers, and 4) reinserts the trends. The residuals to the fit are plotted so that one can
-add additional time-dependent models as required or remove outliers not caught by \textit{bust\_5}.   In addition, the input to successive calls to \textit{est\_noise} is set-up, which are required in the next two scripts. 
+add additional time-dependent models as required or remove outliers not caught by \textit{bust\_5}.   In addition, the input to successive calls to \textit{est\_noise} is set-up, which are required in the next four scripts. The work performed by this and the other scripts is
+found in \texttt{/tmp/SCRATCH/\textit{data\_file\_name}}.
 \item[EstNoise.sh]  Uses the cleaned data, \texttt{data.cl} and the file \texttt{est0.in} from \textit{cleanEst.sh} along with a user selected noise
 model and runs \textit{est\_noise} to find the optimal parameters of the noise model.  The residuals to this fit are plotted.
 In addition, the output of \textit{est\_noise} is feed into \textit{compare\_wander} and the RMS drift of the data, along with
@@ -547,19 +553,58 @@ the corresponding drift.  Initially, both the random-walk plus white noise and t
 computed.  The script picks the one with the \textit{maximum likelihood} and identifies it as the so called \textit{null} model.
 Next, the power law model is evaluated and its likelihood is compared with that from the \textit{null} model. Similarly,
 the flicker plus random-walk noise is evaluated. Of these four, it is likely that one of these is a clear "winner". However,
-the script goes on to evaluate both First order Gauss-Markov and Generalized G-M noise. A final set of evaluations uses
+the script goes on to evaluate both first-order Gauss-Markov and generalized G-M noise. A final set of evaluations uses
 bandpass filtered noise superimposed on either flicker or random-walk noise, and flicker plus random walk noise (the default) or power-law noise with the \texttt{-P} option.  Using the \texttt{-S} option,
-one can limit the number of noise models tested from the original eight. For all of these, a drift curve is evaluated.
+one can limit the number of noise models tested from the original eight.  Use the \texttt{-B} to change the limits
+of the band-passed filter. Using \texttt{-m} changes the limit on the power-law index from the default value of $3$.For all of these, a drift curve is evaluated. More description of the script can be obtained with \texttt{-h}.
+\end{description}
+
+Two additional scripts are provided that extend the analysis of \textit{EstNoiseAll.sh}.  These scripts allow for the combination of band-passed
+filtered noise and generalized Gauss-Markov noise. \textit{EstNoiseAll.sh} allows for either GGM or band-passed filtered noise. Note that \textit{EstNoiseAll.sh} 
+needs to be run prior to either \textit{EstNoiseMore.sh} or \textit{EstNoiseAdded.sh}.
+\begin{description}
+\item[EstNoiseMore.sh]  This script tests all four possibilities of band-passed filtered noise (four different poles) along with estimating the Gauss-Markov frequency (radians/yr), power-law index and amplitude.
+\item[EstNoiseAdded.sh] This script tests only one band-passed filtered noise by selecting the pole found by running textit{EstNoiseAll.sh} that
+it identified as optimal.
 \end{description}
 These scripts currently set for the \texttt{otr} format and mostly set-up for
-the \texttt{gmt} format.
+the \texttt{gmt} format. 
 
 Prior to running each of these scripts, you will need to edit each script to identify where the executable programs reside.
 This line should be located near the top of the file containing the script with an environment variable \texttt{progs}.  The actual
-work by these scripts is carried out in \texttt{/tmp/SCRATCH}.
+work by these scripts is carried out in \texttt{/tmp/SCRATCH/\textit{data\_file\_name}}.
 
 By typing the command, one should get documentation with regards to the inputs to these files. The \texttt{example0} directory
 contains the scripts, two data sets, files that are required for the inputs, and the output plot files.
+
+With \textit{cleanEst.sh} there are three options that require additional files.  These options allow for removing bad data, \texttt{-E}.
+estimating the size of offsets, \texttt{-E}. and estimating additional trends in the  \texttt{-T}.  For each of these, they require specific formats
+and there are examples shown in the \texttt{example0} directory (\texttt{canp.edit, canp.off and canp.trnd}.
+
+\begin{description}
+\item[-E] Deleting observations;
+\linebreak \texttt{cat canp.edit
+2004 272 2004 274}
+\item[-O] Offset;
+\linebreak \texttt{cat canp.off
+\linebreak 
+2003 356
+\linebreak
+2004 272}
+\item[-T] Trend;
+\texttt{
+\linebreak
+cat canp.trd 
+\linebreak 
+m 2003 356 0.0054 fix}. \scriptsize{Omori function with 0.0054 year time delay held constant}
+\normalsize
+\linebreak
+\texttt{ r 2000 1 2007 120}  \scriptsize{Change in rate}
+\normalsize
+\linebreak
+\texttt{m 2004 272 0.0054 float} \scriptsize{Omori function with 0.0054 year time delay as initial guess}
+
+\end{description}
 
 \subsection{Example 1}
 
