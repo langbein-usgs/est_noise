@@ -131,7 +131,7 @@ c  Intermediate covariance and filter functions; double precision
        print*,'  7) user supplied function or data'
        print*,' '
        print*,' Program can handle data in various formats'
-       print*,' Version 7.30  --- May 2021'
+       print*,' Version 7.30  --- Sept 2022'
        print*,' '
 c  next statement only for MKL/Intel linked libraries
 c      print*,' num of threads',mkl_get_max_threads()
@@ -1294,9 +1294,12 @@ c  evaluate power level of band pass filtered noise
             amp_mod=sqrt(psd_pl/h)
             print*,' Modify BP amplitude for dithering'
             print*,' at Freq=',freq
+            print*,' flow and fhigh ',flow,fhigh
             print*,'   Power law amplitude is ', psd_pl
             print*,'   BP filter amplitude is ', powBP
             print*,'  Change amplitude from',amp_bp,' to', amp_mod
+            print*,'   ignore change in amplitude'
+            amp_mod=amp_bp
             if (vamp_bp(iloop) .gt. 1) damp_bp=amp_mod*vamp_bp(iloop)
             if (vamp_bp(iloop) .lt. 1) damp_bp=amp_mod/vamp_bp(iloop)
           end if
@@ -1723,7 +1726,6 @@ c   Apr 2021 --- if alpha .ne. 0  set modtype = 'c'
        if ((alpha .ne. 0 ) .and. 
      &    ( modtype .eq. 'f') )  Modtype='c'
 c     &    ((Modtype .eq. 'f') .or. (Modtype .eq. 'q')) Modtype='c'
-
         call funmin(fv4,siginstr,amp1,exp1,alpha,amp_bp,
      &    npole,flow,fhigh,amp2,exp2,dt_sam/365.25d+0,
      &    iswt,ModType,A,d,res)

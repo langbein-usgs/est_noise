@@ -1,6 +1,6 @@
       subroutine funmin(fmle,sig1,sig2,sig3,sig4,sig5,
      &   npole,flow,fhigh,sig6,sig7,ts_yrs,
-     &   iswt,ModType,ax,d,res)
+     &   iswt,modType,ax,d,res)
 
 c
 c  computes maximum likelihood for specified inputs
@@ -60,7 +60,7 @@ c     & FtCi(12687,12687),FtCiF(12687,12687),
       dimension bexp(10), parm(10)
       character*7 exp_choice(10), exp_type(10)
       integer irow(12687), irowmiss(12687)
-      character*1 ModType
+      character*1 modType
 c  Next used for DFT
 c      double precision ftemp(65536),wsave(196623)
 c   double precision
@@ -82,7 +82,7 @@ c  double precision
       md=max_data
       maxnmod=max_parm
       mmax=max_time
-      irowOffset=0
+
       nexp=n_exp
 c      print*,'Modtype=', Modtype
 
@@ -225,38 +225,19 @@ c        print*,fny,sig1
          print*,' kmax = ',kmax,' exceeds max_time of ',max_time
          stop
        end if
-c      print*,'ModType= ',ModType,' ipl_flag= ',ipl_flag, 'iswt= ',iswt
+
       if ((ModType .eq. 'f' ) .or. (ModType .eq. 'c')) then
 
 c  create first power law and GM filter
 
-      if ((ipl_flag_1 .ne. 1) .or. (iswt .eq. 1))  then
+      if (ipl_flag_1 .ne. 1)  then
         kkmax=kmax
         irowOffset=0
 c        if ((iswt .eq. 1) .and. (sig4 .gt. 0.0)) then
         if ( (sig4 .gt. 0.0) .and. (ModType .eq. 'c')) then
-c  normally, create 'ghost' data preceding actual time series for GM
-c     for GM noise
-c   But, for sig4 roughly equal to the length of the time series, it
-c    is close to PL noise and those ghost data aren't needed to compute
-c    an accurate covariance matrix
-          ttlen=(t_year(jmax)-t_year(1))
-          fxlow=1/ttlen
-          extend=3.0
-c  compare sig4 to ttlen
-         fnaught=sig4/6.28
-         if (fnaught .lt. fxlow) then
-           extend=-1.5*(fxlow-fnaught)+3
-           if (fnaught .lt. 0.5*fxlow) extend=0
-         end if
-c   check to see if sig4 could make covariance matrix exceed dimensions
-          if (sig4 .lt. 3/((float(max_time-kmax)*sngl(t_small)) ))
-     &       sig4=3.10/((float(max_time-kmax)*sngl(t_small)) )
 c  extend time series by 3/sig4 (sig4 is ggm in rad/year)
 c           print*,' orig kkmax=', kkmax,t_small,sig4
-           kkmax=kmax+ifix(extend*1/(sngl(t_small)*sig4))
-c           print*,sig4,kkmax,kkmax-kmax,kmax, max_time
-c           print*,fxlow,fnaught," extend", extend
+           kkmax=kmax+ifix(3*1/(sngl(t_small)*sig4))
 c  what happens when sig4 is very close to zero and requests something
 c    that exceeds array size..... put limit on kkmax.
            if (kkmax .gt. max_time) kkmax=max_time
@@ -473,7 +454,6 @@ c           print*,i,ix
 c  bail-out if nerror not equal 0
       if (nerror .ne. 0) then
       print*,' covariance is singular, nerror=',nerror
-c      print*,sig1,sig2,sig3,sig4,sig5,sig6,sig7
 
       
       sig1_new=sig1*1.26
