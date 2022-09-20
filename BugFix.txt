@@ -113,3 +113,7 @@ Version 20210501
 
 Version 20210601
 1 various fixes in funmin in cholesky decomposition introduced in version20210501
+
+Version 20220909  --  More fixes concerning GGM (or FOGM) with GM frequencies that are very low;
+   constrain lowest, GM frequency to 0.1*2*pi/tlen  where tlen is the length of the time series
+   This change was made in the subroutine pow_law_cov  found in filtfunc.f
