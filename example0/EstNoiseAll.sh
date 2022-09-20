@@ -7,7 +7,7 @@ if [ "$#" -lt 1  ]
 then
    echo  " "
    echo "  Script determines parameters of noise model using maximum likelihood"
-   echo " Usage:  EstNoise.sh -d data  [ -h ] [-S 0/1/2 ] [ -P ] [ -m expmax]"
+   echo " Usage:  EstNoise.sh -d data  [ -h ] [-S 0/1/2 ] [ -P ] [ -m expmax] [ -B low:high ]"
    echo "   Steps through and evaluates a sequence of noise models likely"
    echo "     to model the background noise of GNSS data"
    echo "   Initially, evaluates random walk and flicker (not the combo)"
@@ -30,6 +30,8 @@ then
    echo " -m expmax  Maximum allowed power-law index for first power-law model"
    echo "     default is 3. Used occassionally to limit size of Pl index"
    echo "     Some data appear to have indices > 2.5 which may be unrealistic"
+   echo " -B low:high  Sets limits of bandpass filter (: needed to separate the BP filt limits)"
+   echo "    default is 0.5:2.0 -- 0.5 c/yr to 2.0 c/yr for modulated, seasonal noise"
    echo " -h --  provides more documentation of algorithm"
 
    echo " This script requires cleanEst.sh to be run immediately prior to this one"
@@ -37,12 +39,12 @@ then
    exit
 fi
 #  Provide location where the executables are located
-source /home/langbein/.bashrc
+#source /home/langbein/.bashrc
 progs=/Users/john/proglib/est_noise20151128/bin
 progs=/Users/john/Desktop/est_noise20151217/bin
 progs=/Users/john/proglib/est_noise20160201/bin
 progs=/Users/john/proglib/est_noiseBeta/bin
-progs=/home/langbein/proglib/est_noiseBetaX/bin
+#progs=/home/langbein/proglib/est_noiseBetaX/bin
 # defaults
 nett=otr
 netd=otr
@@ -53,6 +55,7 @@ tsamDay=0     #  default sampling interval of data --- in days <----  This could
 Nnoise=0      # Default on noise models being tested; Does 8 models
 expmax=3    #  default value of power law index
 
+bpfilt=0
 skip=0  #  This is for testing; normaly set to zero
 
 nsim=201    #  Number of simulations for compare_wander.
@@ -61,7 +64,7 @@ nsim=201    #  Number of simulations for compare_wander.
 ###
 
 
-while getopts d:hS:Pm: option 
+while getopts d:hS:Pm:B: option 
 do
 
      case "$option"
@@ -71,6 +74,7 @@ do
           S) Nnoise=$OPTARG;;
           P) bpother=yes;;
           m) expmax=$OPTARG;;
+          B) bpfilt=$OPTARG;;
          \?)  echo "Incomplete set of arguements; type EstNoiseAll.sh without arguments to get documentation"
               exit 1;;
      esac
@@ -214,7 +218,15 @@ nett=$netd
 cd /tmp/SCRATCH/"$data"
 echo 772395 > seed.dat
 ntype=`cat modtype.dat`
+#bpfilt=`cat bpfilt.dat`
+if [ "$bpfilt"  = "0" ] 
+then
+  echo 0.5 2.0 > bpfilt.dat
+else
+  echo $bpfilt | sed 's/:/ /' > bpfilt.dat
+fi
 bpfilt=`cat bpfilt.dat`
+
 
 if [ "$ntype" = "q" ]
 then
@@ -361,6 +373,7 @@ cat > model_"$data".dat << EOF
 Model	rate	intercept	365	182	offset
 EOF
 
+DiffMLEthres=100     #  sets a threshold for deciding whether the 'fast' version worked
 
 ####   Establish null noise model by running both Flicker and Random walk
 ###
@@ -421,7 +434,7 @@ EOF
 
 ####   Plot the wander
 ls -lt wander.out 
-sed '/Nan/d' wander.out | sed '/nan/d' | sed '/NAN/d' | sed '/Inf/d' > junk
+sed '/Nan/d' wander.out | sed '/nan/d' | sed '/NAN/d' | sed '/Inf/d' | sed '/NaN/d'  > junk
 mv junk wander.out
 tmin=`head -1 wander.out | awk '{print $1}'`
 tmax=`tail -1 wander.out | awk '{print (int($1/1000) + 1)*1000}'`
@@ -1132,7 +1145,7 @@ then
     echo $MLE $MLE0
     DiffMLE=`echo $MLE $MLE0 | awk '{print int(sqrt(($1-$2)**2))}'`
     echo $DiffMLE
-    if [ "$DiffMLE" -gt 1000 ]
+    if [ "$DiffMLE" -gt "$DiffMLEthres" ]
     then
       ReDo=1
     fi
@@ -1222,7 +1235,7 @@ then
     echo $MLE $MLE0
     DiffMLE=`echo $MLE $MLE0 | awk '{print int(sqrt(($1-$2)**2))}'`
     echo $DiffMLE
-    if [ "$DiffMLE" -gt 1000 ]
+    if [ "$DiffMLE" -gt "$DiffMLEthres" ]
     then
       ReDo=1
     fi
@@ -1314,7 +1327,7 @@ then
     echo $MLE $MLE0
     DiffMLE=`echo $MLE $MLE0 | awk '{print int(sqrt(($1-$2)**2))}'`
     echo $DiffMLE
-    if [ "$DiffMLE" -gt 1000 ]
+    if [ "$DiffMLE" -gt "$DiffMLEthres" ]
     then
       ReDo=1
     fi
@@ -1407,7 +1420,7 @@ then
     echo $MLE $MLE0
     DiffMLE=`echo $MLE $MLE0 | awk '{print int(sqrt(($1-$2)**2))}'`
     echo $DiffMLE
-    if [ "$DiffMLE" -gt 1000 ]
+    if [ "$DiffMLE" -gt "$DiffMLEthres" ]
     then
       ReDo=1
     fi
@@ -1573,6 +1586,8 @@ then
 ###  Tabulate the results here for later sorting
 rm -f PLBPsort.dat
 
+
+
 MOD=PLBP1
 np=1
 rm -f est2.in
@@ -1607,7 +1622,7 @@ then
     echo $MLE $MLE0x
     DiffMLE=`echo $MLE $MLE0x | awk '{print int(sqrt(($1-$2)**2))}'`
     echo $DiffMLE
-    if [ "$DiffMLE" -gt 1000 ]
+    if [ "$DiffMLE" -gt "$DiffMLEthres" ]
     then
       ReDo=1
     fi
@@ -1694,7 +1709,7 @@ then
     echo $MLE $MLE0x
     DiffMLE=`echo $MLE $MLE0x | awk '{print int(sqrt(($1-$2)**2))}'`
     echo $DiffMLE
-    if [ "$DiffMLE" -gt 1000 ]
+    if [ "$DiffMLE" -gt "$DiffMLEthres" ]
     then
       ReDo=1
     fi
@@ -1781,7 +1796,7 @@ then
     echo $MLE $MLE0x
     DiffMLE=`echo $MLE $MLE0x | awk '{print int(sqrt(($1-$2)**2))}'`
     echo $DiffMLE
-    if [ "$DiffMLE" -gt 1000 ]
+    if [ "$DiffMLE" -gt "$DiffMLEthres" ]
     then
       ReDo=1
     fi
@@ -1868,7 +1883,7 @@ then
     echo $MLE $MLE0x
     DiffMLE=`echo $MLE $MLE0x | awk '{print int(sqrt(($1-$2)**2))}'`
     echo $DiffMLE
-    if [ "$DiffMLE" -gt 1000 ]
+    if [ "$DiffMLE" -gt "$DiffMLEthres" ]
     then
       ReDo=1
     fi
@@ -2065,7 +2080,7 @@ then
     echo $MLE $MLE0x
     DiffMLE=`echo $MLE $MLE0x | awk '{print int(sqrt(($1-$2)**2))}'`
     echo $DiffMLE
-    if [ "$DiffMLE" -gt 1000 ]
+    if [ "$DiffMLE" -gt "$DiffMLEthres" ]
     then
       ReDo=1
     fi
@@ -2153,7 +2168,7 @@ then
     echo $MLE $MLE0x
     DiffMLE=`echo $MLE $MLE0x | awk '{print int(sqrt(($1-$2)**2))}'`
     echo $DiffMLE
-    if [ "$DiffMLE" -gt 1000 ]
+    if [ "$DiffMLE" -gt "$DiffMLEthres" ]
     then
       ReDo=1
     fi
@@ -2241,7 +2256,7 @@ then
     echo $MLE $MLE0x
     DiffMLE=`echo $MLE $MLE0x | awk '{print int(sqrt(($1-$2)**2))}'`
     echo $DiffMLE
-    if [ "$DiffMLE" -gt 1000 ]
+    if [ "$DiffMLE" -gt "$DiffMLEthres" ]
     then
       ReDo=1
     fi
@@ -2329,7 +2344,7 @@ then
     echo $MLE $MLE0x
     DiffMLE=`echo $MLE $MLE0x | awk '{print int(sqrt(($1-$2)**2))}'`
     echo $DiffMLE
-    if [ "$DiffMLE" -gt 1000 ]
+    if [ "$DiffMLE" -gt "$DiffMLEthres" ]
     then
       ReDo=1
     fi
