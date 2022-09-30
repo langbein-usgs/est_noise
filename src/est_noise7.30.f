@@ -2828,7 +2828,7 @@ c      if ( iswitch .eq. 1) then
 
 c        write(88,*)" ERROR calc"
 c130     format(90(3x,f15.3,1x,f15.3))
-130     format(90(3x,e17.10,1x,e16.10))
+130     format(90(3x,e17.10,1x,e17.10))
       else
         write(13,130)(x(i),e(i),i=1,nmod),(x(nmod+i),0.0,i=1,ix)
 c        write(88,*)" no error"
@@ -3477,21 +3477,21 @@ c     & ' is ',f10.2,' +/- ',f8.2,'  Time constant is: ',f10.5,' yrs')
 212   format(' Exponential number ',i3,' at ',f16.9,
      & f12.4,' +/- ',f10.4,'  Time constant is: ', e12.5,' yrs')
 2081  format(' Exponential number ',i5,' at ',i5,f10.3,
-     & ' is ',f10.2,' +/- ',f8.2,'  Time constant is: ',e10.5,
-     &  ' +/- ',e11.5,' yrs')
+     & ' is ',f10.2,' +/- ',f8.2,'  Time constant is: ',e12.5,
+     &  ' +/- ',e12.5,' yrs')
 2091  format(' Exponential number ',i3,' at ',i5,i3,f8.3,
-     & ' is ',f10.2,' +/- ',f8.2,'  Time constant is: ',e10.5,
-     &  ' +/- ',e11.5,' yrs')    
+     & ' is ',f10.2,' +/- ',f8.2,'  Time constant is: ',e12.5,
+     &  ' +/- ',e12.5,' yrs')    
 2101  format(' Exponential number ',i3,' at ',i4,i2.2,i2.2,f4.3,
      & ' is ',f10.2,' +/- ' ,f8.2,'  Time constant is: ', e12.5,' yrs',
-     &  ' +/- ',e11.5,' yrs') 
+     &  ' +/- ',e12.5,' yrs') 
 2111  format(' Exponential number ',i3,' at ',i4,'-',i2.2,'-',i2.2,'T',
      & i2.2,':',i2.2,':',i2.2,f2.1,
      & ' is ',f10.2,' +/- ' ,f8.2,'  Time constant is: ', e12.5,' yrs',
-     &  ' +/- ',e11.5,' yrs')     
+     &  ' +/- ',e12.5,' yrs')     
 2121  format(' Exponential number ',i3,' at ',f16.9,
      & f12.4,' +/- ',f10.4,'  Time constant is: ', e12.5,' yrs',
-     &  ' +/- ',e11.5,' yrs') 
+     &  ' +/- ',e12.5,' yrs') 
       end if
 c      print*,'n_file_press=',n_file_press,' nc=',nc
 c      nc=nc-n_file_press
