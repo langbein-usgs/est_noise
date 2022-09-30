@@ -1,0 +1,37 @@
+This contains all the software used by the current version of est_noise.
+est_noise is a linear regression program to estimates various
+functional relations in time seriers (ie, rate, offsets, etc) and,
+importantly, estimates the parameters that describe the temporal correlations
+such that the estimated values of the functional relations are 'relatively'
+unbiased (ie, representing the true values).
+
+This package includes "the manual".
+For Linux systems, the excutables are found in bin_linux
+Otherwise, for Macs, there is a compile.sh script which allows
+one to use either gfortran or Intel fortran to create the executables
+which will land in the bin directory.
+
+The directory example provides the input file and sample data to test est_noise.
+The input file is anotated .. please read the manual
+
+The directory example0 provides some scripts that use all of the
+executables to assist with analyzing time series data. Please read the manual.
+
+For the interested user, there are three other reports provided:
+Langbein_Geod_2017.pdf  -- explains the method of how est_noise works
+Threshold_dMLE_v4.pdf  -- describes how to select the "best" noise model
+     that models the temporal correlation
+GGMproblemFixed.pdf  -- describes the modification of the original est_noise (v7.22)
+    to fix the problem of incorrectly computing the rate and its uncertainty when
+    a Gauss-Markov process is used to describe the temporal correlations.
+
+Older versions of est_noise can be found at:
+https://escweb.wr.usgs.gov/share/langbein/Web/OUT/est_noise/
+and
+https://escweb.wr.usgs.gov/share/langbein/Web/OUT/est_noise_legacy/
+
+Questions --- contact me;
+langbein@usgs.gov
+john_langbein@yahoo.com
+
+Sept 27, 2022
