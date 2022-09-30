@@ -45,6 +45,8 @@ progs=/Users/john/Desktop/est_noise20151217/bin
 progs=/Users/john/proglib/est_noise20160201/bin
 progs=/Users/john/proglib/est_noiseBeta/bin
 #progs=/home/langbein/proglib/est_noiseBetaX/bin
+#   provide location of GMT -- using either version 5 or 6; 
+gmtdir=/usr/local/Cellar/gmt/6.4.0_1/bin
 # defaults
 nett=otr
 netd=otr
@@ -188,7 +190,7 @@ on the statistical ranges of simulated data having the same noise
 as the estimated from the actual data.  The red line represents the
 drift of the data adjusted for its time-dependence.  The dashed
 black curve represents the range of 68% of the simulations. Likewise,
-the solid black curve is the range for 95% of the simulations. In
+the solid  black curve is the range for 95% of the simulations. In
 principle, the noise model with the most positive MLE could be the
 best.  However, MLE does not take into account the number of unknowns.
 These are taken into accounted with AIC and BIC in slightly different
@@ -452,34 +454,34 @@ max=`sort -g junk | tail -1 | awk '{print 5*(int($1/5)+1)}'`
 #fi
 
 echo $tmin/$tmax/$min/$max
-gmtset MEASURE_UNIT inch
-gmtset PAPER_MEDIA letter
-gmtset PAPER_MEDIA Custom_612x1000
-gmtset HEADER_FONT_SIZE 18p
-gmtset HEADER_OFFSET -0.2i
-gmtset LABEL_FONT_SIZE 14p
-gmtset ANNOT_FONT_SIZE_PRIMARY 12p
-gmtset ANNOT_FONT_SIZE_SECONDARY 12p
+"$gmtdir"/gmt gmtset MEASURE_UNIT inch
+"$gmtdir"/gmt gmtset PAPER_MEDIA letter
+"$gmtdir"/gmt gmtset PAPER_MEDIA Custom_612x1000
+"$gmtdir"/gmt gmtset HEADER_FONT_SIZE 18p
+"$gmtdir"/gmt gmtset HEADER_OFFSET -0.0i
+"$gmtdir"/gmt gmtset LABEL_FONT_SIZE 14p
+"$gmtdir"/gmt gmtset ANNOT_FONT_SIZE_PRIMARY 12p
+"$gmtdir"/gmt gmtset ANNOT_FONT_SIZE_SECONDARY 12p
 
 title=`echo $data  $MOD`
 psf=plot
 rm -f plot.ps
 echo 
 awk '{print $1, $2}' wander.out | \
-psxy -JX2.5l/2.0l -R$tmin/$tmax/$min/$max -Ba1f3:" ":/a2f3:"drift, mm"::."$title":WSen -W3/255/0/0p -Xa1.5 -Ya10.9 -K -P > $psf.ps
+"$gmtdir"/gmt psxy -JX2.5l/2.0l -R$tmin/$tmax/$min/$max -Ba1f3:" ":/a2f3:"drift, mm"::."$title":WSen -W3p,255/0/0,solid -Xa1.5 -Ya10.9 -K -P > $psf.ps
 
 awk '{print $1, $3}' wander.out | \
-psxy -JX -R -W1/0/0/0tap -K -O -Xa1.5 -Ya10.9 >> $psf.ps
+"$gmtdir"/gmt psxy -JX -R -W1p,0/0/0,dashed -K -O -Xa1.5 -Ya10.9 >> $psf.ps
 awk '{print $1, $4}' wander.out | \
-psxy -JX -R -W1/0/0/0tap -K -O -Xa1.5 -Ya10.9 >> $psf.ps
+"$gmtdir"/gmt psxy -JX -R -W1p,0/0/0,dashed -K -O -Xa1.5 -Ya10.9 >> $psf.ps
 awk '{print $1, $7}' wander.out | \
-psxy -JX -R -W2/0/0/0p -K -O -Xa1.5 -Ya10.9 >> $psf.ps
+"$gmtdir"/gmt psxy -JX -R -W2p,0/0/0,solid -K -O -Xa1.5 -Ya10.9 >> $psf.ps
 awk '{print $1, $8}' wander.out | \
-psxy -JX -R -W2/0/0/0p -K -O -Xa1.5 -Ya10.9 >> $psf.ps
+"$gmtdir"/gmt psxy -JX -R -W2p,0/0/0,solid -K -O -Xa1.5 -Ya10.9 >> $psf.ps
 
 
 
-pstext -JX2.5/2.0 -R0/1/0/1 -K -O -Xa1.5 -Ya10.9 >> $psf.ps <<EOF
+"$gmtdir"/gmt pstext -JX2.5/2.0 -R0/1/0/1 -K -O -Xa1.5 -Ya10.9 >> $psf.ps <<EOF
 0.08 0.90 8 0 0 ML White Noise $wh
 0.06 0.84 8 0 0 ML 1st Power Law
 0.08 0.79 8 0 0 ML Index $plexp1
@@ -583,7 +585,7 @@ echo NULL $null $MLE0 $AIC0 $BIC0 $wh0 $plamp0 $plexp0
 dmle=`echo $MLEFL $MLE0 | awk '{print $1-$2}'`
 daic=`echo $AICFL $AIC0 | awk '{print $1-$2}'`
 dbic=`echo $BICFL $BIC0 | awk '{print $1-$2}'`
-pstext -JX2.5/2.0 -R0/1/0/1 -K -O -Xa1.5 -Ya10.9 >> $psf.ps <<EOF
+"$gmtdir"/gmt pstext -JX2.5/2.0 -R0/1/0/1 -K -O -Xa1.5 -Ya10.9 >> $psf.ps <<EOF
 0.05 0.95 8 0 0 ML @~d@~MLE $dmle
 0.40 0.95 8 0 0 ML @~d@~AIC $daic
 0.70 0.95 8 0 0 ML @~d@~BIC $dbic
@@ -625,20 +627,20 @@ echo $tmin/$tmax/$min/$max
 title=`echo $data  $MOD`
 
 awk '{print $1, $2}' wander.out | \
-psxy -JX2.5l/2.0l -R$tmin/$tmax/$min/$max -Ba1f3:" ":/a2f3:"drift, mm"::."$title":WSen -W3/255/0/0p -Xa1.5 -Ya8.0 -K -O >> $psf.ps
+"$gmtdir"/gmt psxy -JX2.5l/2.0l -R$tmin/$tmax/$min/$max -Ba1f3:" ":/a2f3:"drift, mm"::."$title":WSen -W3p,255/0/0,solid -Xa1.5 -Ya8.0 -K -O >> $psf.ps
 
 awk '{print $1, $3}' wander.out | \
-psxy -JX -R -W1/0/0/0tap -K -O -Xa1.5 -Ya8.0 >> $psf.ps
+"$gmtdir"/gmt psxy -JX -R -W1p,0/0/0,dashed -K -O -Xa1.5 -Ya8.0 >> $psf.ps
 awk '{print $1, $4}' wander.out | \
-psxy -JX -R -W1/0/0/0tap -K -O -Xa1.5 -Ya8.0 >> $psf.ps
+"$gmtdir"/gmt psxy -JX -R -W1p,0/0/0,dashed -K -O -Xa1.5 -Ya8.0 >> $psf.ps
 awk '{print $1, $7}' wander.out | \
-psxy -JX -R -W2/0/0/0p -K -O -Xa1.5 -Ya8.0 >> $psf.ps
+"$gmtdir"/gmt psxy -JX -R -W2p,0/0/0,solid -K -O -Xa1.5 -Ya8.0 >> $psf.ps
 awk '{print $1, $8}' wander.out | \
-psxy -JX -R -W2/0/0/0p -K -O -Xa1.5 -Ya8.0 >> $psf.ps
+"$gmtdir"/gmt psxy -JX -R -W2p,0/0/0,solid -K -O -Xa1.5 -Ya8.0 >> $psf.ps
 
 
 
-pstext -JX2.5/2.0 -R0/1/0/1 -K -O -Xa1.5 -Ya8.0 >> $psf.ps <<EOF
+"$gmtdir"/gmt pstext -JX2.5/2.0 -R0/1/0/1 -K -O -Xa1.5 -Ya8.0 >> $psf.ps <<EOF
 0.05 0.95 8 0 0 ML @~d@~MLE $dmle
 0.40 0.95 8 0 0 ML @~d@~AIC $daic
 0.70 0.95 8 0 0 ML @~d@~BIC $dbic
@@ -735,20 +737,20 @@ echo $tmin/$tmax/$min/$max
 title=`echo $data  $MOD`
 
 awk '{print $1, $2}' wander.out | \
-psxy -JX2.5l/2.0l -R$tmin/$tmax/$min/$max -Ba1f3:" ":/a2f3:"drift, mm"::."$title":WSen -W3/255/0/0p -Xa1.5 -Ya5.1 -K -O >> $psf.ps
+"$gmtdir"/gmt psxy -JX2.5l/2.0l -R$tmin/$tmax/$min/$max -Ba1f3:" ":/a2f3:"drift, mm"::."$title":WSen -W3p,255/0/0,solid -Xa1.5 -Ya5.1 -K -O >> $psf.ps
 
 awk '{print $1, $3}' wander.out | \
-psxy -JX -R -W1/0/0/0tap -K -O -Xa1.5 -Ya5.1 >> $psf.ps
+"$gmtdir"/gmt psxy -JX -R -W1p,0/0/0,dashed -K -O -Xa1.5 -Ya5.1 >> $psf.ps
 awk '{print $1, $4}' wander.out | \
-psxy -JX -R -W1/0/0/0tap -K -O -Xa1.5 -Ya5.1 >> $psf.ps
+"$gmtdir"/gmt psxy -JX -R -W1p,0/0/0,dashed -K -O -Xa1.5 -Ya5.1 >> $psf.ps
 awk '{print $1, $7}' wander.out | \
-psxy -JX -R -W2/0/0/0p -K -O -Xa1.5 -Ya5.1 >> $psf.ps
+"$gmtdir"/gmt psxy -JX -R -W2p,0/0/0,solid -K -O -Xa1.5 -Ya5.1 >> $psf.ps
 awk '{print $1, $8}' wander.out | \
-psxy -JX -R -W2/0/0/0p -K -O -Xa1.5 -Ya5.1 >> $psf.ps
+"$gmtdir"/gmt psxy -JX -R -W2p,0/0/0,solid -K -O -Xa1.5 -Ya5.1 >> $psf.ps
 
 
 
-pstext -JX2.5/2.0 -R0/1/0/1 -K -O -Xa1.5 -Ya5.1 >> $psf.ps <<EOF
+"$gmtdir"/gmt pstext -JX2.5/2.0 -R0/1/0/1 -K -O -Xa1.5 -Ya5.1 >> $psf.ps <<EOF
 0.05 0.95 8 0 0 ML @~d@~MLE $dmle
 0.40 0.95 8 0 0 ML @~d@~AIC $daic
 0.70 0.95 8 0 0 ML @~d@~BIC $dbic
@@ -852,20 +854,20 @@ echo $tmin/$tmax/$min/$max
 title=`echo $data  $MOD`
 
 awk '{print $1, $2}' wander.out | \
-psxy -JX2.5l/2.0l -R$tmin/$tmax/$min/$max -Ba1f3:"Period, days ":/a2f3:"drift, mm"::."$title":WSen -W3/255/0/0p -Xa1.5 -Ya2.2 -K -O >> $psf.ps
+"$gmtdir"/gmt psxy -JX2.5l/2.0l -R$tmin/$tmax/$min/$max -Ba1f3:"Period, days ":/a2f3:"drift, mm"::."$title":WSen -W3p,255/0/0,solid -Xa1.5 -Ya2.2 -K -O >> $psf.ps
 
 awk '{print $1, $3}' wander.out | \
-psxy -JX -R -W1/0/0/0tap -K -O -Xa1.5 -Ya2.2 >> $psf.ps
+"$gmtdir"/gmt psxy -JX -R -W1p,0/0/0,dashed -K -O -Xa1.5 -Ya2.2 >> $psf.ps
 awk '{print $1, $4}' wander.out | \
-psxy -JX -R -W1/0/0/0tap -K -O -Xa1.5 -Ya2.2 >> $psf.ps
+"$gmtdir"/gmt psxy -JX -R -W1p,0/0/0,dashed -K -O -Xa1.5 -Ya2.2 >> $psf.ps
 awk '{print $1, $7}' wander.out | \
-psxy -JX -R -W2/0/0/0p -K -O -Xa1.5 -Ya2.2 >> $psf.ps
+"$gmtdir"/gmt psxy -JX -R -W2p,0/0/0,solid -K -O -Xa1.5 -Ya2.2 >> $psf.ps
 awk '{print $1, $8}' wander.out | \
-psxy -JX -R -W2/0/0/0p -K -O -Xa1.5 -Ya2.2 >> $psf.ps
+"$gmtdir"/gmt psxy -JX -R -W2p,0/0/0,solid -K -O -Xa1.5 -Ya2.2 >> $psf.ps
 
 
 
-pstext -JX2.5/2.0 -R0/1/0/1 -K -O -Xa1.5 -Ya2.2 >> $psf.ps <<EOF
+"$gmtdir"/gmt pstext -JX2.5/2.0 -R0/1/0/1 -K -O -Xa1.5 -Ya2.2 >> $psf.ps <<EOF
 0.05 0.95 8 0 0 ML @~d@~MLE $dmle
 0.40 0.95 8 0 0 ML @~d@~AIC $daic
 0.70 0.95 8 0 0 ML @~d@~BIC $dbic
@@ -960,20 +962,20 @@ echo $tmin/$tmax/$min/$max
 title=`echo $data  $MOD`
 
 awk '{print $1, $2}' wander.out | \
-psxy -JX2.5l/2.0l -R$tmin/$tmax/$min/$max -Ba1f3:" ":/a2f3:"drift, mm"::."$title":WSen -W3/255/0/0p -Xa5.0 -Ya10.9 -K -O >> $psf.ps
+"$gmtdir"/gmt psxy -JX2.5l/2.0l -R$tmin/$tmax/$min/$max -Ba1f3:" ":/a2f3:"drift, mm"::."$title":WSen -W3p,255/0/0,solid -Xa5.0 -Ya10.9 -K -O >> $psf.ps
 
 awk '{print $1, $3}' wander.out | \
-psxy -JX -R -W1/0/0/0tap -K -O -Xa5.0 -Ya10.9 >> $psf.ps
+"$gmtdir"/gmt psxy -JX -R -W1p,0/0/0,dashed -K -O -Xa5.0 -Ya10.9 >> $psf.ps
 awk '{print $1, $4}' wander.out | \
-psxy -JX -R -W1/0/0/0tap -K -O -Xa5.0 -Ya10.9 >> $psf.ps
+"$gmtdir"/gmt psxy -JX -R -W1p,0/0/0,dashed -K -O -Xa5.0 -Ya10.9 >> $psf.ps
 awk '{print $1, $7}' wander.out | \
-psxy -JX -R -W2/0/0/0p -K -O -Xa5.0 -Ya10.9 >> $psf.ps
+"$gmtdir"/gmt psxy -JX -R -W2p,0/0/0,solid -K -O -Xa5.0 -Ya10.9 >> $psf.ps
 awk '{print $1, $8}' wander.out | \
-psxy -JX -R -W2/0/0/0p -K -O -Xa5.0 -Ya10.9 >> $psf.ps
+"$gmtdir"/gmt psxy -JX -R -W2p,0/0/0,solid -K -O -Xa5.0 -Ya10.9 >> $psf.ps
 
 
 
-pstext -JX2.5/2.0 -R0/1/0/1 -K -O -Xa5.0 -Ya10.9 >> $psf.ps <<EOF
+"$gmtdir"/gmt pstext -JX2.5/2.0 -R0/1/0/1 -K -O -Xa5.0 -Ya10.9 >> $psf.ps <<EOF
 0.05 0.95 8 0 0 ML @~d@~MLE $dmle
 0.40 0.95 8 0 0 ML @~d@~AIC $daic
 0.70 0.95 8 0 0 ML @~d@~BIC $dbic
@@ -1066,20 +1068,20 @@ echo $tmin/$tmax/$min/$max
 title=`echo $data  $MOD`
 
 awk '{print $1, $2}' wander.out | \
-psxy -JX2.5l/2.0l -R$tmin/$tmax/$min/$max -Ba1f3:" ":/a2f3:"drift, mm"::."$title":WSen -W3/255/0/0p -Xa5.0 -Ya8.0 -K -O >> $psf.ps
+"$gmtdir"/gmt psxy -JX2.5l/2.0l -R$tmin/$tmax/$min/$max -Ba1f3:" ":/a2f3:"drift, mm"::."$title":WSen -W3p,255/0/0,solid -Xa5.0 -Ya8.0 -K -O >> $psf.ps
 
 awk '{print $1, $3}' wander.out | \
-psxy -JX -R -W1/0/0/0tap -K -O -Xa5.0 -Ya8.0 >> $psf.ps
+"$gmtdir"/gmt psxy -JX -R -W1p,0/0/0,dashed -K -O -Xa5.0 -Ya8.0 >> $psf.ps
 awk '{print $1, $4}' wander.out | \
-psxy -JX -R -W1/0/0/0tap -K -O -Xa5.0 -Ya8.0 >> $psf.ps
+"$gmtdir"/gmt psxy -JX -R -W1p,0/0/0,dashed -K -O -Xa5.0 -Ya8.0 >> $psf.ps
 awk '{print $1, $7}' wander.out | \
-psxy -JX -R -W2/0/0/0p -K -O -Xa5.0 -Ya8.0 >> $psf.ps
+"$gmtdir"/gmt psxy -JX -R -W2p,0/0/0,solid -K -O -Xa5.0 -Ya8.0 >> $psf.ps
 awk '{print $1, $8}' wander.out | \
-psxy -JX -R -W2/0/0/0p -K -O -Xa5.0 -Ya8.0 >> $psf.ps
+"$gmtdir"/gmt psxy -JX -R -W2p,0/0/0,solid -K -O -Xa5.0 -Ya8.0 >> $psf.ps
 
 
 
-pstext -JX2.5/2.0 -R0/1/0/1 -K -O -Xa5.0 -Ya8.0 >> $psf.ps <<EOF
+"$gmtdir"/gmt pstext -JX2.5/2.0 -R0/1/0/1 -K -O -Xa5.0 -Ya8.0 >> $psf.ps <<EOF
 0.05 0.95 8 0 0 ML @~d@~MLE $dmle
 0.40 0.95 8 0 0 ML @~d@~AIC $daic
 0.70 0.95 8 0 0 ML @~d@~BIC $dbic
@@ -1541,20 +1543,20 @@ echo $tmin/$tmax/$min/$max
 title=`echo $data  $MOD`
 
 awk '{print $1, $2}' wander.out | \
-psxy -JX2.5l/2.0l -R$tmin/$tmax/$min/$max -Ba1f3:" ":/a2f3:"drift, mm"::."$title":WSen -W3/255/0/0p -Xa5.0 -Ya5.1 -K -O >> $psf.ps
+"$gmtdir"/gmt psxy -JX2.5l/2.0l -R$tmin/$tmax/$min/$max -Ba1f3:" ":/a2f3:"drift, mm"::."$title":WSen -W3p,255/0/0,solid -Xa5.0 -Ya5.1 -K -O >> $psf.ps
 
 awk '{print $1, $3}' wander.out | \
-psxy -JX -R -W1/0/0/0tap -K -O -Xa5.0 -Ya5.1 >> $psf.ps
+"$gmtdir"/gmt psxy -JX -R -W1p,0/0/0,dashed -K -O -Xa5.0 -Ya5.1 >> $psf.ps
 awk '{print $1, $4}' wander.out | \
-psxy -JX -R -W1/0/0/0tap -K -O -Xa5.0 -Ya5.1 >> $psf.ps
+"$gmtdir"/gmt psxy -JX -R -W1p,0/0/0,dashed -K -O -Xa5.0 -Ya5.1 >> $psf.ps
 awk '{print $1, $7}' wander.out | \
-psxy -JX -R -W2/0/0/0p -K -O -Xa5.0 -Ya5.1 >> $psf.ps
+"$gmtdir"/gmt psxy -JX -R -W2p,0/0/0,solid -K -O -Xa5.0 -Ya5.1 >> $psf.ps
 awk '{print $1, $8}' wander.out | \
-psxy -JX -R -W2/0/0/0p -K -O -Xa5.0 -Ya5.1 >> $psf.ps
+"$gmtdir"/gmt psxy -JX -R -W2p,0/0/0,solid -K -O -Xa5.0 -Ya5.1 >> $psf.ps
 
 
 
-pstext -JX2.5/2.0 -R0/1/0/1 -K -O -Xa5.0 -Ya5.1 >> $psf.ps <<EOF
+"$gmtdir"/gmt pstext -JX2.5/2.0 -R0/1/0/1 -K -O -Xa5.0 -Ya5.1 >> $psf.ps <<EOF
 0.05 0.95 8 0 0 ML @~d@~MLE $dmle
 0.40 0.95 8 0 0 ML @~d@~AIC $daic
 0.70 0.95 8 0 0 ML @~d@~BIC $dbic
@@ -2003,20 +2005,20 @@ echo $tmin/$tmax/$min/$max
 title=`echo $data  $MOD`
 
 awk '{print $1, $2}' wander.out | \
-psxy -JX2.5l/2.0l -R$tmin/$tmax/$min/$max -Ba1f3:"period, days ":/a2f3:"drift, mm"::."$title":WSen -W3/255/0/0p -Xa5.0 -Ya2.2 -K -O >> $psf.ps
+"$gmtdir"/gmt psxy -JX2.5l/2.0l -R$tmin/$tmax/$min/$max -Ba1f3:"period, days ":/a2f3:"drift, mm"::."$title":WSen -W3p,255/0/0,solid -Xa5.0 -Ya2.2 -K -O >> $psf.ps
 
 awk '{print $1, $3}' wander.out | \
-psxy -JX -R -W1/0/0/0tap -K -O -Xa5.0 -Ya2.2 >> $psf.ps
+"$gmtdir"/gmt psxy -JX -R -W1p,0/0/0,dashed -K -O -Xa5.0 -Ya2.2 >> $psf.ps
 awk '{print $1, $4}' wander.out | \
-psxy -JX -R -W1/0/0/0tap -K -O -Xa5.0 -Ya2.2 >> $psf.ps
+"$gmtdir"/gmt psxy -JX -R -W1p,0/0/0,dashed -K -O -Xa5.0 -Ya2.2 >> $psf.ps
 awk '{print $1, $7}' wander.out | \
-psxy -JX -R -W2/0/0/0p -K -O -Xa5.0 -Ya2.2 >> $psf.ps
+"$gmtdir"/gmt psxy -JX -R -W2p,0/0/0,solid -K -O -Xa5.0 -Ya2.2 >> $psf.ps
 awk '{print $1, $8}' wander.out | \
-psxy -JX -R -W2/0/0/0p -K -O -Xa5.0 -Ya2.2 >> $psf.ps
+"$gmtdir"/gmt psxy -JX -R -W2p,0/0/0,solid -K -O -Xa5.0 -Ya2.2 >> $psf.ps
 
 
 
-pstext -JX2.5/2.0 -R0/1/0/1 -K -O -Xa5.0 -Ya2.2 >> $psf.ps <<EOF
+"$gmtdir"/gmt pstext -JX2.5/2.0 -R0/1/0/1 -K -O -Xa5.0 -Ya2.2 >> $psf.ps <<EOF
 0.05 0.95 8 0 0 ML @~d@~MLE $dmle
 0.40 0.95 8 0 0 ML @~d@~AIC $daic
 0.70 0.95 8 0 0 ML @~d@~BIC $dbic
@@ -2464,20 +2466,20 @@ echo $tmin/$tmax/$min/$max
 title=`echo $data  $MOD`
 
 awk '{print $1, $2}' wander.out | \
-psxy -JX2.5l/2.0l -R$tmin/$tmax/$min/$max -Ba1f3:"period, days ":/a2f3:"drift, mm"::."$title":WSen -W3/255/0/0p -Xa5.0 -Ya2.2 -K -O >> $psf.ps
+"$gmtdir"/gmt psxy -JX2.5l/2.0l -R$tmin/$tmax/$min/$max -Ba1f3:"period, days ":/a2f3:"drift, mm"::."$title":WSen -W3p,255/0/0,solid -Xa5.0 -Ya2.2 -K -O >> $psf.ps
 
 awk '{print $1, $3}' wander.out | \
-psxy -JX -R -W1/0/0/0tap -K -O -Xa5.0 -Ya2.2 >> $psf.ps
+"$gmtdir"/gmt psxy -JX -R -W1p,0/0/0,dashed -K -O -Xa5.0 -Ya2.2 >> $psf.ps
 awk '{print $1, $4}' wander.out | \
-psxy -JX -R -W1/0/0/0tap -K -O -Xa5.0 -Ya2.2 >> $psf.ps
+"$gmtdir"/gmt psxy -JX -R -W1p,0/0/0,dashed -K -O -Xa5.0 -Ya2.2 >> $psf.ps
 awk '{print $1, $7}' wander.out | \
-psxy -JX -R -W2/0/0/0p -K -O -Xa5.0 -Ya2.2 >> $psf.ps
+"$gmtdir"/gmt psxy -JX -R -W2p,0/0/0,solid -K -O -Xa5.0 -Ya2.2 >> $psf.ps
 awk '{print $1, $8}' wander.out | \
-psxy -JX -R -W2/0/0/0p -K -O -Xa5.0 -Ya2.2 >> $psf.ps
+"$gmtdir"/gmt psxy -JX -R -W2p,0/0/0,solid -K -O -Xa5.0 -Ya2.2 >> $psf.ps
 
 
 
-pstext -JX2.5/2.0 -R0/1/0/1 -K -O -Xa5.0 -Ya2.2 >> $psf.ps <<EOF
+"$gmtdir"/gmt pstext -JX2.5/2.0 -R0/1/0/1 -K -O -Xa5.0 -Ya2.2 >> $psf.ps <<EOF
 0.05 0.95 8 0 0 ML @~d@~MLE $dmle
 0.40 0.95 8 0 0 ML @~d@~AIC $daic
 0.70 0.95 8 0 0 ML @~d@~BIC $dbic

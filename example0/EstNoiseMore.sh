@@ -13,7 +13,10 @@ then
 fi
 
 
+#  location of executables
 progs=/home/langbein/proglib/est_noiseBeta
+#   provide location of GMT -- using either version 5 or 6; 
+gmtdir=/usr/local/Cellar/gmt/6.4.0_1/bin
 
 while getopts d: option 
 do
@@ -554,34 +557,34 @@ max=`sort -g junk | tail -1 | awk '{print 5*(int($1/5)+1)}'`
 #fi
 
 echo $tmin/$tmax/$min/$max
-gmtset MEASURE_UNIT inch
-gmtset PAPER_MEDIA letter
-gmtset PAPER_MEDIA Custom_612x1000
-gmtset HEADER_FONT_SIZE 18p
-gmtset HEADER_OFFSET -0.2i
-gmtset LABEL_FONT_SIZE 14p
-gmtset ANNOT_FONT_SIZE_PRIMARY 12p
-gmtset ANNOT_FONT_SIZE_SECONDARY 12p
+"$gmtdir"/gmt gmtset MEASURE_UNIT inch
+"$gmtdir"/gmt gmtset PAPER_MEDIA letter
+"$gmtdir"/gmt gmtset PAPER_MEDIA Custom_612x1000
+"$gmtdir"/gmt gmtset HEADER_FONT_SIZE 18p
+"$gmtdir"/gmt gmtset HEADER_OFFSET -0.0i
+"$gmtdir"/gmt gmtset LABEL_FONT_SIZE 14p
+"$gmtdir"/gmt gmtset ANNOT_FONT_SIZE_PRIMARY 12p
+"$gmtdir"/gmt gmtset ANNOT_FONT_SIZE_SECONDARY 12p
 
 title=`echo $data  $MOD`
 psf=plot2
 rm -f plot2.*
 
 awk '{print $1, $2}' wander.out | \
-psxy -JX2.5l/2.0l -R$tmin/$tmax/$min/$max -Ba1f3:" ":/a2f3:"drift, mm"::."$title":WSen -W3/255/0/0p -Xa1.5 -Ya10.9 -K -P > $psf.ps
+"$gmtdir"/gmt psxy -JX2.5l/2.0l -R$tmin/$tmax/$min/$max -Ba1f3:" ":/a2f3:"drift, mm"::."$title":WSen -W3p,255/0/0,solid -Xa1.5 -Ya10.9 -K -P > $psf.ps
 
 awk '{print $1, $3}' wander.out | \
-psxy -JX -R -W1/0/0/0tap -K -O -Xa1.5 -Ya10.9 >> $psf.ps
+"$gmtdir"/gmt psxy -JX -R -W1p,0/0/0,dashed -K -O -Xa1.5 -Ya10.9 >> $psf.ps
 awk '{print $1, $4}' wander.out | \
-psxy -JX -R -W1/0/0/0tap -K -O -Xa1.5 -Ya10.9 >> $psf.ps
+"$gmtdir"/gmt psxy -JX -R -W1p,0/0/0,dashed -K -O -Xa1.5 -Ya10.9 >> $psf.ps
 awk '{print $1, $7}' wander.out | \
-psxy -JX -R -W2/0/0/0p -K -O -Xa1.5 -Ya10.9 >> $psf.ps
+"$gmtdir"/gmt psxy -JX -R -W2p,0/0/0,solid -K -O -Xa1.5 -Ya10.9 >> $psf.ps
 awk '{print $1, $8}' wander.out | \
-psxy -JX -R -W2/0/0/0p -K -O -Xa1.5 -Ya10.9 >> $psf.ps
+"$gmtdir"/gmt psxy -JX -R -W2p,0/0/0,solid -K -O -Xa1.5 -Ya10.9 >> $psf.ps
 
 
 
-pstext -JX2.5/2.0 -R0/1/0/1 -K -O -Xa1.5 -Ya10.9 >> $psf.ps <<EOF
+"$gmtdir"/gmt pstext -JX2.5/2.0 -R0/1/0/1 -K -O -Xa1.5 -Ya10.9 >> $psf.ps <<EOF
 0.08 0.90 8 0 0 ML White Noise $wh
 0.06 0.84 8 0 0 ML 1st Power Law
 0.08 0.79 8 0 0 ML Index $plexp1
@@ -594,7 +597,7 @@ pstext -JX2.5/2.0 -R0/1/0/1 -K -O -Xa1.5 -Ya10.9 >> $psf.ps <<EOF
 0.08 0.42 8 0 0 ML BP pole $np
 EOF
 
-pstext -JX2.5/2.0 -R0/1/0/1 -K -O -Xa1.5 -Ya10.9 >> $psf.ps <<EOF
+"$gmtdir"/gmt pstext -JX2.5/2.0 -R0/1/0/1 -K -O -Xa1.5 -Ya10.9 >> $psf.ps <<EOF
 0.05 0.95 8 0 0 ML @~d@~MLE $dMLE
 EOF
 
