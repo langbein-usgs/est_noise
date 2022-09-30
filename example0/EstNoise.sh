@@ -28,8 +28,10 @@ then
    echo "   as all of the set-up parameters are done by cleanEst.sh" 
    exit
 fi
-#  Provide location where the executables are located
+#  location of executables
 progs=/Users/john/proglib/est_noiseBeta/bin
+#   provide location of GMT -- using either version 5 or 6; 
+gmtdir=/usr/local/Cellar/gmt/6.4.0_1/bin
 
 # defaults
 nett=otr
@@ -54,6 +56,7 @@ done
 
 
 cd /tmp/SCRATCH
+cd $data
 
 ntype=`cat modtype.dat`
 
@@ -73,7 +76,7 @@ in
      WH ) cat > estn.in <<EOF
 1.0  float
 0.0001 fix
-2    fix
+2    fix  4
 0    fix
 .5 2
 1
@@ -86,8 +89,8 @@ EOF
      RW ) cat > estn.in <<EOF
 1.0  float
 1    float
-2    fix
-0    fix
+2    fix 4
+0    fix  
 .5 2
 1
 0   fix
@@ -99,7 +102,7 @@ EOF
      FL ) cat > estn.in <<EOF
 1.0  float
 1    float
-1    fix
+1    fix  4
 0    fix
 .5 2
 1
@@ -112,7 +115,7 @@ EOF
      PL ) cat > estn.in <<EOF
 1.0  float
 1    float
-1    float
+1    float 4
 0    fix
 .5 2
 1
@@ -125,7 +128,7 @@ EOF
      FLRW ) cat > estn.in <<EOF
 1.0  float
 1    float
-1    fix
+1    fix 4
 0    fix
 .5 2
 1
@@ -138,7 +141,7 @@ EOF
      FOGM ) cat > estn.in <<EOF
 1.0  float
 1    float
-2    fix
+2    fix 4
 1.0    float
 .5 2
 1
@@ -151,7 +154,7 @@ EOF
      GM ) cat > estn.in <<EOF
 1.0  float
 1    float
-2    float
+2    float 4
 10    float
 .5 2
 1
@@ -164,7 +167,7 @@ EOF
      BP1 ) cat > estn.in <<EOF
 1.0  float
 1    float
-2    fix
+2    fix 4
 0    fix
 .5 2
 1
@@ -177,7 +180,7 @@ EOF
      BP2 ) cat > estn.in <<EOF
 1.0  float
 1    float
-2    fix
+2    fix 4
 0    fix
 .5 2
 2
@@ -190,7 +193,7 @@ EOF
      BP3 ) cat > estn.in <<EOF
 1.0  float
 1    float
-2    fix
+2    fix 4
 0    fix
 .5 2
 3
@@ -203,7 +206,7 @@ EOF
      BP4 ) cat > estn.in <<EOF
 1.0  float
 1    float
-2    fix
+2    fix 4
 0    fix
 .5 2
 4
@@ -216,7 +219,7 @@ EOF
      BP1F ) cat > estn.in <<EOF
 1.0  float
 1    float
-1    fix
+1    fix 4
 0    fix
 .5 2
 1
@@ -229,7 +232,7 @@ EOF
      BP2F ) cat > estn.in <<EOF
 1.0  float
 1    float
-1    fix
+1    fix 4
 0    fix
 .5 2
 2
@@ -242,7 +245,7 @@ EOF
      BP3F ) cat > estn.in <<EOF
 1.0  float
 1    float
-1    fix
+1    fix 4
 0    fix
 .5 2
 3
@@ -255,7 +258,7 @@ EOF
      BP4F ) cat > estn.in <<EOF
 1.0  float
 1    float
-1    fix
+1    fix 4
 0    fix
 .5 2
 4
@@ -277,7 +280,7 @@ cp data.cl data.in
 ####
 ################
 echo 772395 > seed.dat
-time "$progs"/est_noise7.22 < est2.in > est2.out
+time "$progs"/est_noise7.30 < est2.in > est2.out
 cp resid.out resid_"$data"_"$modtype".out
 tail -75 est2.out > est_"$data"_"$modtype".out
 
@@ -314,26 +317,26 @@ then
 fi
 
 echo $tmin/$tmax/$min/$max
-gmtset MEASURE_UNIT inch
-gmtset PAPER_MEDIA letter
-gmtset HEADER_FONT_SIZE 24p
-gmtset HEADER_OFFSET -0.1i
+"$gmtdir"/gmt gmtset MEASURE_UNIT inch
+"$gmtdir"/gmt gmtset PAPER_MEDIA letter
+"$gmtdir"/gmt gmtset HEADER_FONT_SIZE 24p
+"$gmtdir"/gmt gmtset HEADER_OFFSET -0.0i
 
 title=`echo $data "wander " $modtype`
 psf=plot
 rm -f plot.ps
 echo 
 awk '{print $1, $2}' wander.out | \
-psxy -JX3.0l -R$tmin/$tmax/$min/$max -Ba1f3:"Period, days":/a2f3:"drift, mm"::."$title":WSen -W3/255/0/0p -X1.5 -Y7 -K -P > $psf.ps
+"$gmtdir"/gmt psxy -JX3.0l -R$tmin/$tmax/$min/$max -Ba1f3:"Period, days":/a2f3:"drift, mm"::."$title":WSen -W3,255/0/0,solid -X1.5 -Y7 -K -P > $psf.ps
 
 awk '{print $1, $3}' wander.out | \
-psxy -JX -R -W1/0/0/0tap -K -O >> $psf.ps
+"$gmtdir"/gmt psxy -JX -R -W1,0/0/0,dashed -K -O >> $psf.ps
 awk '{print $1, $4}' wander.out | \
-psxy -JX -R -W1/0/0/0tap -K -O >> $psf.ps
+"$gmtdir"/gmt psxy -JX -R -W1,0/0/0,dashed -K -O >> $psf.ps
 awk '{print $1, $7}' wander.out | \
-psxy -JX -R -W2/0/0/0p -K -O >> $psf.ps
+"$gmtdir"/gmt psxy -JX -R -W2,0/0/0,solid -K -O >> $psf.ps
 awk '{print $1, $8}' wander.out | \
-psxy -JX -R -W2/0/0/0p -K -O >> $psf.ps
+"$gmtdir"/gmt psxy -JX -R -W2,0/0/0,solid -K -O >> $psf.ps
 
 #  Get and print the noise model
 MLE=`grep "MLE=" est2.out | tail -1 | awk '{printf "%.2f\n", $2}'`
@@ -352,7 +355,7 @@ ln=`expr $ln + 1 `
 plexp2=`sed -n ''$ln'p' est2.out | awk '{printf "%.2f\n", $2}'`
 bpamp=`grep "Bandpass filter amplitude=" est2.out | tail -1 | awk '{printf "%.2f\n", $4}'`
 
-pstext -JX3.0/3.0 -R0/1/0/1 -K -O >> $psf.ps <<EOF
+"$gmtdir"/gmt pstext -JX3.0/3.0 -R0/1/0/1 -K -O >> $psf.ps <<EOF
 0.05 0.95 10 0 0 ML MLE $MLE
 0.40 0.95 10 0 0 ML AIC $AIC
 0.70 0.95 10 0 0 ML BIC $BIC
@@ -400,7 +403,7 @@ pmax=`sort -g -k 2 psdcalc.out | tail -1 | awk '{print 10*int($2/10)+10}'`
 minmax < psdcalc.out
 echo $fmin $fmax $pmin $pmax
 
-psxy psdcalc.out -JX2l/2 -R$fmin/$fmax/$pmin/$pmax -Ba1f3:"freq c/yr":/a10f2.5:"mm@+2@+2/c/yr, db":WSen -W3/0/0/0p -K -O -X4.0 >> $psf.ps
+"$gmtdir"/gmt psxy psdcalc.out -JX2l/2 -R$fmin/$fmax/$pmin/$pmax -Ba1f3:"freq c/yr":/a10f2.5:"mm@+2@+2/c/yr, db":WSen -W3,0/0/0,solid -K -O -X4.0 >> $psf.ps
 
 #############################################
 ##########
@@ -410,22 +413,22 @@ psxy psdcalc.out -JX2l/2 -R$fmin/$fmax/$pmin/$pmax -Ba1f3:"freq c/yr":/a10f2.5:"
 
 if [ "$nett" = "otr" ]
 then
-   gmtset PAPER_MEDIA letter
-   gmtset HEADER_FONT_SIZE 24p
-   gmtset HEADER_OFFSET -0.1i
+   "$gmtdir"/gmt gmtset PAPER_MEDIA letter
+   "$gmtdir"/gmt gmtset HEADER_FONT_SIZE 24p
+   "$gmtdir"/gmt gmtset HEADER_OFFSET -0.0i
    title=`echo $data "residual" $modtype`
 
    R=`awk '{printf "%.3f %.2f\n", $1 +($2-1)/365.25, $3}' resid.out | minmax -I1/5`
    echo $R
    awk '{printf "%.3f %.2f\n", $1 +($2-1)/365.25, $3}' resid.out | \
-   psxy -JX6/3 $R -Ba5f1/a10f5:mm::."$title":WSen -Sc0.01 -X-4.4 -Y-5  -O -K >> $psf.ps
+   "$gmtdir"/gmt psxy -JX6/3 $R -Ba5f1/a10f5:mm::."$title":WSen -Sc0.01 -X-4.4 -Y-5  -O -K >> $psf.ps
 fi
 
 if [ "$nett" = "gmt" ]
 then
-   gmtset PAPER_MEDIA letter
-   gmtset HEADER_FONT_SIZE 24p
-   gmtset HEADER_OFFSET -0.1i
+   "$gmtdir"/gmt gmtset PAPER_MEDIA letter
+   "$gmtdir"/gmt gmtset HEADER_FONT_SIZE 24p
+   "$gmtdir"/gmt gmtset HEADER_OFFSET -0.0i
    title=`echo $data "residual" $modtype`
 
    tmin=`head -1 resid.out | awk '{print $1}'`
@@ -434,7 +437,7 @@ then
    dmax=`awk '{print $2}' resid.out | sort -g | tail -1 | awk '{print 5*int($1/5)+5}'`
    echo $tmin $tmax $dmin $dmax
    awk '{print $1, $2}' resid.out | \
-   psxy -JX6T/3 -R"$tmin"/"$tmax"/$dmin/$dmax -Ba5Yf1y/a10f5:mm::."$title":WSen -Sc0.01  -X-4.4 -Y-5 -O -K >> $psf.ps
+   "$gmtdir"/gmt psxy -JX6T/3 -R"$tmin"/"$tmax"/$dmin/$dmax -Ba5Yf1y/a10f5:mm::."$title":WSen -Sc0.01  -X-4.4 -Y-5 -O -K >> $psf.ps
 
 fi
 

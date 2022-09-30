@@ -53,6 +53,9 @@ progs=/Users/john/Desktop/est_noise20151217/bin
 progs=/Users/john/proglib/est_noise20160201/bin
 progs=/Users/john/proglib/est_noiseBeta/bin
 #progs=/home/langbein/proglib/est_noiseBeta/bin
+#  provide location of the location of GMT routines --- script uses either version 5 or 6
+#     (version 6 in the "classic" mode
+gmtdir=/usr/local/Cellar/gmt/6.4.0_1/bin
 #  defaults 
 
 
@@ -536,25 +539,25 @@ EOF
 
 if [ "$nett" = "otr" ]
 then
-   gmtset MEASURE_UNIT inch
-   gmtset PAPER_MEDIA letter
-   gmtset HEADER_FONT_SIZE 24p
-   gmtset HEADER_OFFSET -0.1i
+   "$gmtdir"/gmt gmtset MEASURE_UNIT inch
+   "$gmtdir"/gmt gmtset PAPER_MEDIA letter
+   "$gmtdir"/gmt gmtset HEADER_FONT_SIZE 24p
+   "$gmtdir"/gmt gmtset HEADER_OFFSET -0.0i
    title=`echo $data "detrended"`
    psf=plot
    rm -f plot.ps
    R=`awk '{printf "%.3f %.2f\n", $1 +($2-1)/365.25, $3}' data.in | minmax -I1/5`
    echo $R
    awk '{printf "%.3f %.2f\n", $1 +($2-1)/365.25, $3}' data.in | \
-   psxy -JX6/3 $R -Ba5f1/a10f5:mm::."$title":WSen -Sc0.03 -X1.1 -Y7 -P -K > $psf.ps
+   "$gmtdir"/gmt psxy -JX6/3 $R -Ba5f1/a10f5:mm::."$title":WSen -Sc0.03 -X1.1 -Y7 -P -K > $psf.ps
 fi
 
 if [ "$nett" = "gmt" ]
 then
-   gmtset MEASURE_UNIT inch
-   gmtset PAPER_MEDIA letter
-   gmtset HEADER_FONT_SIZE 24p
-   gmtset HEADER_OFFSET -0.1i
+   "$gmtdir"/gmt gmtset MEASURE_UNIT inch
+   "$gmtdir"/gmt gmtset PAPER_MEDIA letter
+   "$gmtdir"/gmt gmtset HEADER_FONT_SIZE 24p
+   "$gmtdir"/gmt gmtset HEADER_OFFSET -0.0i
    title=`echo $data "detrended"`
    psf=plot
    rm -f plot.ps
@@ -564,7 +567,7 @@ then
    dmax=`awk '{print $2}' data.in | sort -g | tail -1 | awk '{print 5*int($1/5)+5}'`
    echo $tmin $tmax $dmin $dmax
    awk '{print $1, $2}' data.in | \
-   psxy -JX6T/3 -R"$tmin"/"$tmax"/$dmin/$dmax -Ba5Yf1y/a10f5:mm::."$title":WSen -Sc0.03 -X1.1 -Y7 -P -K > $psf.ps
+   "$gmtdir"/gmt psxy -JX6T/3 -R"$tmin"/"$tmax"/$dmin/$dmax -Ba5Yf1y/a10f5:mm::."$title":WSen -Sc0.03 -X1.1 -Y7 -P -K > $psf.ps
 fi
 
 
@@ -622,7 +625,7 @@ then
 #   echo $R
    title=`echo $data "detrended, cleaned"`
    awk '{printf "%.3f %.2f\n", $1 +($2-1)/365.25, $3}' resid.out | \
-   psxy -JX $R -Ba5f1/a10f5:mm::."$title":WSen -Sc0.03 -X0 -Y-4.0  -O -K >> $psf.ps
+   "$gmtdir"/gmt psxy -JX $R -Ba5f1/a10f5:mm::."$title":WSen -Sc0.03 -X0 -Y-4.0  -O -K >> $psf.ps
 fi
 
 #   replot data with outliers removed
@@ -637,7 +640,7 @@ then
 #   echo $R
    title=`echo $data "detrended, cleaned"`
    awk '{print $1, $2}' resid.out | \
-   psxy -JX -R -Ba5Yf1y/a10f5:mm::."$title":WSen -Sc0.03 -X0 -Y-4.0  -O -K >> $psf.ps
+   "$gmtdir"/gmt psxy -JX -R -Ba5Yf1y/a10f5:mm::."$title":WSen -Sc0.03 -X0 -Y-4.0  -O -K >> $psf.ps
 fi
 
 #  Save detrended time-series (and cleaned)
