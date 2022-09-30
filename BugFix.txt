@@ -117,3 +117,10 @@ Version 20210601
 Version 20220909  --  More fixes concerning GGM (or FOGM) with GM frequencies that are very low;
    constrain lowest, GM frequency to 0.1*2*pi/tlen  where tlen is the length of the time series
    This change was made in the subroutine pow_law_cov  found in filtfunc.f
+
+Version 20221001 -- 
+1   Modified the scripts (cleanEst, EstNoise*, etc.) to use either
+   GMT versions 5 or 6.  For version 6, it uses the "classic" mode.
+2  Recompiled fortran using the 'license free' version of intel Fortran and its MKL
+   libraries.  Created a bin_linux directory that includes statically linked executables
+   for linux using the Intel compiler and MKL.  I'm not able to perform the same for Macs.
