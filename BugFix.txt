@@ -124,3 +124,23 @@ Version 20221001 --
 2  Recompiled fortran using the 'license free' version of intel Fortran and its MKL
    libraries.  Created a bin_linux directory that includes statically linked executables
    for linux using the Intel compiler and MKL.  I'm not able to perform the same for Macs.
+
+Oct 24, 2022
+added option to cleanEst.sh to NOT calculate the seasonal; (365/182) periods
+
+Nov 1, 2022
+Modified est_noise7.30 to output a file, adj.out, that contains the estimates
+  of the parameters of the time-dependent model that can be used as an
+  input to the adjust_1 program.  This is useful in the case where one might
+  decimate the original data set to estimate the time-dependence, then apply
+  that time-dependent model to the original, un-decimates time series. In the
+  case where the original time-series has more observations than est_noise can
+  handle, it may be useful to decimate the time-series.  Otherwise, if one
+  wants the detrended data, one can look at the resid.out file.
+
+Dec 18, 2022
+Fixed bug where date of initiation of exponential or omori function
+  was NOT passed into the subroutine modify_A; hence this made the A
+  matrix singular and yielded 'bogus' values of the time constant
+  and amplitude of exponential/omori functions. This problem only
+  occurred when the time constant was estimated (float).

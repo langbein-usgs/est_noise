@@ -83,8 +83,8 @@ c   ,enull(82)
      & vexp2(8),acov(7,7),cov(7,7),wz(23)
       double precision ran4(32768),chi2,amby
 c   double precision
-      common /ModFit1/dtime,t_year,covinv,covar,texp
-      common /ModFit1a/t_start,t_stop
+      common /ModFit1/dtime,t_year,covinv,covar
+      common /ModFit1a/t_start,t_stop,texp
 c  single precision
       common /ModFit2/x,e,bexp
       common /ModFit2a/expmax
@@ -131,7 +131,7 @@ c  Intermediate covariance and filter functions; double precision
        print*,'  7) user supplied function or data'
        print*,' '
        print*,' Program can handle data in various formats'
-       print*,' Version 7.30  --- Sept 2022'
+       print*,' Version 7.30  --- Dec. 2022'
        print*,' '
 c  next statement only for MKL/Intel linked libraries
 c      print*,' num of threads',mkl_get_max_threads()
@@ -144,6 +144,7 @@ c      print*,' num of threads',mkl_get_max_threads()
       open(26,file='prob1.out')
       open(78,file='covar.out')
       open(89,file='tauexp.out')
+      open(17,file='adj.out')
       read(23,*)iseed
       print*,' A journal file consisting of typed input'
       print*,'  is created in estin.jrn'
@@ -769,7 +770,7 @@ c
       call output(x,e,max_mod,net,nbt,nrate,n_rat_chg,
      & nper,noff,rat_chg1,rat_chg2,off,per,sea,rate_norm,
      &  n_file_press,aux_norm,n_exp,texp,bexp,exp_choice,exp_type,
-     &  rat_chng_norm)
+     &  rat_chng_norm,t_start)
 
 
 c
@@ -1820,7 +1821,7 @@ c    when there is an exponential time constant to be estimated and dec .ne. 0 -
 c   Needed to change ic (which is in common) to add the exponential to A_orig
       icTmp=ic
       ic=ic_orig
-      call modify_A(A_orig,dtime_orig,texp)
+      call modify_A(A_orig,dtime_orig)
       ic=icTmp
       print*,' Update A_orig matrix'
 c  output model parameters using best noise model
@@ -1840,7 +1841,7 @@ c
       call output(x,e,max_mod,net,nbt,nrate,n_rat_chg,
      & nper,noff,rat_chg1,rat_chg2,off,per,sea,rate_norm,
      &  n_file_press,aux_norm,n_exp,texp,bexp,exp_choice,exp_type,
-     &  rat_chng_norm)
+     &  rat_chng_norm,t_start)
       print*,' '
       print*,' '
 
@@ -1884,8 +1885,11 @@ c for fast covariance analysis, need to change the actual number of points in ma
      &  exp2, e(7),sea
 7879  format(a20,3x,f10.3,3i6,7(3x,f10.3,1x,f10.3),3x,f10.3)    
       print*,' Residuals in resid.out and/or resid_dec.out'
+      print*,'   time, obs-calc, calc, obs'
       print*,' Model covariance and cross correlation in covar.out'
       print*,' Journal of input parameter in estin.jrn'
+      print*,' Parameters needed for program adjust_1 in adj.out'
+      print*,'   adj.out time format is all otr'
       print*,' History of estimating exp/Omori time constants,',
      & ' if requested in tauexp.out'
    
@@ -1895,6 +1899,7 @@ c for fast covariance analysis, need to change the actual number of points in ma
       close(15)
       close(78)
       close(79)
+      close(17)
 c  Compute execution time
       Tend=secnds(0.)
       TotalTime=Tend-Tstart
@@ -2380,8 +2385,8 @@ c
 
  
 c   double precision
-      common /ModFit1/dtime,t_year,covinv,covar,texp
-      common /ModFit1a/t_start,t_stop
+      common /ModFit1/dtime,t_year,covinv,covar
+      common /ModFit1a/t_start,t_stop,texp
 c  single precision
       common /ModFit2/x,e,bexp
       common /ModFit2a/expmax
@@ -2405,7 +2410,7 @@ c  double precision
       if (nexp .ne. 0 ) then
 
 
-        call modify_A(A,dtime,texp)
+        call modify_A(A,dtime)
 
       end if
 
@@ -2493,7 +2498,7 @@ c        write(89,*)' testing', k,bexp(k),alog10(bexp(k)),spar(1,nsim)
            write(89,*) ' bexp(1)= ',bexp(1),' bexp(k)=',k,bexp(k)
         end if
 
-        call modify_A(A,dtime,texp)
+        call modify_A(A,dtime)
 
 
         call calcres(0,ModType,sumRes,A,d,res,chi2)
@@ -2562,7 +2567,7 @@ c      end if
 
       nmod=nmod_orig
 
-      call modify_A(A,dtime,texp)
+      call modify_A(A,dtime)
       call calcres(0,ModType,sumRes,A,d,res,chi2)
 
 c   put the estimate of exponential into list of x(i)
@@ -2867,8 +2872,8 @@ c
       integer irowmiss(12687)
       character*1, ModType
 c   double precision
-      common /ModFit1/dtime,t_year,covinv,covar,texp
-      common /ModFit1a/t_start,t_stop
+      common /ModFit1/dtime,t_year,covinv,covar
+      common /ModFit1a/t_start,t_stop,texp
 c  single precision
       common /ModFit2/x,e,bexp
       common /ModFit2a/expmax
@@ -3224,7 +3229,7 @@ c  Output correlation coefficients
       subroutine output(x,e,max_mod,net,nbt,nrate,n_rat_chg,
      & nper,noff,rat_chg1,rat_chg2,off,per,sea,rate_norm,
      &  n_file_press,aux_norm,n_exp,texp,bexp,exp_choice,exp_type,
-     & rat_chng_norm)
+     & rat_chng_norm,tref)
 c  output results of model
       dimension x(max_mod),e(max_mod)
       dimension bexp(10)
@@ -3232,32 +3237,84 @@ c  output results of model
       character*3 net
       double precision rat_chg1(82),rat_chg2(82),off(82),per(82),
      &   texp(10), rat_chng_norm(82),dec_time1,dec_time2,
-     &  aux_norm(max_mod)
+     &  aux_norm(max_mod),tref,dec_tref
 c
 c  five different output format; otr, otd, otx,mjd, and gmt
 c
+c Modify to output model parameters compatible with the adjust program
+c
+
+      rewind (17)
       nc=0
       sea=0.
+C  output reference time
+      itref=int(tref)
+      dec_tref=tref-float(itref)
+      call inv_jul_time(itref,nyr0,jul0)
+c      print*,tref,itref,nyr0,jul0
+      if (net .eq. 'otr') then
+ 
+        write(6,1700)nyr0,jul0+dec_tref
 
+      end if
+
+      if (net .eq. 'otx' ) then
+         call invcal(int(tref),nyr,mn,idate)
+         write(6,1701), nyr,mn,idate+dec_tref
+      end if
+      if (net .eq. 'otd' ) then
+         call invcal(int(tref),nyr,mn,idate)
+         write(6,1702) nyr,mn,idate+dec_tref
+      end if
+      if (net .eq. 'gmt') then
+         call invcal(int(tref),nyr,mn,idate)
+          ihr1=int(24.0*dec_tref)
+          imn1=int(24.0*60.0*(dec_tref-dble(ihr1)/24.0))
+          sec1=dec_tref-dble(ihr1)/24.0-dble(imn1)/(24.0*60.0)
+          sec1=sec1*3600.0*24.0
+          isec1=int(sec1)
+          sec1=sec1-float(isec1)
+         write(6,1703)nyr,mn,ihr1,imn1,sec1
+      end if
+      if (net .eq. 'mjd' ) then
+         write(6,1704)tref+36933.d+0
+      end if
+1700  format("Reference epoch:", i6,f16.9)
+1701  format("Reference epoch:", i6,i3,f16.9)
+1702  format("Reference epoch:", 2i5,f16.9)
+1703  format("Reference epoch:",i4,'-',i2.2,'-',i2.2,'T',
+     & i2.2,':',i2.2,':',i2.2,f2.1)
+1704  format("Reference epoch:",f21.9)
       do 64 i=1,nbt
         write(6,201)i,x(i),e(i)
 201     format(' Nomimal value for baseline ',i3,f10.2,' +/- ',f10.2)
 64    continue
+c
+c  Secular rate
+c
       nc=nc+nbt
-      if (nrate .eq. 1) 
-     &      write(6,202)x(nc+1)/rate_norm,e(nc+1)/rate_norm
+      if (nrate .eq. 1) then
+        write(6,202)x(nc+1)/rate_norm,e(nc+1)/rate_norm
+        write(17,1501)x(nc+1)/rate_norm
+      end if
 202   format(' Rate in units per year ',f16.4,' +/- ',f16.4)
+1501  format("R",/,f16.4)
       nc=nc+nrate
+c
+c  Rate changes
+c
       if (n_rat_chg .gt. 0) then
         do 65 k=1,n_rat_chg
         itime1=int(rat_chg1(k))
         dec_time1=rat_chg1(k)-float(itime1)
         itime2=int(rat_chg2(k))
         dec_time2=rat_chg2(k)-float(itime2)
-
+        call inv_jul_time(itime1,nyr,jul)
+        call inv_jul_time(itime2,nyr2,jul2)
+        write(17,1503)k,nyr,jul+dec_time1,nyr2,jul2+dec_time2,
+     &       x(nc+k)/rat_chng_norm(k)
         if (net .eq. 'otr') then
-          call inv_jul_time(itime1,nyr,jul)
-          call inv_jul_time(itime2,nyr2,jul2)
+
           write(6,203)k,nyr,jul+dec_time1,nyr2,jul2+dec_time2,
      &       x(nc+k)/rat_chng_norm(k),e(nc+k)/rat_chng_norm(k)
         end if
@@ -3267,6 +3324,7 @@ c
           write(6,204)k,nyr,mn,idate+dec_time1,
      &      nyr2,mn2,idate2+dec_time2,
      &       x(nc+k)/rat_chng_norm(k),e(nc+k)/rat_chng_norm(k)
+
         end if
         if (net .eq. 'otd') then
           call invcal(itime1,nyr,mn,idate)
@@ -3274,6 +3332,7 @@ c
           write(6,2041)k,nyr,mn,idate,dec_time1,
      &      nyr2,mn2,idate2,dec_time2,
      &       x(nc+k)/rat_chng_norm(k),e(nc+k)/rat_chng_norm(k)
+
         end if
         if (net .eq. 'gmt') then
 
@@ -3295,6 +3354,7 @@ c
           write(6,2042)k,nyr,mn,idate,ihr1,imn1,isec1,sec1,
      &      nyr2,mn2,idate2,ihr2,imn2,isec2,sec2,
      &       x(nc+k)/rat_chng_norm(k),e(nc+k)/rat_chng_norm(k)
+
         end if    
         if (net .eq. 'mjd' ) then
           write(6,2043)k,dble(itime1)+dec_time1+36933.d+0,
@@ -3308,19 +3368,26 @@ c
 203   format(' Rate change number ',i3,' between ',i5,f10.3,
      & ' and ',i5,f10.3,
      & ' is ',f16.4,' +/- ',f16.4)
+1503  format('r   # rate change num',i2,/,i5,f10.3,1x,i5,f10.3,/,f16.4)
 204   format(' Rate change number ',i3,' between ',2i5,f6.3,
      & ' and ',2i5,f6.3,
      & ' is ',f12.4,' +/- ',f10.4)
+
 2041   format(' Rate change number ',i3,' between ',i4,i2.2,i2.2,f4.3,
      & ' and ',i4,i2.2,i2.2,f4.3,
      & ' is ',f12.4,' +/- ',f10.4)
+
 2042   format(' Rate change number ',i3,' between ',i4,'-',i2.2,'-',i2.2,'T',
      & i2.2,':',i2.2,':',i2.2,f2.1,
      & ' and ',i4,'-',i2.2,'-',i2.2,'T',
      & i2.2,':',i2.2,':',i2.2,f2.1,
      & ' is ',f12.4,' +/- ',f10.4)
+
 2043   format(' Rate change number ',i3,' between ',f16.9,' and ',
      & f16.9,' is ',f12.4,' +/- ',f10.4)
+c
+c  Sinusoids
+c
       if (nper .gt. 0) then
          do 66 k=1,nper
          fmag=x(nc+2*k-1)**2 + x(nc+2*k-0)**2
@@ -3330,19 +3397,28 @@ c
          e_mag=sqrt(e_mag)/fmag
          write(6,205) per(k),x(nc+2*k-1),e(nc+2*k-1), 
      &   x(nc+2*k-0),e(nc+2*k-0), fmag,e_mag
+         write(17,1705)k,nyr0,jul0+dec_tref,per(k),
+     &    x(nc+2*k-1),x(nc+2*k-0)
          if (k .eq. 1) sea=fmag
 66       continue
       end if
       nc=nc+2*nper
+1705  format("s   # sinusoid num", i2,/,i5,f16.9,/,f16.9,2f10.3)
 205   format(' Period of ',f8.3,' days,  cos amp= ',f12.2,' +/-',f10.2,
      & '  sin amp= ',f12.2,' +/-',f10.2,'  magnitude= ',
      &  f12.2,' +/-',f10.2)
+c
+c Offsets
+c
       if (noff .gt. 0) then
         do 67 k=1,noff
         itime=int(off(k))
         dec_time1=off(k)-float(itime)
+        call inv_jul_time(itime,nyr,jul)
+        write(17,1706)k,nyr,jul+dec_time1,x(nc+k)
+
         if (net .eq. 'otr') then
-          call inv_jul_time(itime,nyr,jul)
+
           write(6,206)k,nyr,jul+dec_time1,x(nc+k),e(nc+k)
         end if
         if (net .eq. 'otx') then
@@ -3382,6 +3458,9 @@ c
      & ' is ',f12.4,' +/- ',f10.4)
 2073   format(' Offset number ',i3,' at ',f16.9,
      & f12.4,' +/- ',f10.4)
+1706  format("o  # offset num. ",i2,/,i5,f16.9/,f11.3)
+c
+c  exponentials and/or Omori
       nc=nc+noff
       ikk=n_exp
 c      nc=nc+n_file_press
@@ -3391,14 +3470,17 @@ c      do 680 k=1,n_exp
 c680   if (exp_choice(k) .eq. "float") nfloat=nfloat+1
 c      print*,"nfloat=",nfloat
       do 68 k=1,n_exp
-
+         if (exp_type(k) .eq. "m" ) print*," Omori function"
          if (exp_choice(k) .ne. "float") then
          
          nfix=nfix+1
          itime=int(texp(k))
          dec_time=texp(k)-float(itime)
+        call inv_jul_time(itime,nyr,jul)
+        write(17,1708)exp_type(k),k,nyr,jul+dec_time,bexp(k),x(nc+k)
+
         if (net .eq. 'otr') then
-          call inv_jul_time(itime,nyr,jul)
+
           write(6,208)k,nyr,jul+dec_time,x(nc+k),e(nc+k),bexp(k)
         end if
         if (net .eq. 'otx') then
@@ -3424,6 +3506,7 @@ c      print*,"nfloat=",nfloat
            write(6,212)k,dble(itime)+dec_time1+36933.d+0,
      &       x(nc+k),e(nc+k),bexp(k)
         end if
+1708  format(A2,"   #exp or omori num.",i2,/,i5,f16.9,/,f10.5,f10.3)
         else
          ikk=ikk+1
          nc=nc+n_file_press

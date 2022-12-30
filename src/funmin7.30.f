@@ -64,8 +64,8 @@ c     & FtCi(12687,12687),FtCiF(12687,12687),
 c  Next used for DFT
 c      double precision ftemp(65536),wsave(196623)
 c   double precision
-      common /ModFit1/txx,t_year,covinv,covar,texp
-      common /ModFit1a/t_start,t_stop
+      common /ModFit1/txx,t_year,covinv,covar
+      common /ModFit1a/t_start,t_stop,texp
 c  single precision
       common /ModFit2/x,xe,bexp
       common /ModFit2a/expmax
@@ -247,7 +247,9 @@ c  compare sig4 to ttlen
          fnaught=sig4/6.28
          if (fnaught .lt. fxlow) then
            extend=-1.5*(fxlow-fnaught)+3
+           extend=1.5*(fxlow-fnaught)+0
            if (fnaught .lt. 0.5*fxlow) extend=0
+           if (extend .lt. 0.0) extend=1.0
          end if
 c   check to see if sig4 could make covariance matrix exceed dimensions
           if (sig4 .lt. 3/((float(max_time-kmax)*sngl(t_small)) ))
@@ -256,7 +258,8 @@ c  extend time series by 3/sig4 (sig4 is ggm in rad/year)
 c           print*,' orig kkmax=', kkmax,t_small,sig4
            kkmax=kmax+ifix(extend*1/(sngl(t_small)*sig4))
 c           print*,sig4,kkmax,kkmax-kmax,kmax, max_time
-c           print*,fxlow,fnaught," extend", extend
+c           print*,'fxlow=',fxlow,' fo=',fnaught," extend", extend,
+c     &      ' ttlen=',ttlen
 c  what happens when sig4 is very close to zero and requests something
 c    that exceeds array size..... put limit on kkmax.
            if (kkmax .gt. max_time) kkmax=max_time

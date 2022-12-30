@@ -115,7 +115,7 @@ c      print*,'rtol=',rtol,y(ihi),y(ilo),ihi,ilo
           p(1,(n))=p(ilo,(n))
           p(ilo,(n))=swap
 14      continue
-c        write(89,*)' Converged! iter= ',iter
+        write(89,*)' Converged! iter= ',iter
         return
       endif
 c      if (iter.ge.ITMAX) pause 'ITMAX exceeded in NedlerMeadeEXP'
@@ -330,8 +330,8 @@ c      dimension sres(11),spar(11,10)
 c      integer irowmiss(11687)
 
 c   double precision
-      common /ModFit1/dtime,t_year,covinv,covar,texp
-      common /ModFit1a/t_start,t_stop
+      common /ModFit1/dtime,t_year,covinv,covar
+      common /ModFit1a/t_start,t_stop,texp
 c  single precision
       common /ModFit2/x,e,bexp
       common /ModFit2a/expmax
@@ -365,7 +365,7 @@ c         print*, "Try ",ix,parm(ix),bexp(i)
 c      print*,' in fmodel_fit output A and d'
 c      print*,(A(100,j),j=1,nmod)
 c      print*,d(100),dtime(100)
-      call modify_A(A,dtime,texp)
+      call modify_A(A,dtime)
 c      call calcres(0,nopt,sumRes,A,d,res,chi2)
       call calcres(nopt,ModType,sumRes,A,d,res,chi2)
 c      write(13,130)(x(i),e(i),i=1,nmod)
@@ -377,8 +377,10 @@ c      print*, " Chi^2 is", sum," RMS=",sqrt(sum/float(ic-nmod))
       nmod=nmod_orig
       fmodel_fit_A=chi2
 
-      write(89,*)chi2,(parm(ix),10.0**parm(i),i=1,ix)
+      write(89,8901)chi2,(texp(ix), parm(ix),10.0**parm(i),i=1,ix)
         
+8901  format('chi2=',f20.3,5(' texp', f10.3,' log(tau)',f10.3,
+     &  ' tau',e10.3))
       return
       end
 c

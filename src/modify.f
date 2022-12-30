@@ -1,4 +1,4 @@
-      subroutine modify_A(A,t,texp)
+      subroutine modify_A(A,t)
 
 c  modifies A matrix to include exponential terms
       double precision A(max_data,max_mod)
@@ -7,7 +7,7 @@ c  modifies A matrix to include exponential terms
       character*7 exp_choice(10),exp_type(10)
 c   double precision
 
-      common /ModFit1a/t_start,t_stop
+      common /ModFit1a/t_start,t_stop,texp
 c  single precision
       common /ModFit2/x,e,bexp
       common /ModFit2a/expmax
