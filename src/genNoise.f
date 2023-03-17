@@ -141,7 +141,7 @@ c
 13        continue
           call convolv(npts+ispinUp,f4,ran4,max_time)
         end if
-        do 15 i=101,npts
+        do 15 i=1,npts+ispinUp
           ran1(i)=ran1(i)+ran2(i)+ran3(i)+ran4(i)
 15      continue
       else

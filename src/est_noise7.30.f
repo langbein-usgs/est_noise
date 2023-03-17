@@ -3403,10 +3403,10 @@ c
 66       continue
       end if
       nc=nc+2*nper
-1705  format("s   # sinusoid num", i2,/,i5,f16.9,/,f16.9,2f10.3)
-205   format(' Period of ',f8.3,' days,  cos amp= ',f12.2,' +/-',f10.2,
-     & '  sin amp= ',f12.2,' +/-',f10.2,'  magnitude= ',
-     &  f12.2,' +/-',f10.2)
+1705  format("s   # sinusoid num", i2,/,i5,f16.9,/,f16.9,2f12.4)
+205   format(' Period of ',f8.3,' days,  cos amp= ',f14.4,' +/-',f12.4,
+     & '  sin amp= ',f14.4,' +/-',f12.4,'  magnitude= ',
+     &  f14.2,' +/-',f12.4)
 c
 c Offsets
 c
@@ -3448,17 +3448,17 @@ c
 67      continue
       end if
 206   format(' Offset number ',i5,' at ',i5,f10.3,
-     & ' is ',f10.2,' +/- ',f8.2)
+     & ' is ',f12.4,' +/- ',f10.4)
 207   format(' Offset number ',i3,' at ',i5,i3,f8.3,
-     & ' is ',f10.2,' +/- ' ,f8.2)
+     & ' is ',f12.4,' +/- ' ,f10.4)
 2071  format(' Offset number ',i3,' at ',i4,i2.2,i2.2,f4.3,
-     & ' is ',f10.2,' +/- ' ,f8.2)
+     & ' is ',f12.4,' +/- ' ,f10.4)
 2072   format(' Offset number ',i3,' at ',i4,'-',i2.2,'-',i2.2,'T',
      & i2.2,':',i2.2,':',i2.2,f2.1,
      & ' is ',f12.4,' +/- ',f10.4)
 2073   format(' Offset number ',i3,' at ',f16.9,
      & f12.4,' +/- ',f10.4)
-1706  format("o  # offset num. ",i2,/,i5,f16.9/,f11.3)
+1706  format("o  # offset num. ",i2,/,i5,f16.9/,f12.4)
 c
 c  exponentials and/or Omori
       nc=nc+noff
@@ -3656,11 +3656,11 @@ c      print*,(i,x(i),i=1,nmod)
       end if
 
 9011  continue
-6501  format(1x,f6.0,1x, f15.9, 3(1x,f15.2))
-6502  format(1x,2i5,f15.9, 3(1x,f15.2))
-6503  format(1x,i4,i2.2,i2.2,f10.9, 3(1x,f15.2))
+6501  format(1x,f6.0,1x, f15.9, 3(1x,f16.3))
+6502  format(1x,2i5,f15.9, 3(1x,f16.3))
+6503  format(1x,i4,i2.2,i2.2,f10.9, 3(1x,f16.3))
 6504  format(1x,i4,'-',i2.2,'-',i2.2,'T',
-     & i2.2,':',i2.2,':',i2.2,f2.1, 3(1x,f15.2))
-6505  format(1x,f18.9, 3(1x,f15.2))
+     & i2.2,':',i2.2,':',i2.2,f2.1, 3(1x,f16.3))
+6505  format(1x,f18.9, 3(1x,f16.3))
       return
       end

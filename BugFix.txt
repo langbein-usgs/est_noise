@@ -144,3 +144,8 @@ Fixed bug where date of initiation of exponential or omori function
   matrix singular and yielded 'bogus' values of the time constant
   and amplitude of exponential/omori functions. This problem only
   occurred when the time constant was estimated (float).
+
+March 7, 2023
+Fixed bug in genNoise subroutine which impacts the gen_noise program. For
+  quadrature noise, the indexing wasn't correct such that there were zeros
+  placed in the last 100 numbers of the synthetic data. Now fixed.

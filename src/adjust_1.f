@@ -201,12 +201,12 @@ c  deal with removing the rate
           write(1,6505)dble(itime)+dec_timed+36933.d+0,data(i),er(i)
         end if
 60    continue
-6501  format(1x,i5,1x, f15.9, 1x, f15.2,1x,f8.2)
-6502  format(1x,2i5,f15.9, 1x,f15.2,1x,f8.2 )
-6503  format(1x,i4,i2.2,i2.2,f10.9, 1x,f15.2,1x,f8.2)
+6501  format(1x,i5,1x, f15.9, 1x, f16.3,1x,f8.2)
+6502  format(1x,2i5,f15.9, 1x,f16.3,1x,f8.2 )
+6503  format(1x,i4,i2.2,i2.2,f10.9, 1x,f16.3,1x,f8.2)
 6504  format(1x,i4,'-',i2.2,'-',i2.2,'T',
-     & i2.2,':',i2.2,':',i2.2,f2.1, 1x,f15.2,1x,f8.2)
-6505  format(1x,f18.9, 1x,f15.2,1x,f8.2)
+     & i2.2,':',i2.2,':',i2.2,f2.1, 1x,f16.3,1x,f8.2)
+6505  format(1x,f18.9, 1x,f16.3,1x,f8.2)
       print*,' number of sinusoids fixed', nsea
       print*,' number of offset fixed', noff
       print*,' number of ratechanges fixed', nrate
