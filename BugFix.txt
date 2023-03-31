@@ -149,3 +149,22 @@ March 7, 2023
 Fixed bug in genNoise subroutine which impacts the gen_noise program. For
   quadrature noise, the indexing wasn't correct such that there were zeros
   placed in the last 100 numbers of the synthetic data. Now fixed.
+
+March 31, 2023
+Attempted to modify est_noise codes to incorporate more openmp parallelization.
+  The gfortran compiled code runs much slower than the Intel compiled code.
+  I speculated that I could improve the gfortran by explicitly invoking openmp
+  commands at places where there are nested do-loops. I modified the est_noise file
+  and the filterfunc file with openmp commands.  Those modified version are called
+  7.31 (instead of 7.30).  In conclusion, v7.31 is not an improvement. So, I'm
+  including both the 7.30 and 7.31 versions, but the compile.sh script points to
+  7.30.  When I compiled 7.31, I used the -lgomp option with gfortran. However, all
+  of the gfortran documentation suggests that I should use -fopenmp as the gfortran
+  option. Although the code compiles successfully, the program crashes. 
+
+Also noted, that, although the Intel documentation suggests that my compilation
+  of est_noise should provide a 'static' executable (ie, executable includes
+  all of the required libraries) for linux, that proved to be not the case. I've removed
+  the linux_bin directory and modified the user manual to suggest that one should
+  download and install the Intel Fortran compiler and its MKL library. It is easy
+  to do and the software is free. 

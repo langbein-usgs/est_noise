@@ -6,8 +6,7 @@ such that the estimated values of the functional relations are 'relatively'
 unbiased (ie, representing the true values).
 
 This package includes "the manual".
-For Linux systems, the excutables are found in bin_linux
-Otherwise, for Macs, there is a compile.sh script which allows
+There is a compile.sh script which allows
 one to use either gfortran or Intel fortran to create the executables
 which will land in the bin directory.
 
@@ -34,4 +33,4 @@ Questions --- contact me;
 langbein@usgs.gov
 john_langbein@yahoo.com
 
-Sept 27, 2022
+March 31, 2023
