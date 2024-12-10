@@ -1,0 +1,75 @@
+       0.4991       0.9098       2.0000       1.1786       0.0000       0.0001       2.0000      -4411.178     7311.261    -5957.298        0.139
+       0.4991       0.9282       2.0000       1.0663       0.0000       0.0001       2.0000      -4398.339     7285.691    -5957.352        0.139
+       0.4991       0.9098       2.0000       1.0663       0.0000       0.0001       2.0000      -4411.178     7311.291    -5957.313        0.139
+  
+  Inverse covariance matrix
+           white     plamp1    GM    
+ white    49839.1      16.3       0.4
+ plamp1      16.3     430.9       0.4
+ GM           0.4       0.4       7.5
+  The eigenvalues for inverting covariance matrix   7.528701       430.8470    
+   49839.14    
+  
+  the covariance matrix
+            white      plamp1     plexp1     GM         BPamp      plamp2     plexp2
+ white   0.201E-04 -0.757E-06 -0.939E-06
+ plamp1 -0.757E-06  0.232E-02 -0.133E-03
+ GM     -0.939E-06 -0.133E-03  0.133E+00
+  
+  Cross correlation matrix
+           white     plamp1    GM    
+ white      1.000    -0.004    -0.001
+ plamp1    -0.004     1.000    -0.008
+ GM        -0.001    -0.008     1.000
+ MLE best is    5957.29052734375     
+  
+  
+  row number for optimal solution is                   118
+  nmod=                     7
+        -0.343 +/-      0.000     50.065 +/-      0.000      2.913 +/-      0.000      0.000 +/-      0.000      0.015 +/-      0.000      1.526 +/-      0.000      5.074 +/-      0.000
+  Eigenvalues                      1   5.28785297951555     
+                     2   15.7689378759272                          3
+   92.3922240883594                          4   435.035875378567     
+                     5   439.561705077673                          6
+   1552.48681375132                          7   1562.04763448902     
+  using                      7  out of                      7  eigenvalues
+       0.4991       0.9190       2.0000       1.1224       0.0000       0.0001       2.0000      -4403.703     7297.919    -5958.103        3.924
+  number of rows is                   120
+ -0.154053642900000       0.343840251800000        49.9385775100000     
+  0.313487197200000        2.91652077700000       4.775102413000000E-002
+  9.089913495000000E-004  4.804711396000000E-002  1.569527900000000E-002
+  2.535289561000000E-002   1.52606818800000       2.539511205000000E-002
+   5.05956780000000       0.216409713600000     
+  
+Reference epoch:1960-01-01T00:00:.0
+ Nomimal value for baseline   1     -0.15 +/-       0.34
+ Rate in units per year           4.9945 +/-           0.0314
+ Period of  365.250 days,  cos amp=         2.9165 +/-      0.0478  sin amp=         0.0009 +/-      0.0480  magnitude=         2.9165 +/-      0.0478
+ Period of  182.625 days,  cos amp=         0.0157 +/-      0.0254  sin amp=         1.5261 +/-      0.0254  magnitude=         1.5261 +/-      0.0254
+ Offset number   1 at 1965-02-01T00:00:00.0 is       5.0596 +/-     0.2164
+  
+  
+  
+  AIC=    11934.5810546875     
+  BIC=    12003.5442047119     
+  Best fitting solutions
+  MLE=   -5957.29052734375     
+  white noise=      0.49909 +/-   0.00448
+  Bandpass filter amplitude=      0.00000 +/-   0.00000
+  power law noise 1
+    amplitude=      0.91898 +/-   0.04818
+    exponent=      2.00000 +/-   0.00000
+    G-M freq=      1.12243 +/-   0.36445 rad/yr
+  power law noise 2
+    amplitude=      0.00010 +/-   0.00000
+    exponent=      2.00000 +/-   0.00000
+  
+  Residuals in resid.out and/or resid_dec.out
+    time, obs-calc, calc, obs
+  Model covariance and cross correlation in covar.out
+  Journal of input parameter in estin.jrn
+  Parameters needed for program adjust_1 in adj.out
+    adj.out time format is doy
+  History of estimating exp/Omori time constants, if requested in tauexp.out
+ runtime per wall clock       22.96 sec
+  runtime per cpu cyclces   124.8273      seconds

@@ -1,0 +1,75 @@
+            white      plamp1     plexp1     GM         BPamp      plamp2     plexp2
+ white   0.734E-04 -0.244E-05 -0.275E-05
+ plamp1 -0.244E-05  0.129E-02 -0.373E-04
+ plamp2 -0.275E-05 -0.373E-04  0.474E-02
+  
+  Cross correlation matrix
+           white     plamp1    plamp2
+ white      1.000    -0.008    -0.005
+ plamp1    -0.008     1.000    -0.015
+ plamp2    -0.005    -0.015     1.000
+ MLE best is    7663.60888671875     
+  
+  
+  row number for optimal solution is                    60
+  nmod=                    11
+        54.517 +/-      0.000   -101.667 +/-      0.000     13.979 +/-      0.000      0.641 +/-      0.000     -0.558 +/-      0.000      0.001 +/-      0.000     -0.050 +/-      0.000     -7.760 +/-      0.000     22.290 +/-      0.000     -1.578 +/-      0.000     16.777 +/-      0.000
+  Eigenvalues                      1  0.167458901400507     
+                     2  0.737272233896419                          3
+   2.03680826975466                          4   3.05723781657411     
+                     5   10.4021421120994                          6
+   22.0917113770476                          7   34.3371933688300     
+                     8   343.442634680204                          9
+   354.448588858963                         10   749.779550301347     
+                    11   753.276196037989     
+  Using                     11  out of                    11  eigenvalues
+       0.7260       0.7625       1.0000       0.0000       0.0000       0.4656       2.0000       -445.130     5719.523    -7663.609        0.158
+ tau=   0.54E-02   tau=   0.47E-02   tau= 
+  number of rows is                    62
+   54.5168147800000       0.313891143500000       -101.667360500000     
+   1.49570893900000        13.9790067700000        2.23185154700000     
+  0.640964997200000       5.435134629000000E-002 -0.558063502400000     
+  5.486608069000000E-002  8.922113635000000E-004  3.670864408000000E-002
+ -5.014591138000000E-002  3.687150409000000E-002  -7.76021930300000     
+  0.533908617100000        22.2899904200000       0.594966099500000     
+  -1.57832904000000       0.412181611800000        16.7766728300000     
+  0.436459806500000     
+  
+Reference epoch:  2000     1.000000000
+ Nomimal value for baseline   1     54.52 +/-       0.31
+ Rate in units per year         -12.7608 +/-           0.1877
+ Rate change number   1 between  2000     1.000 and  2007   120.000 is           1.9080 +/-           0.3046
+ Period of  365.250 days,  cos amp=         0.6410 +/-      0.0544  sin amp=        -0.5581 +/-      0.0549  magnitude=         0.8499 +/-      0.0546
+ Period of  182.625 days,  cos amp=         0.0009 +/-      0.0367  sin amp=        -0.0501 +/-      0.0369  magnitude=         0.0502 +/-      0.0369
+ Offset number     1 at  2003   356.000 is      -7.7602 +/-     0.5339
+ Offset number     2 at  2004   272.000 is      22.2900 +/-     0.5950
+  Omori function
+ Exponential number     1 at  2003   356.000 is      -1.58 +/-     0.41  Time constant is:  0.54000E-02 yrs
+  Omori function
+ Exponential number     2 at  2004   272.000 is      16.78 +/-     0.44  Time constant is:  0.47000E-02 yrs
+  
+  
+  
+  AIC=    15355.2177734375     
+  BIC=    15448.3223190308     
+  Best fitting solutions
+  MLE=   -7663.60888671875     
+  white noise=      0.72598 +/-   0.00857
+  Bandpass filter amplitude=      0.00000 +/-   0.00000
+  power law noise 1
+    amplitude=      0.76247 +/-   0.03586
+    exponent=      1.00000 +/-   0.00000
+    G-M freq=      0.00000 +/-   0.00000 rad/yr
+  power law noise 2
+    amplitude=      0.46563 +/-   0.06882
+    exponent=      2.00000 +/-   0.00000
+  
+  Residuals in resid.out and/or resid_dec.out
+    time, obs-calc, calc, obs
+  Model covariance and cross correlation in covar.out
+  Journal of input parameter in estin.jrn
+  Parameters needed for program adjust_1 in adj.out
+    adj.out time format is doy
+  History of estimating exp/Omori time constants, if requested in tauexp.out
+ runtime per wall clock       13.48 sec
+  runtime per cpu cyclces   80.01610      seconds

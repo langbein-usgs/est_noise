@@ -1,0 +1,75 @@
+       1.0000       1.0000       1.0000       0.0000       0.0000       1.0000       2.0000       1080.737     1479.880    -5829.087        0.113
+  Start the covariance calculations for noise model
+  best estimate   1.000000       dither  9.9999998E-03
+  best estimate   1.000000       dither  9.9999998E-03
+  best estimate   1.000000       dither  5.0000001E-02
+  best estimate  0.0000000E+00   dither  5.0000001E-02
+  best estimate  0.0000000E+00   dither  5.0000001E-02
+  best estimate   1.000000       dither  5.0000001E-02
+  best estimate   2.000000       dither  0.1000000    
+  
+  Inverse covariance matrix
+
+  The eigenvalues for inverting covariance matrix
+  
+  the covariance matrix
+            white      plamp1     plexp1     GM         BPamp      plamp2     plexp2
+  
+  Cross correlation matrix
+
+       1.0000       1.0000       1.0000       0.0000       0.0000       1.0000       2.0000       1080.737     1479.880    -5829.087        0.082
+ MLE best is   -5829.08680982022     
+  
+  
+  row number for optimal solution is                     2
+  nmod=                     8
+        -0.007 +/-      0.000     35.602 +/-      0.000      2.768 +/-      0.000     -0.369 +/-      0.000     -0.025 +/-      0.000      0.005 +/-      0.000     -9.986 +/-      0.000    -11.288 +/-      0.000
+  Eigenvalues                      1  0.276398678435705     
+                     2   4.04785869229906                          3
+   4.07873634394489                          4   4.24102692571786     
+                     5   92.4165791157550                          6
+   97.2292587597362                          7   233.002929658805     
+                     8   237.161771534189     
+  Using                      8  out of                     8  eigenvalues
+       1.0000       1.0000       1.0000       0.0000       0.0000       1.0000       2.0000       1080.737     1479.880    -5829.087        0.079
+  number of rows is                     4
+ -7.070683482000000E-003  0.495356545000000        35.6020684500000     
+   1.89959267800000        2.76761430000000       0.103933221800000     
+ -0.369421792000000       0.105132474600000      -2.526627881000000E-002
+  6.522063693000001E-002  5.393327257000000E-003  6.628983726000000E-002
+  -9.98618093200000       0.495214736700000       -11.2880159500000     
+  0.495999170100000     
+  
+Reference epoch:1960-01-01T00:00:.0
+ Nomimal value for baseline   1     -0.01 +/-       0.50
+ Rate in units per year           5.9350 +/-           0.3167
+ Period of  365.250 days,  cos amp=         2.7676 +/-      0.1039  sin amp=        -0.3694 +/-      0.1051  magnitude=         2.7922 +/-      0.1040
+ Period of  182.625 days,  cos amp=        -0.0253 +/-      0.0652  sin amp=         0.0054 +/-      0.0663  magnitude=         0.0258 +/-      0.0653
+ Offset number   1 at 1965-01-01T00:00:00.0 is      -9.9862 +/-     0.4952
+ Offset number   2 at 1971-09-23T00:00:00.0 is     -11.2880 +/-     0.4960
+  
+  
+  
+  AIC=   -11642.1736196404     
+  BIC=   -11591.1281331902     
+  Best fitting solutions
+  MLE=    5829.08680982022     
+  white noise=      1.00000 +/-   0.00000
+  Bandpass filter amplitude=      0.00000 +/-   0.00000
+  power law noise 1
+    amplitude=      1.00000 +/-   0.00000
+    exponent=      1.00000 +/-   0.00000
+    G-M freq=      0.00000 +/-   0.00000 rad/yr
+  power law noise 2
+    amplitude=      1.00000 +/-   0.00000
+    exponent=      2.00000 +/-   0.00000
+  
+  Residuals in resid.out and/or resid_dec.out
+    time, obs-calc, calc, obs
+  Model covariance and cross correlation in covar.out
+  Journal of input parameter in estin.jrn
+  Parameters needed for program adjust_1 in adj.out
+    adj.out time format is doy
+  History of estimating exp/Omori time constants, if requested in tauexp.out
+ runtime per wall clock        0.52 sec
+  runtime per cpu cyclces   2.538338      seconds
