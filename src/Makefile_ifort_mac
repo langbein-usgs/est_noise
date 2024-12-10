@@ -1,0 +1,58 @@
+####
+##   IMPORTANT   --- need to run the following command before compiling
+###   source /opt/intel/oneapi/setvars.sh --force
+###
+FC = ifort
+
+FFLAGS = -Ofast  -w -std=f2008  -i8  -I"${MKLROOT}/include"
+
+## linking
+FFLAGS2 =  ${MKLROOT}/lib/libmkl_intel_ilp64.a ${MKLROOT}/lib/libmkl_intel_thread.a ${MKLROOT}/lib/libmkl_core.a -liomp5 -lpthread -lm -ldl \
+         -L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib
+
+BLAS =  -I${MKLROOT}/include/intel64/ilp64 
+FFT = dfft.o
+
+SRC = time_mod.f90  alloc_mod.f90 est_noise_mod.f90 filterfunc_mod.f90  psd_calc8.f90 bust_mod.f90  GetStuff_mod.f90  bust8.f90 \
+  adjust8.f90 genNoise_mod.f90  randnor.f gen_noise8.f90  mle_mod.f90   NedlerMeadSimplex_mod.f90  model_fit_A_mod.f90 est_noise8.01.f90 \
+  compare_wander_mod.f90 compare_wander8.01.f90
+
+%.o: %.f90  #wildcard rule, creation of *.o depends on *.f90
+	$(FC) $(FFLAGS) -o $@ -c $<
+	
+dfft:
+	gfortran -c dfft.f -std=legacy -w
+	
+OBJ1 = time_mod.o alloc_mod.o filterfunc_mod.o  psd_calc8.o
+psd_calc8: $(OBJ1)
+	$(FC) $(FFLAGS) $(FFLAGS2) $(FFT) $(BLAS) -o $@ $(OBJ1) 
+	
+OBJ2 = bust_mod.o time_mod.o GetStuff_mod.o  bust8.o    
+bust8: $(OBJ2)
+	$(FC) $(FFLAGS) $(FFLAGS2) -o $@ $(OBJ2)
+	
+OBJ3 = GetStuff_mod.o time_mod.o adjust8.o
+adjust8: $(OBJ3)
+	$(FC) $(FFLAGS)  $(FFLAGS2) -o $@ $(OBJ3)
+	
+OBJ4 = alloc_mod.o filterfunc_mod.o genNoise_mod.o time_mod.o randnor.o   gen_noise8.o
+gen_noise8: $(OBJ4)
+	$(FC) $(FFLAGS) $(FFLAGS2) $(FFT) -o $@ $(OBJ4)
+	
+OBJ5 =   alloc_mod.o  est_noise_mod.o model_fit_A_mod.o  mle_mod.o filterfunc_mod.o  genNoise_mod.o randnor.o GetStuff_mod.o \
+        time_mod.o  NedlerMeadSimplex_mod.o est_noise8.01.o	
+est_noise8: $(OBJ5)
+	$(FC) $(FFLAGS) $(FFLAGS2) $(BLAS) $(FFT) -o $@ $(OBJ5)
+
+OBJ6= time_mod.o alloc_mod.o GetStuff_mod.o compare_wander_mod.o randnor.o filterfunc_mod.o genNoise_mod.o compare_wander8.01.o
+compare_wander8: $(OBJ6)
+	$(FC) $(FFLAGS) $(FFLAGS2) $(FFT) -o $@ $(OBJ6)
+	
+all:  dfft bust8 adjust8 gen_noise8 psd_calc8 est_noise8 compare_wander8
+
+install:
+	mv psd_calc8 bust8 adjust8 gen_noise8 est_noise8 compare_wander8 ../bin_ifort
+	@echo "Ready to run make clean"
+clean:
+	rm -fr *.o *.mod *.dSYM core psd_calc8 bust8 adjust8 gen_noise8 est_noise8 compare_wander8 *.out *.jrn
+
