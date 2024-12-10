@@ -1,4 +1,4 @@
-Various bug fixes
+Various bug fixes and feature creep.
 
 version 20160301  relative to 20151217
 In bust_5,  -- The median routine would stop if there was no data in the specified interval-- bust_5 would crash
@@ -168,3 +168,22 @@ Also noted, that, although the Intel documentation suggests that my compilation
   the linux_bin directory and modified the user manual to suggest that one should
   download and install the Intel Fortran compiler and its MKL library. It is easy
   to do and the software is free. 
+  
+November 2024 -- NEW VERSION; version 8
+All code went through a rewrite to bring the programs into compliance with "modern"
+  Fortran. The older versions are based on Fortran 77. Motivation for the change was that
+  the old programs, especially est_noise, did not take advantage of the memory allocation
+  feature of modern Fortran. Basically, the old version of the codes could not be
+  compiled and executed due to memory allocation (or lack thereof). The new versions
+  are compatible with the inputs and data formats of the older versions.
+  
+  Other changes include:
+  1)  Program can accomodate dates between 1800 and 2200 rather than 1960 to 2040
+  2)  Fixed error bar calculation for the noise parameters so they are now believable.
+  3)  New normalization for BP filter -- sums of squares of filter coefficients now equal 1.0
+  4)  Changed compilation method; rather using a script, I now provide Makefile for
+      gfortran on the Mac, and for Linux, gfortran and Intel Fortran (ifort). With newer
+      Macs, they use non-Intel cpu and the Intel compilers are not available. (I have
+      compiled the codes using the Intel compiler on an older, Intel'd chipped Mac and
+      I also provide that Makefile, too.)
+

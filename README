@@ -5,20 +5,20 @@ importantly, estimates the parameters that describe the temporal correlations
 such that the estimated values of the functional relations are 'relatively'
 unbiased (ie, representing the true values).
 
-This package includes "the manual".
-There is a compile.sh script which allows
-one to use either gfortran or Intel fortran to create the executables
-which will land in the bin directory.
+This package includes "the manual". For both Linux and Mac, I provide
+Makefiles for both gfortran and ifort (Intel Fortran).  These are located
+in the "src" directory.
 
-The directory example provides the input file and sample data to test est_noise.
-The input file is anotated .. please read the manual
 
-The directory example0 provides some scripts that use all of the
+The directory "example" provides the input file and sample data to test est_noise.
+The input file is anotated .. but, please read the manual
+
+The directory "example0" provides some scripts that use all of the
 executables to assist with analyzing time series data. Please read the manual.
 
 For the interested user, there are three other reports provided:
 Langbein_Geod_2017.pdf  -- explains the method of how est_noise works
-Threshold_dMLE_v4.pdf  -- describes how to select the "best" noise model
+Threshold_dMLE_v5.pdf  -- describes how to select the "best" noise model
      that models the temporal correlation
 GGMproblemFixed.pdf  -- describes the modification of the original est_noise (v7.22)
     to fix the problem of incorrectly computing the rate and its uncertainty when
@@ -29,8 +29,11 @@ https://escweb.wr.usgs.gov/share/langbein/Web/OUT/est_noise/
 and
 https://escweb.wr.usgs.gov/share/langbein/Web/OUT/est_noise_legacy/
 
+The current version has two modes, one that replicates the legacy version (with
+bug-fixes) and the second method follows Langbein_Geod_2017.pdf.
+
 Questions --- contact me;
 langbein@usgs.gov
 john_langbein@yahoo.com
 
-March 31, 2023
+Nov. 30, 2024
