@@ -475,9 +475,11 @@ if (n_exp .ne. 0) then
   print*,' column of A matrix prior to input pressure data', nc
   print*,' Number of files of Auxillary data (pressure)'
 !  compute the tolerance in time to match the pressure and distance data
-   tsmall=((A(ic,nbt+1) - A(1,nbt+1)))*365.25*rate_norm/(float(ic-1)*10.)
 
+  tsmall=(t(ic)-t(1))/(float(ic-1)*10.)
+!  tsmall=((A(ic,nbt+1) - A(1,nbt+1)))*365.25*rate_norm/(float(ic-1)*10.)
   if (n_file_press .gt. 0) then
+
      open(88,file='dist_press.dat',action='write')    !!!  file that contains matching pressure and "distance" data
      print*,'size A',size(A,dim=1),size(A,dim=2),size(d),size(t)
      do i=1,n_file_press
@@ -1509,22 +1511,21 @@ if (n_exp .ne. 0) then
             xx(i)=xn(i)+dith(i)*xn(i)
             xx(j)=xn(j)+dith(j)*xn(j)
            call mle(fv1,xx(1),xx(2),xx(3),xx(4),xx(5),npole,flow,fhigh,xx(6),xx(7),ModType,iswt) 
- 
 
             xx(i)=xn(i)+dith(i)*xn(i)
             xx(j)=xn(j)-dith(j)*xn(j)
             call mle(fv2,xx(1),xx(2),xx(3),xx(4),xx(5),npole,flow,fhigh,xx(6),xx(7),ModType,iswt) 
-            
+                   
             xx(i)=xn(i)-dith(i)*xn(i)
             xx(j)=xn(j)+dith(j)*xn(j)
             call mle(fv3,xx(1),xx(2),xx(3),xx(4),xx(5),npole,flow,fhigh,xx(6),xx(7),ModType,iswt) 
- 
+           
             xx(i)=xn(i)-dith(i)*xn(i)
             xx(j)=xn(j)-dith(j)*xn(j)
             call mle(fv4,xx(1),xx(2),xx(3),xx(4),xx(5),npole,flow,fhigh,xx(6),xx(7),ModType,iswt) 
- 
-          acov(ii,jj)=abs(fv1+fv4-fv2-fv3)/   sqrt((4.*dith(i)*xn(i)*dith(j)*xn(j)))
 
+!          acov(ii,jj)=abs(fv1+fv4-fv2-fv3)/   sqrt((4.*dith(i)*xn(i)*dith(j)*xn(j)))
+          acov(ii,jj)=abs(fv1+fv4-fv2-fv3)/   ((4.*dith(i)*xn(i)*dith(j)*xn(j)))
           acov(jj,ii)=acov(ii,jj)
   
         end if
