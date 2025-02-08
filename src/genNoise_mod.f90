@@ -220,7 +220,7 @@ module genNoise_mod
     implicit none
     integer :: npts,i,j
     real(kind=real64), intent(inout) :: ran(:)
-    real(kind=real64) :: ranin(npts)
+    real(kind=real64) :: ranin(size(ran))
     real(kind=real64), intent(in) :: H(:)
 
     ranin=ran

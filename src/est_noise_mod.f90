@@ -256,7 +256,8 @@ module est_noise_mod
 !
 !     compute At*covinv
 !
-
+      if (nmod .gt. 0 ) then
+      
       call dgemm('T','N',nmod,ic,ic,1.0d+0,A,mdmax,covinv,mdmax,0.0d+0,a1,maxnmod)
 !    compute At*covinv*A   A1*A
 
@@ -265,6 +266,7 @@ module est_noise_mod
 !    invert At*covinv*A
 
       call dsyev('V','L',nmod,a2,maxnmod,evd,wzd,5000,ier)
+    
 
 !    examine the eigenvalues
       ie=1
@@ -327,6 +329,9 @@ module est_noise_mod
         end do
       res(i)=d(i)-res(i)
       end do
+     else
+      res=d
+     end if   !  execute if nmod > 0
 
 
 !     calculate RMS residuals
@@ -389,15 +394,15 @@ module est_noise_mod
     end if   !! iswitch
  
 !      if ( nopt .eq. 1) then
-     if ( iswitch .eq. 1) then
-        write(13,130)(x(i),ex(i),i=1,nmod)
+!     if ( iswitch .eq. 1) then
+!        write(13,130)(x(i),ex(i),i=1,nmod)
 
 
-130     format(90(3x,e17.10,1x,e17.10))
-      else
-        write(13,130)(x(i),ex(i),i=1,nmod)               ! ,(x(nmod+i),0.0,i=1,nmod)
+!130     format(90(3x,e17.10,1x,e17.10))
+!      else
+!        write(13,130)(x(i),ex(i),i=1,nmod)               ! ,(x(nmod+i),0.0,i=1,nmod)
 
-      end if
+!      end if
  
 
     return

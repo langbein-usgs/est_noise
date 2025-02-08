@@ -645,7 +645,7 @@ if (n_exp .ne. 0) then
     open(77,file='noise.dat')
 !    call genNoise(ModType,t,d,ic,max_data,iseed,dt_sam,max_time)
 !  compute length of time series would be if there were no data gaps
-    itlen=int((t(ic)- t(1))/dt_sam + 1)
+    itlen=int((t(ic)- t(1))/dt_sam + 1) + 1
     print*,' number of noisy data without gaps; program will create a set of data at time of actual measurements'
     print*,itlen
     allocate(tnoise(itlen))
@@ -777,7 +777,7 @@ if (n_exp .ne. 0) then
 
 !  increase dimension of A, t, d,t_year to span all time, even for times 
 !   missing data 
-   itlen=int((t(ic)- t(1))/dt_sam + 1)
+   itlen=int((t(ic)- t(1))/dt_sam + 1) + 1
    print*,ic,size(d),size(t)
    print*,'itlen=',itlen,ic,t(ic),t(1),dt_sam
    deallocate(A)
@@ -1636,28 +1636,20 @@ write(6,fmt="(7x,7(2x,a9))")(nameNoise(i),i=1,7)
   print*,' '
 
   print*,' row number for optimal solution is',isave 
- do i=1,isave
+ do i=1,isave-1
         read(13,*)(x(j),ex(j),j=1,nmod)
   end do
   read(13,*)(x(j),ex(j),j=1,nmod)
   print*,' nmod=',nmod
   write(6,fmt="(3x,120(1x,f10.3,' +/- ',f10.3))")(x(j),ex(j),j=1,nmod)
 
+  close(13)
+  open(13,position="APPEND",file="model.out")
 !  use best MLE and recalculate the model
        iswt=1
 !  calculate error bars on model  (x and e) e being the error
 
 
-! if ((alpha .ne. 0 ) .and. (modType .eq. 'c')) then
-!   call DestructModTypeC
-!   print*,' here8 irowOffset=',irowOffset
-!   call CreateModtypeC
-! end if
-! if ((alpha .ne. 0 ) .and. (modType .eq. 'q')) then
-!   call DestructModTypeQ
- 
-!   call CreateModtypeQ
-! end if
 
 !  Apr 2021 --- if alpha .ne. 0  set modtype = 'c'
  if ((alpha .ne. 0 ) .and. ( modtype .eq. 'f') ) then

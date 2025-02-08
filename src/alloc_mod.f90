@@ -48,7 +48,8 @@ module alloc_mod
     implicit none
 
     mdmax=ic
-  
+    mdmax=size(t_year)
+
     allocate(a1(maxnmod,mdmax))
     allocate(a2(maxnmod,maxnmod))
     allocate(evd(maxnmod))
@@ -174,6 +175,7 @@ module alloc_mod
     use iso_fortran_env
     implicit none
     maxnmod=nmod+n_exp
+    ic=ic+5
     allocate(covinv(ic,ic))    !! data covariance matrix
     allocate(covar(ic,ic))     !! inverser covariance
     allocate(A(ic,maxnmod))       !! design or trajectory matrix
