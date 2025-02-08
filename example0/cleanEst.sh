@@ -49,11 +49,11 @@ fi
 
 #  Provide location where the executables are located
 #source /home/langbein/.bashrc
-progs=/Users/john/proglib/est_noise8.00/bin_ifort
+progs=/Users/john/proglib/est_noise8.00/bin
 
 #  provide location of the location of GMT routines --- script uses either version 5 or 6
 #     (version 6 in the "classic" mode
-gmtdir=/usr/local/Cellar/gmt/6.5.0_3/bin
+gmtdir=/opt/homebrew/Cellar/gmt/6.5.0_3/bin
 #  defaults 
 
 
