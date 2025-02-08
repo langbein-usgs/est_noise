@@ -187,3 +187,5 @@ All code went through a rewrite to bring the programs into compliance with "mode
       compiled the codes using the Intel compiler on an older, Intel'd chipped Mac and
       I also provide that Makefile, too.)
 
+Late January, 2025
+Fixed small bugs in est_noise code; some problems with array allocation.
