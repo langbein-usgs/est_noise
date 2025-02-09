@@ -8,10 +8,16 @@ FFLAGS1 = -Ofast -w -std=legacy
 #  fft --- https://www.netlib.org/fftpack/
 #          https://fortran-lang.github.io/fftpack/ 
 FFT = dfft.o
-##  using apple'version of blas --- otherwise use openblas
+
+##  using apple'version of blas --- seems to work best with apple cpu (M1)
 BLAS = -fexternal-blas -framework accelerate
 
+# homebrew   similar run time as apple's but seems to use fewer resources
 #BLAS = -I/usr/local/opt/openblas/include -lopenblas -L/usr/local/opt/openblas/lib
+#BLAS = -I/opt/homebrew/opt/openblas/include -lopenblas -L/opt/homebrew/opt/openblas/lib
+
+# macports  runtime is about 30% slower than either apple's version or homebrew's version
+#BLAS= -I/opt/local/include -lopenblas -L/opt/local/lib
 
 SRC = time_mod.f90  alloc_mod.f90 est_noise_mod.f90 filterfunc_mod.f90  psd_calc8.f90 bust_mod.f90  GetStuff_mod.f90  bust8.f90 \
   adjust8.f90 genNoise_mod.f90  randnor.f gen_noise8.f90  mle_mod.f90   NedlerMeadSimplex_mod.f90  model_fit_A_mod.f90 est_noise8.01.f90 \

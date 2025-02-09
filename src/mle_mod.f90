@@ -59,12 +59,12 @@ module mle_mod
 
     fmle=0.0
     
-    md=size(d)
-    mdmax=size(t_year)
+    md=size(d)  !!+5
+    mdmax=size(t_year) !!+5
     irowOffset=0
     nexp=n_exp
     jmax=ic
-    max_time=size(t_year)
+    max_time=size(t_year)  !!+5
     ts_yrs=dt_sam/365.25d+0
 
    
@@ -589,6 +589,11 @@ module mle_mod
     if (chi2 .lt. 0.) fmle=-9999999.
     write(6,7491)sig1,sig2,sig3,sig4,sig5,sig6,sig7,dett,chi2,fmle,del_sec
     write(12,7490)sig1,sig2,sig3,sig4,sig5,sig6,sig7,dett,chi2,fmle
+    ix=0
+    do i=1,n_exp
+      if (exp_choice(i) .eq. "float") ix=ix+2
+    end do
+    if (nmod .gt. 0)    write(13,fmt="(90(3x,e17.10,1x,e17.10))")(x(i),ex(i),i=1,nmod+ix)
 
 7490  format(7f13.4,2x,3f13.3)
 7491  format(7f13.4,2x,4f13.3)

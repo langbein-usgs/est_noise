@@ -48,11 +48,10 @@ module model_fit_A_mod
     nexp=n_exp
     
     if (n_exp .ne. 0 ) then
-    
         call modify_A
         
     end if 
-
+    
     call calcres(nopt,ModType,chi2)
 
     
@@ -133,10 +132,10 @@ module model_fit_A_mod
       end do
       ftol=1.0e-02
 !  check to see if we need to iterate to find best fit time constants
-      if (iflag .eq. 0) then
-        write(13,fmt="(90(3x,e17.10,1x,e17.10))")(x(i),ex(i),i=1,nmod)
-        return
-      end if
+!      if (iflag .eq. 0) then
+!        write(13,fmt="(90(3x,e17.10,1x,e17.10))")(x(i),ex(i),i=1,nmod)
+!        return
+!      end if
       call NedlerMeadEXP(spar,sres,11,10,nsim,ftol,ITER,ModType)
       do k=1,nsim+1
 

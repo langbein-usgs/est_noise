@@ -1695,8 +1695,8 @@ write(6,fmt="(7x,7(2x,a9))")(nameNoise(i),i=1,7)
   do i=1,n_exp
       if (exp_choice(i) .eq. "float") ix=ix+2
   end do
- read(13,*)(x(j),ex(j),j=1,nmod),(x(j+nmod),ex(j+nmod),j=1,ix)
- print*,(x(j),ex(j),j=1,nmod), (x(j+nmod),ex(j+nmod),j=1,ix)
+  read(13,*)(x(j),ex(j),j=1,nmod+ix)
+  print*,(x(j),ex(j),j=1,nmod+ix)
 
 
 !  modify rates due to normalization
