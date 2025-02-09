@@ -8,14 +8,14 @@ then
    echo  " "
    echo "  Script determines builds upon EstNoiseAll.sh for a PLBPx + GM noise"
    echo "   Assumes EstNoiseAll has been run successfully"
-   echo " Usage:  EstNoiseAdd.sh -d data -t old/new  "
+   echo " Usage:  EstNoiseAdd.sh -d data  "
    exit
 fi
 
 #  location of executables
-progs=/Users/john/proglib/est_noiseBeta/bin_ifort
+progs=/Users/john/proglib/est_noise8.00/bin
 #   provide location of GMT -- using either version 5 or 6; 
-gmtdir=/usr/local/Cellar/gmt/6.5.0_3/bin
+gmtdir=/opt/homebrew/Cellar/gmt/6.5.0_3/bin
 
 while getopts d: option 
 do
@@ -23,7 +23,6 @@ do
      case "$option"
      in
           d)  data=$OPTARG;;
-#          t)  type=$OPTARG;;
          \?)  echo "Incomplete set of arguements; type EstNoiseAll.sh without arguments to get documentation"
               exit 1;;
      esac
@@ -42,18 +41,22 @@ then
 fi
 
 ls -l $progs/est_noise*
-grep PLBP noise_"$data".dat | sort -g -k 3 | tail -1 > junkPLBP
+grep PLBP noise_"$data".dat | sort -g -k 1 | tail -1 > junkPLBP
 
 grep GM noise_"$data".dat | sed '/FOGM/d' | tail -1 > junkGM
 
 cat junkGM
 cat junkPLBP
 
-MLE0=`grep RW noise_"$data".dat | head -1 | awk '{print $3}'`
+grep RW noise_"$data".dat | head -1 | awk '{print $2}' > xjunk
+grep FL noise_"$data".dat | head -1 | awk '{print $2}' >> xjunk
+MLE0=`sort -g -k 1 xjunk | tail -1`
+
+#MLE0=`grep RW noise_"$data".dat | head -1 | awk '{print $2}'`
 echo MLE0 $MLE0
 
 # parse starting values
-wn=`awk '{print $6}' junkGM`
+wn=`awk '{print $5}' junkGM`
 echo $wn
 wn100=`awk '{print int(100*$6)}' junkGM`
 if [ "$wn100" -lt 1 ]
@@ -61,13 +64,13 @@ then
   wn=0.01
 fi
 
-plexp1=`awk '{print $7}' junkGM`
-plamp1=`awk '{print $8}' junkGM`
-gm=`awk '{print $9}' junkGM`
-plexp2=`awk '{print $10}' junkGM`
-plamp2=`awk '{print $11}' junkGM`
-np=`awk '{print $12}' junkPLBP`
-bpamp=`awk '{print $13}' junkPLBP`
+plexp1=`awk '{print $6}' junkGM`
+plamp1=`awk '{print $7}' junkGM`
+gm=`awk '{print $8}' junkGM`
+plexp2=`awk '{print $9}' junkGM`
+plamp2=`awk '{print $10}' junkGM`
+np=`awk '{print $11}' junkPLBP`
+bpamp=`awk '{print $12}' junkPLBP`
 echo $wn $plexp1 $plamp1 $gm $plexp2 $plamp2 $np $bpamp
 
 bpamp=`echo $bpamp | awk '{print $1+0.25}'`
@@ -87,7 +90,7 @@ $plamp2 fix
 0
 EOF
 
-"$progs"/est_noise7.30 < est3.in > $file
+"$progs"/est_noise8 < est3.in > $file
 cp resid.out resid_"$data"_"$MOD".out
   tail -75 $file > est_"$data"_"$MOD".out
   cp resid.out resid"$MOD".out
@@ -108,10 +111,10 @@ plamp2=`sed -n ''$ln'p' $file | awk '{printf "%.2f\n", $2}'`
 ln=`expr $ln + 1 `
 plexp2=`sed -n ''$ln'p' $file | awk '{printf "%.2f\n", $2}'`
 bpamp=`grep "Bandpass filter amplitude=" $file | tail -1 | awk '{printf "%.2f\n", $4}'`
-Mtype=`grep "ModType" $file | grep "calling funmin" | awk '{print $2}'`
-echo $MOD $Mtype $MLE $AIC $BIC $wh $plexp1 $plamp1 $gm $plexp2 $plamp2 $np $bpamp >> noise_"$data".dat 
+Mtype=`grep "ModType" $file | grep "calling mle" | awk '{print $2}'`
+echo $MOD $MLE $AIC $BIC $wh $plexp1 $plamp1 $gm $plexp2 $plamp2 $np $bpamp $Mtype >> noise_"$data".dat 
 echo $MOD $Mtype > zz
-paste zz model.dat >> model_"$data".dat
+paste model.dat zz >> model_"$data".dat
 
 
 dMLE=`echo $MLE $MLE0 | awk '{print $1 - $2}'`
@@ -125,7 +128,7 @@ if [ "$seed" -eq 0 ]
 then
   cat 2945829 > seed.dat
 fi
-"$progs"/compare_wander7.01 <<EOF
+"$progs"/compare_wander8 <<EOF
 otr
 resid.out
 max.dat

@@ -410,10 +410,10 @@ plamp2=`sed -n ''$ln'p' $file | awk '{printf "%.2f\n", $2}'`
 ln=`expr $ln + 1 `
 plexp2=`sed -n ''$ln'p' $file | awk '{printf "%.2f\n", $2}'`
 bpamp=`grep "Bandpass filter amplitude=" $file | tail -1 | awk '{printf "%.2f\n", $4}'`
-Mtype=`grep "ModType" $file | grep "calling funmin" | awk '{print $2}'`
-echo $MOD $Mtype $MLE $AIC $BIC $wh $plexp1 $plamp1 $gm $plexp2 $plamp2 $np $bpamp >> noise_"$data".dat 
+Mtype=`grep "ModType" $file | grep "calling mle" | awk '{print $2}'`
+echo $MOD $MLE $AIC $BIC $wh $plexp1 $plamp1 $gm $plexp2 $plamp2 $np $bpamp $Mtype >> noise_"$data".dat 
 echo $MOD $Mtype > zz
-paste zz model.dat >> model_"$data".dat
+paste model.dat zz >> model_"$data".dat
 
 
 #  Compute the drift
@@ -540,10 +540,10 @@ plamp2=`sed -n ''$ln'p' $file | awk '{printf "%.2f\n", $2}'`
 ln=`expr $ln + 1 `
 plexp2=`sed -n ''$ln'p' $file | awk '{printf "%.2f\n", $2}'`
 bpamp=`grep "Bandpass filter amplitude=" $file | tail -1 | awk '{printf "%.2f\n", $4}'`
-Mtype=`grep "ModType" $file | grep "calling funmin" | awk '{print $2}'`
-echo $MOD $Mtype $MLE $AIC $BIC $wh $plexp1 $plamp1 $gm $plexp2 $plamp2 $np $bpamp >> noise_"$data".dat 
+Mtype=`grep "ModType" $file | grep "calling mle" | awk '{print $2}'`
+echo $MOD $MLE $AIC $BIC $wh $plexp1 $plamp1 $gm $plexp2 $plamp2 $np $bpamp $Mtype >> noise_"$data".dat
 echo $MOD $Mtype > zz
-paste zz model.dat >> model_"$data".dat
+paste model.dat zz >> model_"$data".dat
 MLERW=$MLE
 AICRW=$AIC
 BICRW=$BIC
@@ -701,10 +701,11 @@ plamp2=`sed -n ''$ln'p' $file | awk '{printf "%.2f\n", $2}'`
 ln=`expr $ln + 1 `
 plexp2=`sed -n ''$ln'p' $file | awk '{printf "%.2f\n", $2}'`
 bpamp=`grep "Bandpass filter amplitude=" $file | tail -1 | awk '{printf "%.2f\n", $4}'`
-Mtype=`grep "ModType" $file | grep "calling funmin" | awk '{print $2}'`
-echo $MOD $Mtype $MLE $AIC $BIC $wh $plexp1 $plamp1 $gm $plexp2 $plamp2 $np $bpamp >> noise_"$data".dat 
+Mtype=`grep "ModType" $file | grep "calling mle" | awk '{print $2}'`
+echo $MOD $MLE $AIC $BIC $wh $plexp1 $plamp1 $gm $plexp2 $plamp2 $np $bpamp $Mtype >> noise_"$data".dat
 echo $MOD $Mtype > zz
-paste zz model.dat >> model_"$data".dat
+paste model.dat zz >> model_"$data".dat
+
 dmle=`echo $MLE $MLE0 | awk '{print $1-$2}'`
 daic=`echo $AIC $AIC0 | awk '{print $1-$2}'`
 dbic=`echo $BIC $BIC0 | awk '{print $1-$2}'`
@@ -826,10 +827,11 @@ plamp2=`sed -n ''$ln'p' $file | awk '{printf "%.2f\n", $2}'`
 ln=`expr $ln + 1 `
 plexp2=`sed -n ''$ln'p' $file | awk '{printf "%.2f\n", $2}'`
 bpamp=`grep "Bandpass filter amplitude=" $file | tail -1 | awk '{printf "%.2f\n", $4}'`
-Mtype=`grep "ModType" $file | grep "calling funmin" | awk '{print $2}'`
-echo $MOD $Mtype $MLE $AIC $BIC $wh $plexp1 $plamp1 $gm $plexp2 $plamp2 $np $bpamp >> noise_"$data".dat 
+Mtype=`grep "ModType" $file | grep "calling mle" | awk '{print $2}'`
+echo $MOD $MLE $AIC $BIC $wh $plexp1 $plamp1 $gm $plexp2 $plamp2 $np $bpamp $Mtype >> noise_"$data".dat
 echo $MOD $Mtype > zz
-paste zz model.dat >> model_"$data".dat
+paste model.dat zz >> model_"$data".dat
+
 dmle=`echo $MLE $MLE0 | awk '{print $1-$2}'`
 daic=`echo $AIC $AIC0 | awk '{print $1-$2}'`
 dbic=`echo $BIC $BIC0 | awk '{print $1-$2}'`
@@ -943,10 +945,11 @@ plamp2=`sed -n ''$ln'p' $file | awk '{printf "%.2f\n", $2}'`
 ln=`expr $ln + 1 `
 plexp2=`sed -n ''$ln'p' $file | awk '{printf "%.2f\n", $2}'`
 bpamp=`grep "Bandpass filter amplitude=" $file | tail -1 | awk '{printf "%.2f\n", $4}'`
-Mtype=`grep "ModType" $file | grep "calling funmin" | awk '{print $2}'`
-echo $MOD $Mtype $MLE $AIC $BIC $wh $plexp1 $plamp1 $gm $plexp2 $plamp2 $np $bpamp >> noise_"$data".dat 
+Mtype=`grep "ModType" $file | grep "calling mle" | awk '{print $2}'`
+echo $MOD $MLE $AIC $BIC $wh $plexp1 $plamp1 $gm $plexp2 $plamp2 $np $bpamp $Mtype >> noise_"$data".dat
 echo $MOD $Mtype > zz
-paste zz model.dat >> model_"$data".dat
+paste model.dat zz >> model_"$data".dat
+
 dmle=`echo $MLE $MLE0 | awk '{print $1-$2}'`
 daic=`echo $AIC $AIC0 | awk '{print $1-$2}'`
 dbic=`echo $BIC $BIC0 | awk '{print $1-$2}'`
@@ -1055,10 +1058,11 @@ plamp2=`sed -n ''$ln'p' $file | awk '{printf "%.2f\n", $2}'`
 ln=`expr $ln + 1 `
 plexp2=`sed -n ''$ln'p' $file | awk '{printf "%.2f\n", $2}'`
 bpamp=`grep "Bandpass filter amplitude=" $file | tail -1 | awk '{printf "%.2f\n", $4}'`
-Mtype=`grep "ModType" $file | grep "calling funmin" | awk '{print $2}'`
-echo $MOD $Mtype $MLE $AIC $BIC $wh $plexp1 $plamp1 $gm $plexp2 $plamp2 $np $bpamp >> noise_"$data".dat 
+Mtype=`grep "ModType" $file | grep "calling mle" | awk '{print $2}'`
+echo $MOD $MLE $AIC $BIC $wh $plexp1 $plamp1 $gm $plexp2 $plamp2 $np $bpamp $Mtype >> noise_"$data".dat
 echo $MOD $Mtype > zz
-paste zz model.dat >> model_"$data".dat
+paste model.dat zz >> model_"$data".dat
+
 dmle=`echo $MLE $MLE0 | awk '{print $1-$2}'`
 daic=`echo $AIC $AIC0 | awk '{print $1-$2}'`
 dbic=`echo $BIC $BIC0 | awk '{print $1-$2}'`
@@ -1166,7 +1170,7 @@ then
   cp max.dat max"$MOD".dat
 fi
 ##  Check to see if BP modeling worked for ModType=f; if not, re-run with ModType=c
-Mtype=`grep "ModType" $file | grep "calling funmin" | awk '{print $2}'`
+Mtype=`grep "ModType" $file | grep "calling mle" | awk '{print $2}'`
 if [ "$Mtype" = "f" ]
 then
   ReDo=0
@@ -1217,10 +1221,11 @@ plamp2=`sed -n ''$ln'p' $file | awk '{printf "%.2f\n", $2}'`
 ln=`expr $ln + 1 `
 plexp2=`sed -n ''$ln'p' $file | awk '{printf "%.2f\n", $2}'`
 bpamp=`grep "Bandpass filter amplitude=" $file | tail -1 | awk '{printf "%.3f\n", $4}'`
-Mtype=`grep "ModType" $file | grep "calling funmin" | awk '{print $2}'`
-echo $MOD $Mtype $MLE $AIC $BIC $wh $plexp1 $plamp1 $gm $plexp2 $plamp2 $np $bpamp >> noise_"$data".dat 
+Mtype=`grep "ModType" $file | grep "calling mle" | awk '{print $2}'`
+echo $MOD $MLE $AIC $BIC $wh $plexp1 $plamp1 $gm $plexp2 $plamp2 $np $bpamp $Mtype >> noise_"$data".dat
 echo $MOD $Mtype > zz
-paste zz model.dat >> model_"$data".dat
+paste model.dat zz >> model_"$data".dat
+
 dmle=`echo $MLE $MLE0 | awk '{print $1-$2}'`
 daic=`echo $AIC $AIC0 | awk '{print $1-$2}'`
 dbic=`echo $BIC $BIC0 | awk '{print $1-$2}'`
@@ -1256,7 +1261,7 @@ then
   cp max.dat max"$MOD".dat
 fi
 ##  Check to see if BP modeling worked for ModType=f; if not, re-run with ModType=c
-Mtype=`grep "ModType" $file | grep "calling funmin" | awk '{print $2}'`
+Mtype=`grep "ModType" $file | grep "calling mle" | awk '{print $2}'`
 if [ "$Mtype" = "f" ]
 then
   ReDo=0
@@ -1308,10 +1313,11 @@ plamp2=`sed -n ''$ln'p' $file | awk '{printf "%.2f\n", $2}'`
 ln=`expr $ln + 1 `
 plexp2=`sed -n ''$ln'p' $file | awk '{printf "%.2f\n", $2}'`
 bpamp=`grep "Bandpass filter amplitude=" $file | tail -1 | awk '{printf "%.3f\n", $4}'`
-Mtype=`grep "ModType" $file | grep "calling funmin" | awk '{print $2}'`
-echo $MOD $Mtype $MLE $AIC $BIC $wh $plexp1 $plamp1 $gm $plexp2 $plamp2 $np $bpamp >> noise_"$data".dat 
+Mtype=`grep "ModType" $file | grep "calling mle" | awk '{print $2}'`
+echo $MOD $MLE $AIC $BIC $wh $plexp1 $plamp1 $gm $plexp2 $plamp2 $np $bpamp $Mtype >> noise_"$data".dat
 echo $MOD $Mtype > zz
-paste zz model.dat >> model_"$data".dat
+paste model.dat zz >> model_"$data".dat
+
 dmle=`echo $MLE $MLE0 | awk '{print $1-$2}'`
 daic=`echo $AIC $AIC0 | awk '{print $1-$2}'`
 dbic=`echo $BIC $BIC0 | awk '{print $1-$2}'`
@@ -1348,7 +1354,7 @@ then
   cp max.dat max"$MOD".dat
 fi
 ##  Check to see if BP modeling worked for ModType=f; if not, re-run with ModType=c
-Mtype=`grep "ModType" $file | grep "calling funmin" | awk '{print $2}'`
+Mtype=`grep "ModType" $file | grep "calling mle" | awk '{print $2}'`
 if [ "$Mtype" = "f" ]
 then
   ReDo=0
@@ -1402,10 +1408,11 @@ plamp2=`sed -n ''$ln'p' $file | awk '{printf "%.2f\n", $2}'`
 ln=`expr $ln + 1 `
 plexp2=`sed -n ''$ln'p' $file | awk '{printf "%.2f\n", $2}'`
 bpamp=`grep "Bandpass filter amplitude=" $file | tail -1 | awk '{printf "%.3f\n", $4}'`
-Mtype=`grep "ModType" $file | grep "calling funmin" | awk '{print $2}'`
-echo $MOD $Mtype $MLE $AIC $BIC $wh $plexp1 $plamp1 $gm $plexp2 $plamp2 $np $bpamp >> noise_"$data".dat 
+Mtype=`grep "ModType" $file | grep "calling mle" | awk '{print $2}'`
+echo $MOD $MLE $AIC $BIC $wh $plexp1 $plamp1 $gm $plexp2 $plamp2 $np $bpamp $Mtype >> noise_"$data".dat
 echo $MOD $Mtype > zz
-paste zz model.dat >> model_"$data".dat
+paste model.dat zz >> model_"$data".dat
+
 dmle=`echo $MLE $MLE0 | awk '{print $1-$2}'`
 daic=`echo $AIC $AIC0 | awk '{print $1-$2}'`
 dbic=`echo $BIC $BIC0 | awk '{print $1-$2}'`
@@ -1441,7 +1448,7 @@ then
   cp max.dat max"$MOD".dat
 fi
 ##  Check to see if BP modeling worked for ModType=f; if not, re-run with ModType=c
-Mtype=`grep "ModType" $file | grep "calling funmin" | awk '{print $2}'`
+Mtype=`grep "ModType" $file | grep "calling mle" | awk '{print $2}'`
 if [ "$Mtype" = "f" ]
 then
   ReDo=0
@@ -1491,10 +1498,11 @@ plamp2=`sed -n ''$ln'p' $file | awk '{printf "%.2f\n", $2}'`
 ln=`expr $ln + 1 `
 plexp2=`sed -n ''$ln'p' $file | awk '{printf "%.2f\n", $2}'`
 bpamp=`grep "Bandpass filter amplitude=" $file | tail -1 | awk '{printf "%.3f\n", $4}'`
-Mtype=`grep "ModType" $file | grep "calling funmin" | awk '{print $2}'`
-echo $MOD $Mtype $MLE $AIC $BIC $wh $plexp1 $plamp1 $gm $plexp2 $plamp2 $np $bpamp >> noise_"$data".dat 
+Mtype=`grep "ModType" $file | grep "calling mle" | awk '{print $2}'`
+echo $MOD $MLE $AIC $BIC $wh $plexp1 $plamp1 $gm $plexp2 $plamp2 $np $bpamp $Mtype >> noise_"$data".dat
 echo $MOD $Mtype > zz
-paste zz model.dat >> model_"$data".dat
+paste model.dat zz >> model_"$data".dat
+
 dmle=`echo $MLE $MLE0 | awk '{print $1-$2}'`
 daic=`echo $AIC $AIC0 | awk '{print $1-$2}'`
 dbic=`echo $BIC $BIC0 | awk '{print $1-$2}'`
@@ -1649,7 +1657,7 @@ then
   cp max.dat max"$MOD".dat
 fi
 ##  Check to see if BP modeling worked for ModType=f; if not, re-run with ModType=c
-Mtype=`grep "ModType" $file | grep "calling funmin" | awk '{print $2}'`
+Mtype=`grep "ModType" $file | grep "calling mle" | awk '{print $2}'`
 if [ "$Mtype" = "f" ]
 then
   ReDo=0
@@ -1699,10 +1707,11 @@ plamp2=`sed -n ''$ln'p' $file | awk '{printf "%.2f\n", $2}'`
 ln=`expr $ln + 1 `
 plexp2=`sed -n ''$ln'p' $file | awk '{printf "%.2f\n", $2}'`
 bpamp=`grep "Bandpass filter amplitude=" $file | tail -1 | awk '{printf "%.3f\n", $4}'`
-Mtype=`grep "ModType" $file | grep "calling funmin" | awk '{print $2}'`
-echo $MOD $Mtype $MLE $AIC $BIC $wh $plexp1 $plamp1 $gm $plexp2 $plamp2 $np $bpamp >> noise_"$data".dat 
+Mtype=`grep "ModType" $file | grep "calling mle" | awk '{print $2}'`
+echo $MOD $MLE $AIC $BIC $wh $plexp1 $plamp1 $gm $plexp2 $plamp2 $np $bpamp $Mtype >> noise_"$data".dat
 echo $MOD $Mtype > zz
-paste zz model.dat >> model_"$data".dat
+paste model.dat zz >> model_"$data".dat
+
 dmle=`echo $MLE $MLE0 | awk '{print $1-$2}'`
 daic=`echo $AIC $AIC0 | awk '{print $1-$2}'`
 dbic=`echo $BIC $BIC0 | awk '{print $1-$2}'`
@@ -1736,7 +1745,7 @@ then
   cp max.dat max"$MOD".dat
 fi
 ##  Check to see if BP modeling worked for ModType=f; if not, re-run with ModType=c
-Mtype=`grep "ModType" $file | grep "calling funmin" | awk '{print $2}'`
+Mtype=`grep "ModType" $file | grep "calling mle" | awk '{print $2}'`
 if [ "$Mtype" = "f" ]
 then
   ReDo=0
@@ -1786,10 +1795,11 @@ plamp2=`sed -n ''$ln'p' $file | awk '{printf "%.2f\n", $2}'`
 ln=`expr $ln + 1 `
 plexp2=`sed -n ''$ln'p' $file | awk '{printf "%.2f\n", $2}'`
 bpamp=`grep "Bandpass filter amplitude=" $file | tail -1 | awk '{printf "%.3f\n", $4}'`
-Mtype=`grep "ModType" $file | grep "calling funmin" | awk '{print $2}'`
-echo $MOD $Mtype $MLE $AIC $BIC $wh $plexp1 $plamp1 $gm $plexp2 $plamp2 $np $bpamp >> noise_"$data".dat 
+Mtype=`grep "ModType" $file | grep "calling mle" | awk '{print $2}'`
+echo $MOD $MLE $AIC $BIC $wh $plexp1 $plamp1 $gm $plexp2 $plamp2 $np $bpamp $Mtype >> noise_"$data".dat
 echo $MOD $Mtype > zz
-paste zz model.dat >> model_"$data".dat
+paste model.dat zz >> model_"$data".dat
+
 dmle=`echo $MLE $MLE0 | awk '{print $1-$2}'`
 daic=`echo $AIC $AIC0 | awk '{print $1-$2}'`
 dbic=`echo $BIC $BIC0 | awk '{print $1-$2}'`
@@ -1823,7 +1833,7 @@ then
   cp max.dat max"$MOD".dat
 fi
 ##  Check to see if BP modeling worked for ModType=f; if not, re-run with ModType=c
-Mtype=`grep "ModType" $file | grep "calling funmin" | awk '{print $2}'`
+Mtype=`grep "ModType" $file | grep "calling mle" | awk '{print $2}'`
 if [ "$Mtype" = "f" ]
 then
   ReDo=0
@@ -1873,10 +1883,11 @@ plamp2=`sed -n ''$ln'p' $file | awk '{printf "%.2f\n", $2}'`
 ln=`expr $ln + 1 `
 plexp2=`sed -n ''$ln'p' $file | awk '{printf "%.2f\n", $2}'`
 bpamp=`grep "Bandpass filter amplitude=" $file | tail -1 | awk '{printf "%.3f\n", $4}'`
-Mtype=`grep "ModType" $file | grep "calling funmin" | awk '{print $2}'`
-echo $MOD $Mtype $MLE $AIC $BIC $wh $plexp1 $plamp1 $gm $plexp2 $plamp2 $np $bpamp >> noise_"$data".dat 
+Mtype=`grep "ModType" $file | grep "calling mle" | awk '{print $2}'`
+echo $MOD $MLE $AIC $BIC $wh $plexp1 $plamp1 $gm $plexp2 $plamp2 $np $bpamp $Mtype >> noise_"$data".dat
 echo $MOD $Mtype > zz
-paste zz model.dat >> model_"$data".dat
+paste model.dat zz >> model_"$data".dat
+
 dmle=`echo $MLE $MLE0 | awk '{print $1-$2}'`
 daic=`echo $AIC $AIC0 | awk '{print $1-$2}'`
 dbic=`echo $BIC $BIC0 | awk '{print $1-$2}'`
@@ -1910,7 +1921,7 @@ then
   cp max.dat max"$MOD".dat
 fi
 ##  Check to see if BP modeling worked for ModType=f; if not, re-run with ModType=c
-Mtype=`grep "ModType" $file | grep "calling funmin" | awk '{print $2}'`
+Mtype=`grep "ModType" $file | grep "calling mle" | awk '{print $2}'`
 if [ "$Mtype" = "f" ]
 then
   ReDo=0
@@ -1960,10 +1971,11 @@ plamp2=`sed -n ''$ln'p' $file | awk '{printf "%.2f\n", $2}'`
 ln=`expr $ln + 1 `
 plexp2=`sed -n ''$ln'p' $file | awk '{printf "%.2f\n", $2}'`
 bpamp=`grep "Bandpass filter amplitude=" $file | tail -1 | awk '{printf "%.3f\n", $4}'`
-Mtype=`grep "ModType" $file | grep "calling funmin" | awk '{print $2}'`
-echo $MOD $Mtype $MLE $AIC $BIC $wh $plexp1 $plamp1 $gm $plexp2 $plamp2 $np $bpamp >> noise_"$data".dat 
+Mtype=`grep "ModType" $file | grep "calling mle" | awk '{print $2}'`
+echo $MOD $MLE $AIC $BIC $wh $plexp1 $plamp1 $gm $plexp2 $plamp2 $np $bpamp $Mtype >> noise_"$data".dat
 echo $MOD $Mtype > zz
-paste zz model.dat >> model_"$data".dat
+paste model.dat zz >> model_"$data".dat
+
 dmle=`echo $MLE $MLE0 | awk '{print $1-$2}'`
 daic=`echo $AIC $AIC0 | awk '{print $1-$2}'`
 dbic=`echo $BIC $BIC0 | awk '{print $1-$2}'`
@@ -2113,7 +2125,7 @@ then
   cp max.dat max"$MOD".dat
 fi
 ##  Check to see if BP modeling worked for ModType=f; if not, re-run with ModType=c
-Mtype=`grep "ModType" $file | grep "calling funmin" | awk '{print $2}'`
+Mtype=`grep "ModType" $file | grep "calling mle" | awk '{print $2}'`
 if [ "$Mtype" = "f" ]
 then
   ReDo=0
@@ -2163,10 +2175,11 @@ plamp2=`sed -n ''$ln'p' $file | awk '{printf "%.2f\n", $2}'`
 ln=`expr $ln + 1 `
 plexp2=`sed -n ''$ln'p' $file | awk '{printf "%.2f\n", $2}'`
 bpamp=`grep "Bandpass filter amplitude=" $file | tail -1 | awk '{printf "%.3f\n", $4}'`
-Mtype=`grep "ModType" $file | grep "calling funmin" | awk '{print $2}'`
-echo $MOD $Mtype $MLE $AIC $BIC $wh $plexp1 $plamp1 $gm $plexp2 $plamp2 $np $bpamp >> noise_"$data".dat 
+Mtype=`grep "ModType" $file | grep "calling mle" | awk '{print $2}'`
+echo $MOD $MLE $AIC $BIC $wh $plexp1 $plamp1 $gm $plexp2 $plamp2 $np $bpamp $Mtype >> noise_"$data".dat
 echo $MOD $Mtype > zz
-paste zz model.dat >> model_"$data".dat
+paste model.dat zz >> model_"$data".dat
+
 dmle=`echo $MLE $MLE0 | awk '{print $1-$2}'`
 daic=`echo $AIC $AIC0 | awk '{print $1-$2}'`
 dbic=`echo $BIC $BIC0 | awk '{print $1-$2}'`
@@ -2201,7 +2214,7 @@ then
   cp max.dat max"$MOD".dat
 fi
 ##  Check to see if BP modeling worked for ModType=f; if not, re-run with ModType=c
-Mtype=`grep "ModType" $file | grep "calling funmin" | awk '{print $2}'`
+Mtype=`grep "ModType" $file | grep "calling mle" | awk '{print $2}'`
 if [ "$Mtype" = "f" ]
 then
   ReDo=0
@@ -2251,10 +2264,11 @@ plamp2=`sed -n ''$ln'p' $file | awk '{printf "%.2f\n", $2}'`
 ln=`expr $ln + 1 `
 plexp2=`sed -n ''$ln'p' $file | awk '{printf "%.2f\n", $2}'`
 bpamp=`grep "Bandpass filter amplitude=" $file | tail -1 | awk '{printf "%.3f\n", $4}'`
-Mtype=`grep "ModType" $file | grep "calling funmin" | awk '{print $2}'`
-echo $MOD $Mtype $MLE $AIC $BIC $wh $plexp1 $plamp1 $gm $plexp2 $plamp2 $np $bpamp >> noise_"$data".dat 
+Mtype=`grep "ModType" $file | grep "calling mle" | awk '{print $2}'`
+echo $MOD $MLE $AIC $BIC $wh $plexp1 $plamp1 $gm $plexp2 $plamp2 $np $bpamp $Mtype >> noise_"$data".dat
 echo $MOD $Mtype > zz
-paste zz model.dat >> model_"$data".dat
+paste model.dat zz >> model_"$data".dat
+
 dmle=`echo $MLE $MLE0 | awk '{print $1-$2}'`
 daic=`echo $AIC $AIC0 | awk '{print $1-$2}'`
 dbic=`echo $BIC $BIC0 | awk '{print $1-$2}'`
@@ -2289,7 +2303,7 @@ then
   cp max.dat max"$MOD".dat
 fi
 ##  Check to see if BP modeling worked for ModType=f; if not, re-run with ModType=c
-Mtype=`grep "ModType" $file | grep "calling funmin" | awk '{print $2}'`
+Mtype=`grep "ModType" $file | grep "calling mle" | awk '{print $2}'`
 if [ "$Mtype" = "f" ]
 then
   ReDo=0
@@ -2339,11 +2353,11 @@ plamp2=`sed -n ''$ln'p' $file | awk '{printf "%.2f\n", $2}'`
 ln=`expr $ln + 1 `
 plexp2=`sed -n ''$ln'p' $file | awk '{printf "%.2f\n", $2}'`
 bpamp=`grep "Bandpass filter amplitude=" $file | tail -1 | awk '{printf "%.3f\n", $4}'`
-Mtype=`grep "ModType" $file | grep "calling funmin" | awk '{print $2}'`
-echo $MOD $Mtype $MLE $AIC $BIC $wh $plexp1 $plamp1 $gm $plexp2 $plamp2 $np $bpamp >> noise_"$data".dat 
+Mtype=`grep "ModType" $file | grep "calling mle" | awk '{print $2}'`
+echo $MOD $MLE $AIC $BIC $wh $plexp1 $plamp1 $gm $plexp2 $plamp2 $np $bpamp $Mtype >> noise_"$data".dat
 echo $MOD $Mtype > zz
-paste zz model.dat >> model_"$data".dat
-dmle=`echo $MLE $MLE0 | awk '{print $1-$2}'`
+paste model.dat zz >> model_"$data".dat
+
 daic=`echo $AIC $AIC0 | awk '{print $1-$2}'`
 dbic=`echo $BIC $BIC0 | awk '{print $1-$2}'`
 
@@ -2377,7 +2391,7 @@ then
   cp max.dat max"$MOD".dat
 fi
 ##  Check to see if BP modeling worked for ModType=f; if not, re-run with ModType=c
-Mtype=`grep "ModType" $file | grep "calling funmin" | awk '{print $2}'`
+Mtype=`grep "ModType" $file | grep "calling mle" | awk '{print $2}'`
 if [ "$Mtype" = "f" ]
 then
   ReDo=0
@@ -2427,10 +2441,11 @@ plamp2=`sed -n ''$ln'p' $file | awk '{printf "%.2f\n", $2}'`
 ln=`expr $ln + 1 `
 plexp2=`sed -n ''$ln'p' $file | awk '{printf "%.2f\n", $2}'`
 bpamp=`grep "Bandpass filter amplitude=" $file | tail -1 | awk '{printf "%.3f\n", $4}'`
-Mtype=`grep "ModType" $file | grep "calling funmin" | awk '{print $2}'`
-echo $MOD $Mtype $MLE $AIC $BIC $wh $plexp1 $plamp1 $gm $plexp2 $plamp2 $np $bpamp >> noise_"$data".dat 
+Mtype=`grep "ModType" $file | grep "calling mle" | awk '{print $2}'`
+echo $MOD $MLE $AIC $BIC $wh $plexp1 $plamp1 $gm $plexp2 $plamp2 $np $bpamp $Mtype >> noise_"$data".dat
 echo $MOD $Mtype > zz
-paste zz model.dat >> model_"$data".dat
+paste model.dat zz >> model_"$data".dat
+
 dmle=`echo $MLE $MLE0 | awk '{print $1-$2}'`
 daic=`echo $AIC $AIC0 | awk '{print $1-$2}'`
 dbic=`echo $BIC $BIC0 | awk '{print $1-$2}'`
