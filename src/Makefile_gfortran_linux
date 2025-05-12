@@ -12,12 +12,13 @@ FFLAGS1 = -Ofast -w -std=legacy
 FFT = dfft.o
 ##  using apple'version of blas --- otherwise use openblas
 BLAS = -L/usr/lib64 -lopenblasp
+OMP = -L/usr/lib64/openmpi -lopenmpi
 
 #BLAS = -I/usr/local/opt/openblas/include -lopenblas -L/usr/local/opt/openblas/lib
 #  for linux
 #BLAS = -L/usr/lib -lopenblas
 SRC = time_mod.f90  alloc_mod.f90 est_noise_mod.f90 filterfunc_mod.f90  psd_calc8.f90 bust_mod.f90  GetStuff_mod.f90  bust8.f90 \
-  adjust8.f90 genNoise_mod.f90  randnor.f gen_noise8.f90  mle_mod.f90   NedlerMeadSimplex_mod.f90  model_fit_A_mod.f90 est_noise8.01.f90 \
+  adjust8.f90 genNoise_mod.f90  randnor.f gen_noise8.f90  mle_mod.f90   NedlerMeadSimplex_mod.f90  model_fit_A_mod.f90 est_noise8.10.f90 \
   compare_wander_mod.f90 compare_wander8.01.f90
 
 #OBJ = ${SRC:.f90=.o} #substitute .f90 with .o
@@ -25,7 +26,7 @@ SRC = time_mod.f90  alloc_mod.f90 est_noise_mod.f90 filterfunc_mod.f90  psd_calc
 
 
 %.o: %.f90  #wildcard rule, creation of *.o depends on *.f90
-	$(FC) $(FFLAGS)  -c $<
+	$(FC) $(FFLAGS) $(OMP) -c $<
 
 dfft:
 	gfortran -c dfft.f -std=legacy -w
@@ -48,7 +49,7 @@ gen_noise8: $(OBJ4)
 	$(FC) $(FFT) -o $@ $(OBJ4)
 
 OBJ5 =   alloc_mod.o  est_noise_mod.o model_fit_A_mod.o  mle_mod.o filterfunc_mod.o  genNoise_mod.o randnor.o GetStuff_mod.o \
-        time_mod.o  NedlerMeadSimplex_mod.o est_noise8.01.o	
+        time_mod.o  NedlerMeadSimplex_mod.o est_noise8.10.o	
 est_noise8: $(OBJ5)
 	$(FC) $(BLAS) $(FFT) -o $@ $(OBJ5)
 	
