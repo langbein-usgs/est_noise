@@ -40,9 +40,9 @@ then
 fi
 #  Provide location where the executables are located
 #source /home/langbein/.bashrc
-progs=/Users/john/proglib/est_noise8.00/bin
+progs=/Users/langbein/proglib/est_noise8.1/bin
 #   provide location of GMT -- using either version 5 or 6; 
-gmtdir=/opt/homebrew/Cellar/gmt/6.5.0_3/bin
+gmtdir=/opt/homebrew/Cellar/gmt/6.5.0_4/bin
 # defaults
 nett=otr
 netd=otr

@@ -49,11 +49,11 @@ fi
 
 #  Provide location where the executables are located
 #source /home/langbein/.bashrc
-progs=/Users/john/proglib/est_noise8.00/bin
+progs=/Users/langbein/proglib/est_noise8.1/bin
 
 #  provide location of the location of GMT routines --- script uses either version 5 or 6
 #     (version 6 in the "classic" mode
-gmtdir=/opt/homebrew/Cellar/gmt/6.5.0_3/bin
+gmtdir=/opt/homebrew/Cellar/gmt/6.5.0_4/bin
 #  defaults 
 
 
@@ -552,7 +552,7 @@ then
    title=`echo $data "detrended"`
    psf=plot
    rm -f plot.ps
-   R=`awk '{printf "%.3f %.2f\n", $1 +($2-1)/365.25, $3}' data.in | minmax -I1/5`
+   R=`awk '{printf "%.3f %.2f\n", $1 +($2-1)/365.25, $3}' data.in | "$gmtdir"/gmt minmax -I1/5`
    echo $R
    awk '{printf "%.3f %.2f\n", $1 +($2-1)/365.25, $3}' data.in | \
    "$gmtdir"/gmt psxy -JX6/3 $R -Ba5f1/a10f5:mm::."$title":WSen -Sc0.03 -X1.1 -Y7 -P -K > $psf.ps
@@ -628,7 +628,7 @@ tail -75 est1.out > est_"$data".out
 if [ "$nett" = "otr"  -o "$nett" = "doy" ]
 then
 
-   R=`awk '{printf "%.3f %.2f\n", $1 +($2-1)/365.25, $3}' resid.out | minmax -I1/5`
+   R=`awk '{printf "%.3f %.2f\n", $1 +($2-1)/365.25, $3}' resid.out | "$gmtdir"/gmt minmax -I1/5`
 #   echo $R
    title=`echo $data "detrended, cleaned"`
    awk '{printf "%.3f %.2f\n", $1 +($2-1)/365.25, $3}' resid.out | \

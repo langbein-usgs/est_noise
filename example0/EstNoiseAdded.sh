@@ -13,9 +13,9 @@ then
 fi
 
 #  location of executables
-progs=/Users/john/proglib/est_noise8.00/bin
+progs=/Users/langbein/proglib/est_noise8.1/bin
 #   provide location of GMT -- using either version 5 or 6; 
-gmtdir=/opt/homebrew/Cellar/gmt/6.5.0_3/bin
+gmtdir=/opt/homebrew/Cellar/gmt/6.5.0_4/bin
 
 while getopts d: option 
 do
@@ -41,7 +41,7 @@ then
 fi
 
 ls -l $progs/est_noise*
-grep PLBP noise_"$data".dat | sort -g -k 1 | tail -1 > junkPLBP
+grep PLBP noise_"$data".dat | sort -g -k 2 | tail -1 > junkPLBP
 
 grep GM noise_"$data".dat | sed '/FOGM/d' | tail -1 > junkGM
 
