@@ -1,4 +1,6 @@
 <<<<<<< HEAD
+#  est_noise 8.1 -- faster version for Mac 8 relative to version 8
+#
 #  est_noise version 8 -- rewrite of version 7.30
 #
 # est_noise   Version 7.30  
