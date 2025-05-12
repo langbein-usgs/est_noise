@@ -4,7 +4,7 @@ module genNoise_mod
   implicit none
   
   private
-  public :: genNoise, convolv, genWhite, convolv0
+  public :: genNoise, convolv, genWhite, convolv0, convolvT
   
   contains 
 !
@@ -214,6 +214,193 @@ module genNoise_mod
   deallocate(temp2)
   end subroutine genNoise 
   
+subroutine DoIt2(n,H,F,O)
+use OMP_LIB
+use iso_fortran_env
+integer, intent(in) :: n
+real(kind=real64), intent(in):: H(:),F(:)
+real(kind=real64), intent(out) :: O(:)
+integer :: i,j,k
+!$OMP PARALLEL
+!$OMP DO
+!    print*,"num of threads",OMP_get_num_threads(),' max num of threads',OMP_get_max_threads(), &
+ !   OMP_in_parallel(),OMP_get_thread_num()
+do i=1,n
+  O(i)=0.0
+  do j=1,i
+    O(i)=O(i) + H(j)*F(i-j+1)
+  end do
+
+!    if (i .eq. n) print*,i,O(i),"num of threads",OMP_get_num_threads(),' max num of threads',OMP_get_max_threads()
+!    if (i .eq.n) print*,OMP_in_parallel(),OMP_get_thread_num()
+
+end do
+!$OMP END DO
+!$OMP END PARALLEL
+end subroutine DoIt2
+   subroutine convolvT(npts,ilen,H,ran,out)
+! time domain convolution 
+    use iso_fortran_env
+    use OMP_LIB
+!    implicit none
+    integer :: i,j,k
+    real(kind=real64), intent(in) :: ran(:)
+    real(kind=real64), intent(out) :: out(:)
+    real(kind=real64), intent(in) :: H(:)
+    real(kind=real64) :: minH
+    integer, intent(in) ::   ilen, npts
+
+! !! split in two --- 
+    if (ilen .le. npts ) then
+!$OMP PARALLEL DO
+      do i=1,npts
+        out(i)=0.0
+        if (i .lt. ilen) then
+          do j=1,i
+            out(i)=out(i)+ran(j)*H(i-j+1)
+          end do
+        else
+          do j=1,i
+            out(i)=out(i)+ran((i+1-j))*H(j)
+          end do
+        end if
+      end do
+!OMP END PARALLEL DO
+    else
+!$OMP PARALLEL DO
+      do i=1,npts
+        out(i)=0.0
+        do j=1,i
+          out(i)=out(i)+ran(j)*H(i-j+1)
+        end do
+      end do
+!OMP END PARALLEL DO
+    end if
+  end subroutine convolvT
+  
+  subroutine convolvF(n,ilen,filt,data,out) 
+!  frequency domain convolution
+!  Attempt to use dfft routines to follow that algorthm in NR program convlv
+    use iso_fortran_env
+!    implicit none
+    integer, intent(in) :: n, ilen
+    real(kind=real64), intent(in) :: filt(:),data(:)
+    real(kind=real64), intent(out) :: out(:)
+    real(kind=real64), allocatable :: filt2(:),data2(:)
+    real(kind=real64), allocatable :: wsave(:), freal(:),fimag(:),dreal(:),dimag(:),oreal(:), &
+      oimag(:)
+    real(kind=real64), allocatable :: out2(:)
+    real(kind=real64) :: fzero,dzero,minfilt
+    integer :: i,npts,iodd
+    real(kind=real64) :: pi
+    
+    pi=3.1415926535897932384626433832795028841971693993751058209749445923078164062
+
+   
+! figure-out the effective length of filter function... when does it go to zero
+ 
+
+
+!    print*,' effective length of filter function; needs to be odd',ilen  
+    npts=n+ilen
+!  force npts to be power of 2
+    npts=int(alog(float(npts)) / alog(2.) ) + 1
+    npts=int(2**npts)
+!    npts=n+ilen
+ !   npts=int(npts*1.0)
+!    print*,' n ilen npts',n,ilen,npts
+    allocate(filt2(npts))
+    allocate(data2(npts))
+    allocate(out2(npts))
+    data2=0.0d+0
+    filt2=0.0d+0
+    do i=1,n
+      data2(i)=data(i)
+    end do
+!    print*,'ilen n npts sizefilt sizefilt2 sizedata ',ilen,n,npts,size(filt),size(filt2),size(data)
+    do i=1,ilen
+      filt2(i)=filt(i)
+    end do
+
+!  redistribute filt2 stuff per NR program convlv
+      do  i=1,(ilen-1)/2
+        filt2(npts+1-i)=filt2(ilen+1-i)
+      end do
+      do i=(ilen +3)/2,npts-(ilen-1)/2
+        filt2(i)=0.0
+      end do
+
+    allocate(wsave(3*2*npts/2+15))
+    call dzffti(npts*2/2,wsave)    !! initialize
+!!  fft
+    allocate(freal(npts))
+    allocate(fimag(npts))
+    allocate(dreal(npts))
+    allocate(dimag(npts))
+    allocate(oreal(npts))
+    allocate(oimag(npts))
+!    do i=1,npts
+!      write(36,*)i,data2(i),filt2(i)
+!    end do
+ 
+    call dzfftf(2*npts/2,filt2,fzero,freal,fimag,wsave)       
+    call dzfftf(2*npts/2,data2,dzero,dreal,dimag,wsave)   
+    print*,'dzero and fzero', dzero,fzero   
+    oreal=dreal*freal-dimag*fimag
+    oimag=freal*dimag+fimag*dreal
+!  inverse fft
+!    allocate(out2(2*npts))
+!    fzero=1.0d+0/((float(n)/2.5)**2)
+!    fzero=fzero*dzero
+    fzero=0.0d+0
+!    fzero=dzero
+    call dzfftb(2*npts/2,out2,fzero,oreal,oimag,wsave)
+    do i=1,n
+!        out(i)=sqrt(2.0)*out2(i)*float(n)
+!        out(i)=out2(i)
+!        out(i)=out2(i)*(dble(float(n)))/(dsqrt(pi))
+        out(i)=out2(i)*(dble(float(npts/2)))      !-dzero
+!        out(i)=out2(i)
+    end do
+    deallocate(wsave)
+    deallocate(filt2)
+    deallocate(data2)
+    deallocate(freal)
+    deallocate(fimag)
+    deallocate(dreal)
+    deallocate(dimag)
+    deallocate(oreal) 
+    deallocate(oimag)
+  end subroutine 
+  subroutine convolvTx(npts,H,ran,ilen)
+! time domain convolution 
+    use iso_fortran_env
+!    implicit none
+    integer :: npts,i,j,ilen,k
+    real(kind=real64), intent(inout) :: ran(:)
+    real(kind=real64) :: ranin(size(ran))
+    real(kind=real64), intent(in) :: H(:)
+    real(kind=real64) :: minH
+! figure-out the effective length of filter function... when does it go to zero
+!    print*,'ilen=',ilen
+    ranin=ran
+    do concurrent (i=1:npts)
+!    do i=1,npts
+      ran(i)=0.0
+!      do  j=1,i
+ !     k=i
+!      if (i .gt. ilen) k=ilen
+      if (i .lt. ilen) then
+        do concurrent (j=1:i)
+          ran(i)=ran(i)+ranin(j)*H(i-j+1)
+        end do
+      else
+        do concurrent (j=1:ilen)
+          ran(i)=ran(i)+ranin((i+1-j))*H(j)
+        end do  
+      end if    
+    end do
+  end subroutine convolvTx
   subroutine convolv0(npts,H,ran)
 ! time domain convolution 
     use iso_fortran_env
@@ -234,8 +421,195 @@ module genNoise_mod
     end do
   end subroutine convolv0
   
+  subroutine convolv1(n,filt,data,out)
+!  frequency domain convolution
+    use iso_fortran_env
+!    implicit none
+    integer, intent(in) :: n
+    real(kind=real64), intent(in) :: filt(:),data(:)
+    real(kind=real64), intent(out) :: out(:)
+    real(kind=real64), allocatable :: filt2(:),data2(:)
+!    real(kind=real64), intent(out) ;; out(:)
+    real(kind=real64), allocatable :: wsave(:), freal(:),fimag(:),dreal(:),dimag(:),oreal(:), &
+      oimag(:),out2(:)
+    real(kind=real64) :: fzero,dzero
+    integer :: i,npts,ndif
+    real(kind=real32) :: pi
+    pi=3.14159265
+!  force npts be a power of 2  !! doesn't have to be....
+      npts=n
+      npts=int(alog(float(npts))/alog(2.))+1  
+ 
+      npts=1*(2**npts)  
+      
+      allocate(filt2(2*npts))
+      allocate(data2(2*npts))
 
-  
+!!  zero pad the inputs to the fft 
+      data2=0.0d+0
+      filt2=0.0d+0
+      ndif=npts-n
+!      print*,' in convolv1 npts, n, ndif  size data2 size data',npts,n,ndif,size(data2),size(data)
+!      print*,1+npts/2-1+ndif/2,n+npts/2-1+ndif/2
+      do i=1,n
+        data2(i+npts/2-1+ndif/2)=data(i)
+        filt2(i+npts/2-1+ndif/2)=filt(i)
+!        if (i .ge. 9*n/10) then     !!!  cosine taper last 10% of filter
+!           filt2(i+npts/2-1+ndif/2)=filt2(i+npts/2-1+ndif/2)*cos((pi/2.0)*(i-9*n/10)/(n/10))
+!           data2(i+npts/2-1+ndif/2)=data2(i+npts/2-1+ndif/2)*cos((pi/2.0)*(i-9*n/10)/(n/10))
+!        end if
+      end do
+
+      allocate(wsave(3*2*npts+15))
+      call dzffti(npts*2,wsave)    !! initialize
+!!  fft
+      allocate(freal(npts))
+      allocate(fimag(npts))
+      allocate(dreal(npts))
+      allocate(dimag(npts))
+      allocate(oreal(npts))
+      allocate(oimag(npts))
+ 
+      call dzfftf(2*npts,filt2,fzero,freal,fimag,wsave)       
+      call dzfftf(2*npts,data2,dzero,dreal,dimag,wsave) 
+      oreal=dreal*freal-dimag*fimag
+      oimag=freal*dimag+fimag*dreal
+!      do i=1,npts
+!          j=i
+!        write(78,*)i,j,(oreal(j)**2+oimag(j)**2), dlog(oreal(j)**2+oimag(j)**2)/alog(10.),  &
+!        dlog(freal(j)**2+fimag(j)**2)/alog(10.),dlog(dreal(j)**2+dimag(j)**2)/alog(10.)
+!        write(76,*)i,freal(i),fimag(i),dlog(freal(j)**2+fimag(j)**2)/alog(10.)
+!      end do
+!  inverse fft
+      allocate(out2(2*npts))
+
+      dzero=1.0d+0/((float(n)/2.5)**2)     
+      call dzfftb(2*npts,out2,dzero,oreal,oimag,wsave) 
+!      do i=1,2*npts
+!        write(70,*)i,out2(i)
+!      end do
+      do i=1,n
+        out(i)=dsqrt(2.0d+0)*out2(npts+i+ndif/1-2)*float(n)
+      end do
+      deallocate(wsave)
+      deallocate(filt2)
+      deallocate(data2)
+      deallocate(freal)
+      deallocate(fimag)
+      deallocate(dreal)
+      deallocate(dimag)
+      deallocate(oreal)
+      deallocate(oimag)
+      
+  end subroutine convolv1
+ 
+  subroutine convolv4(n,filt,data,out)
+!  frequency domain convolution
+!  Attempt to use dfft routines to follow that algorthm in NR program convlv
+    use iso_fortran_env
+!    implicit none
+    integer, intent(in) :: n
+    real(kind=real64), intent(in) :: filt(:),data(:)
+    real(kind=real64), intent(out) :: out(:)
+    real(kind=real64), allocatable :: filt2(:),data2(:)
+    real(kind=real64), allocatable :: wsave(:), freal(:),fimag(:),dreal(:),dimag(:),oreal(:), &
+      oimag(:)
+    real(kind=real64), allocatable :: out2(:)
+    real(kind=real64) :: fzero,dzero,minfilt
+    integer :: i,npts,ilen,iodd
+    real(kind=real64) :: pi
+    
+    pi=3.1415926535897932384626433832795028841971693993751058209749445923078164062
+
+   
+! figure-out the effective length of filter function... when does it go to zero
+    minfilt=maxval(dsqrt(filt**2))*1.0e-04
+    ilen=n-100
+    do i=1,n-100
+     
+       if (dsqrt(filt(n-100+1-i)**2) .ge. minfilt) then
+         ilen=n-100+1-i
+         exit
+       end if
+    end do
+    ilen=ilen*2
+    if (ilen .gt. n)ilen=n-100
+    iodd=int(ilen/2)
+    iodd=ilen-2*iodd
+    if (iodd .eq. 0) ilen=ilen+1
+    if (ilen .gt. n) ilen=ilen-2
+
+!    print*,' effective length of filter function; needs to be odd',ilen  
+    npts=n+ilen
+!  force npts to be power of 2
+    npts=int(alog(float(npts)) / alog(2.) ) + 1
+    npts=int(2**npts)
+!    npts=n+ilen
+ !   npts=int(npts*1.0)
+!    print*,' n ilen npts',n,ilen,npts
+    allocate(filt2(npts))
+    allocate(data2(npts))
+    allocate(out2(npts))
+    data2=0.0d+0
+    filt2=0.0d+0
+    do i=1,n
+      data2(i)=data(i)
+    end do
+!    print*,'ilen n npts sizefilt sizefilt2',ilen,n,npts,size(filt),size(filt2)
+    do i=1,ilen
+      filt2(i)=filt(i)
+    end do
+
+!  redistribute filt2 stuff per NR program convlv
+      do  i=1,(ilen-1)/2
+        filt2(npts+1-i)=filt2(ilen+1-i)
+      end do
+      do i=(ilen +3)/2,npts-(ilen-1)/2
+        filt2(i)=0.0
+      end do
+
+    allocate(wsave(3*2*npts/2+15))
+    call dzffti(npts*2/2,wsave)    !! initialize
+!!  fft
+    allocate(freal(npts))
+    allocate(fimag(npts))
+    allocate(dreal(npts))
+    allocate(dimag(npts))
+    allocate(oreal(npts))
+    allocate(oimag(npts))
+    do i=1,npts
+      write(36,*)i,data2(i),filt2(i)
+    end do
+ 
+    call dzfftf(2*npts/2,filt2,fzero,freal,fimag,wsave)       
+    call dzfftf(2*npts/2,data2,dzero,dreal,dimag,wsave)   
+    
+    oreal=dreal*freal-dimag*fimag
+    oimag=freal*dimag+fimag*dreal
+!  inverse fft
+!    allocate(out2(2*npts))
+!    fzero=1.0d+0/((float(n)/2.5)**2)
+!    fzero=fzero*dzero
+    fzero=0.0d+0
+    call dzfftb(2*npts/2,out2,fzero,oreal,oimag,wsave)
+    do i=1,n
+!        out(i)=sqrt(2.0)*out2(i)*float(n)
+!        out(i)=out2(i)
+!        out(i)=out2(i)*(dble(float(n)))/(dsqrt(pi))
+        out(i)=out2(i)*(dble(float(npts/2)))+dzero
+!        out(i)=out2(i)
+    end do
+    deallocate(wsave)
+    deallocate(filt2)
+    deallocate(data2)
+    deallocate(freal)
+    deallocate(fimag)
+    deallocate(dreal)
+    deallocate(dimag)
+    deallocate(oreal) 
+    deallocate(oimag)
+  end subroutine convolv4
+
   subroutine convolv(npts,H,ran)
 !  fft version of convolution... faster than time domain convolution
     use iso_fortran_env

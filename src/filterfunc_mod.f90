@@ -2,6 +2,7 @@ module filterfunc_mod
 !  filters use to create synthetic noise and/or to create data covariance matrices
   use iso_fortran_env
   use alloc_mod
+!!  use OMP_LIB
   implicit none
   private
  
@@ -24,7 +25,8 @@ module filterfunc_mod
     real, intent(in) :: expon,alpha, ts
     real(kind=real64), intent(out) :: crr(npts)
     real(kind=real64), parameter :: small= 1.0d-10
-    real :: ddexp,fracti,fracti_last
+    real(kind=real64) :: ddexp,fracti,fracti_last   !  originally real32 which caused the inverse filter to ring with expon > 2.5.  Now
+                                                    !  inverse filter monitonically decreases to zero (4/13/2025)
     integer :: i,j
     ddexp=0.5*expon
       do  j=1,npts
@@ -38,7 +40,7 @@ module filterfunc_mod
             fracti_last=fracti
          end if
          crr(j)=fracti*dexp(-dble(alpha)*ts*float(j-1))
-         if (crr(j) .lt. small) crr(j)=small
+!         if (crr(j) .lt. small) crr(j)=small
       end do
   end subroutine frac_diff  
   
@@ -245,10 +247,11 @@ module filterfunc_mod
 
     call  frac_diff(dcr,sig3,sig4,sngl(t_small),kkmax)
                 
-    do  i=mmax,2,-1
-         dcr(i)=dcr(i-1)
-    end do
-    dcr(1)=0
+!  eliminate this step to bring quadrature covariance equal to that of additive covariance (04/13/2024)
+!    do  i=mmax,2,-1
+!         dcr(i)=dcr(i-1)
+!    end do
+!    dcr(1)=0
 
   
     const=(sig2**2)*(t_small**(sig3/2.0))
@@ -264,6 +267,7 @@ module filterfunc_mod
 
 
     call makeMatrix(irow,imax,(dcr),covar,jmax,0,mmax,md)
+!    call makeMatrix(irow,imax,(dcr),covar,jmax,3,mmax,md)
             
 
     do  i=1,jmax
@@ -292,7 +296,7 @@ module filterfunc_mod
 
     call band_pass_filt(t_small,flow,fhigh,npole,mmax,cr,sig5)
                         
-    print*,' BP filt 3',jmax,t_small,flow,fhigh,npole,corran(jmax),sig5,mmax,md
+!    print*,' BP filt 3',jmax,t_small,flow,fhigh,npole,corran(jmax),sig5,mmax,md
     do  i=1,jmax
       imax=int((corran(i)-corran(1))/t_small+0.5)+1
        sumlast=0.
@@ -331,6 +335,10 @@ module filterfunc_mod
 !       Then the cov=H*H'    <------------iflip=0
 !     But, if we're given the inverse filter coefficents, finv
 !       Then the cov^-1 = H'*H  <---------- iflip=2
+!
+!   ilfip=3 cov=H*H'    ---  does the 'brute force' method to compute covariance 
+!           (and not its inverse) but with OMP paralyzation.  Does not work....; at least for now
+!!    use OMP_LIB
     integer, intent(in) :: nmax,mmax,max,nobs,irow(nmax),iflip
     integer :: i,j,k,imax,kmax, nobs2,idif,kcol,kk,kmin,krow
     real(kind=real64), intent(in) :: f(max)
@@ -338,20 +346,20 @@ module filterfunc_mod
     real(kind=real64) :: sum,tmp,sum1,sum2
     real(kind=real64), allocatable :: scr(:,:)
     
-    allocate(scr(max,max))
+    allocate(scr(nmax,nmax))
 !    print*,' max nobs, mmax nmax', max, nobs, mmax, nmax
     if (iflip .lt. 2 ) then
         if (nobs .ne. max ) then
 !  do this when there are missing data
+!!$OMP PARALLEL DO
           do i=1,max
             imax=i
+!!!$OMP PARALLEL DO
+
             do  k=1,i
                sum=0.0
                kmax=k
-!         if (( i .ge. 1) .or. (k .ge. 1 )) then
                if (( i .eq. 1) .or. (k .eq. 1 )) then
-                 sum1=0.0
-                 sum2=0.0
                  kmin=kmax
                else
                  sum=scr(i-1,k-1)
@@ -363,13 +371,15 @@ module filterfunc_mod
               end do
               scr(i,k)=sum
               scr(k,i)=sum
-
             end do
+
+!!!$OMP END PARALLEL DO
           end do
-    
+!!$OMP END PARALLEL DO
 !
 !  select row/columns
 !
+!!!$OMP PARALLEL DO
           
           do  i=1,nobs
              krow=irow(i)
@@ -380,10 +390,10 @@ module filterfunc_mod
               end do
           end do
 
-
+!!!$OMP END PARALLEL DO
         else
 !  when there are no missing data, do this....  
-
+!!!$OMP PARALLEL DO
            do  i=1,max
              imax=i
              do  k=1,i
@@ -391,8 +401,8 @@ module filterfunc_mod
                kmax=k
 !         if (( i .ge. 1) .or. (k .ge. 1 )) then
                if (( i .eq. 1) .or. (k .eq. 1 )) then
-                 sum1=0.0
-                 sum2=0.0
+!                 sum1=0.0
+!                 sum2=0.0
                  kmin=kmax
                else
                   sum=covar(i-1,k-1)
@@ -408,8 +418,8 @@ module filterfunc_mod
            end do
 
          end do   ! index on k
+!!!$OMP END PARALLEL DO
       end if   ! index on i
-
 !
 !   flip matrix for inverse covariance
 !
@@ -487,8 +497,37 @@ module filterfunc_mod
         end do
 
    end if
-    
- end subroutine makeMatrix
+!!$OMP PARALLEL DO 
+!!!   flip= 3   Brute force
+  if (iflip .eq. 3) then
+!  print*,'brute force',max
+  scr=0.0
+!!!$OMP PARALLEL DO
+   do i=1,max ! could be i=2,max
+      
+      do k=2,i   ! could be j=2,i
+        sum=0.0
+        do kk=2,k
+!           print*,i,k,kk,i+1-kk,k+1-kk
+           sum=sum+ f(i+1-kk)*f(k+1-kk)  
+!           dsum=dsum+cr(imax+1-kk)*cr(kmax+1-kk)
+        end do
+      end do
+      scr(i,k)=sum
+   end do
+!!!$OMP END PARALLEL DO
+!!!$OMP PARALLEL DO
+          do  i=1,nobs
+             krow=irow(i)
+             do  j=1,i
+               kcol=irow(j)
+               covar(i,j)=scr(krow,kcol)
+                covar(j,i)=scr(kcol,krow)
+              end do
+          end do
+!!!$OMP END PARALLEL DO
+   end if    !!  iflip = 3
+end subroutine makeMatrix
 
 
   

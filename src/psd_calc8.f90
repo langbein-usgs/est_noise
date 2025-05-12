@@ -25,7 +25,7 @@ program psd_calc8
   real(kind=real32) :: fexp2,amp_pl2,P2o,sigma,Pw,alpha
   real(kind=real32) :: flow,fhigh,tmp,amp_bp,h,powBP
   real(kind=real32) :: freq, powPL1, powPL2,power,powSP,pow
-  real(kind=real64), allocatable :: ran(:,:),filt(:),wsave(:),dreal(:),dimag(:)
+  real(kind=real64), allocatable :: ran(:,:),filt(:),wsave(:),dreal(:),dimag(:),tmpx(:)
   real(kind=real64) :: azero
   real(kind=real32) :: sumh
   integer :: npts,i,j,npole,nx,ishift
@@ -172,6 +172,7 @@ program psd_calc8
       tsam=tsam/365.25
       allocate(ran(4,npts))
       allocate(filt(2*npts))
+      allocate(tmpx(npts))
       do j=1,4
       do i=1,npts
         ran(j,i)=0.0d+0
@@ -187,7 +188,8 @@ program psd_calc8
     if (amp_pl1 .ne. 0.0) then
 
        alpha=fgm*(2.0*pi)  !! convert from c/yr to radians/yu
-       call frac_diff(ran(2,:),fexp1,alpha,tsam,npts)
+       call frac_diff(tmpx,fexp1,alpha,tsam,npts)
+       ran(2,:)=tmpx
        print*,fexp1,alpha,tsam,npts
     
         amp_pl1=amp_pl1*(tsam**(fexp1/4))
@@ -198,7 +200,8 @@ program psd_calc8
       end if
       if (amp_pl2 .ne. 0.0) then
         alpha=0.0
-        call frac_diff(ran(3,:),fexp2,alpha,tsam,npts)
+        call frac_diff(tmpx,fexp2,alpha,tsam,npts)
+        ran(3,:)=tmpx
         amp_pl2=amp_pl2*(tsam**(fexp2/4))
         do  i=1,npts
           ran(3,i)=ran(3,i)*amp_pl2
@@ -208,7 +211,8 @@ program psd_calc8
 !!  BP filtered
       if (amp_bp .ne. 0.) then
 
-        call band_pass_filt(dble(tsam),flow,fhigh,npole,npts, ran(4,:),amp_bp)
+        call band_pass_filt(dble(tsam),flow,fhigh,npole,npts, tmpx,amp_bp)
+        ran(4,:)=tmpx
       end if
       do i=1,2*npts      !!!!  note that filt dimension is twice the required amount
         filt(i)=0.0d+0
@@ -229,10 +233,6 @@ program psd_calc8
       
 !  start the fft process
 
-
-!      do i=1,npts*2
-!       write(8,*)i,filt(i)
-!     end do
       
 
 !  compute fft
@@ -242,7 +242,7 @@ program psd_calc8
       call dzffti(npts*2,wsave)    !! initialize
 
       call dzfftf(npts*2,filt,azero,dreal,dimag,wsave)   !!!  fft
-      
+
       do  i=2,(npts)-1
 !   do some simple smoothing  (3-points)
         Pow=0.0
@@ -266,6 +266,7 @@ program psd_calc8
       deallocate(wsave)
       deallocate(dreal)
       deallocate(dimag)
+      deallocate(tmpx)
     end if    !!!!  end switch between additive and quadrature models
   close(10)
   print*,' Output PSD model in psdcalc.out'

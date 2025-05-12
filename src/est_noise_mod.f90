@@ -66,7 +66,7 @@ module est_noise_mod
 
   subroutine calcres(iswitch,ModType,chi2)
   use alloc_mod
-
+  use OMP_LIB
 !  max_data  dimension of data
 !  max_parm  dimension of num parameters
 !  ic  number of data
@@ -82,12 +82,12 @@ module est_noise_mod
 !   sum Sum of residuals normalized by covariance  dr^t*covinv*dr
 !   ModType;  f, c, n
 !
-    integer :: iswitch,i,j,k,ier
+    integer :: iswitch,i,j,k,ier,ilen
     integer :: ie,iflag   ! mdmax,maxnmod,
     character(len=1) :: ModType 
     
     real (kind=real64), intent(out) :: chi2
-    real (kind=real64) :: wzd(5000),rat,at,resA,chi2adj
+    real (kind=real64) :: wzd(5000),rat,at,resA,chi2adj,minH,tmp(ic+1),tmp1(ic+1)
     real(kind=real32) :: time0,time1
 
 
@@ -110,26 +110,36 @@ module est_noise_mod
 !    chi^2 =d^t * C^-1 d
 !          =dw^t dw -dw^t *B dw
 
+! figure-out the effective length of filter function... when does it go to zero
+    minH=maxval(dsqrt(Finv**2))*1.0e-06
+    ilen=ic
+    do i=1,ic
+
+       if (dsqrt(Finv(ic+1-i)**2) .ge. minH) then
+         ilen=ic+1-i
+         exit
+       end if
+    end do
+    if (iswitch .eq. 1) ilen=ic
+    ilen=ic      !!!  with parallel openmp, shortening the length of the filter has no measurable affect on cpu time
 
       Aw=A
- 
+!$OMP PARALLEL DO
       do j=1,nmod
+!            if ( j .eq. nbt+1 ) call convolvT(mdmax,ic,Finv,A(:,j),Aw(:,j))   !! only used if shortening the length of the filter
+          call convolvT(mdmax,ilen,Finv,A(:,j),Aw(:,j))
          do  i=1,ic
-           din(i)=(A(i,j))
-         end do
-         
-         call convolv0(mdmax,Finv,din)
-         do  i=1,ic
-            Aw(i,j)=(din(i))
             Awt(j,i)=Aw(i,j)
          end do
        end do
+!$OMP END PARALLEL DO
 
 !     whiten data
       do  i=1,ic
         din(i)=d(i)
       end do
-      call convolv0(mdmax,Finv,din)
+      tmp=d
+      call convolvT(mdmax,ic,Finv,tmp,din)
       do i=1,ic
         dw(i)=din(i)
       end do
@@ -152,11 +162,15 @@ module est_noise_mod
          call dgemm('N','N',nmod,nmod,ic,-1.0d+0,a3,maxnmod,Aw,mdmax, 1.0d+0,a2,maxnmod)
 
 !    Awt = Aw^t - Aw^t B = Aw^t - a3
+!$OMP PARALLEL
+!$OMP DO
            do  i=1,nmod
            do  j=1,ic
              Awt(i,j)=Awt(i,j)-a3(i,j)
            end do
            end do
+!$OMP END DO
+!$OMP END PARALLEL
 
 
          end if
@@ -225,7 +239,8 @@ module est_noise_mod
       
 !     whiten residuals
 
-      call convolv0(ic,Finv,dr)
+      tmp=dr
+      call convolvT(ic,ic,Finv,tmp,dr)
 
       chi2=0.0
       do  i=1,ic
@@ -310,7 +325,8 @@ module est_noise_mod
       call dgemm('N','N',nmod,ic,nmod,1.0d+0,ai,maxnmod,a1,maxnmod,0.0d+0,ainv,maxnmod)
 
 !  compute the model, x
-
+!!!$OMP PARALLEL 
+!!!$OMP DO
       do i=1,nmod
 
         x(i)=0.d+0
@@ -319,9 +335,13 @@ module est_noise_mod
            x(i)=x(i)+ainv(i,j)*d(j)
          end do
       end do
+!!!$OMP END DO
+!!!$OMP END PARALLEL
       
 !    compute the residuals
       
+!!!$OMP PARALLEL
+!!!$OMP  DO
       do i=1,ic
       res(i)=0.
         do  j=1,nmod
@@ -329,6 +349,8 @@ module est_noise_mod
         end do
       res(i)=d(i)-res(i)
       end do
+!!!$OMP END DO
+!!!$OMP END PARALLEL
      else
       res=d
      end if   !  execute if nmod > 0
@@ -338,6 +360,8 @@ module est_noise_mod
 
 
       chi2=0.d+0
+!!!$OMP PARALLEL 
+!!!$OMP DO
       do  i=1,ic
       resA=0.
         do  j=1,ic
@@ -345,6 +369,8 @@ module est_noise_mod
          end do!         print*,i,res(i)
       chi2=chi2+resA
       end do
+!!!$OMP END DO
+!!!$OMP END PARALLEL
 !      print*,' chi2=',chi2, sqrt(chi2/float(ic-nmod))
     end if   !!  ModType 
     

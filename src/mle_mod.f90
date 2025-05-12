@@ -6,6 +6,7 @@ module mle_mod
   use est_noise_mod
   use filterfunc_mod
   use model_fit_A_mod
+!!  use OMP_LIB
 
   implicit none
   private
@@ -51,7 +52,7 @@ module mle_mod
       const1,const2,extend,fnaught,fxlow,covmin,covmax,timex,del_sec,sig1_new
     real(kind=real64) :: small=1.0d-15,t_small,ts_yrs,ttlen,dsum,fsmall=1.0d-30,dett,detmiss, chi2
    integer, allocatable :: iroww(:)  
-   integer(kind=int32) :: count, count_rate, count_max, count0 !!  arguments for system clock
+   integer(kind=int32) :: count, count_rate, count_max, count0, countx !!  arguments for system clock
 !  stuff for ModType=c
     integer :: ix,ixx,krow   
     if (.not. allocated(iroww)) allocate(iroww(kmax))
@@ -181,7 +182,7 @@ module mle_mod
     kkmax=kmax
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     if ((ModType .eq. 'f' ) .or. (ModType .eq. 'c')) then   !!! for additive noise
-
+ 
        if ((ipl_flag_1 .ne. 1) .or. (iswt .eq. 1))  then
          kkmax=kmax
          irowOffset=0
@@ -253,6 +254,7 @@ module mle_mod
        do i=1,kmax
            iroww(i)=i
        end do
+
     end if   !!!  finish creating filter functions for modtype f and c
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -315,6 +317,11 @@ module mle_mod
         ixx=jmax
 !        call system_clock(count, count_rate, count_max)
 !         print*,' covariances computed', float(count-count0)/float(count_rate)
+!      write(55,*)(i,covar(i,i),i=1,jmax)
+!      write(55,*)1,(covar(1,j),j=1,jmax)
+!      write(55,*)2,(covar(2,j),j=1,jmax)
+!      write(55,*)10,(covar(10,j),j=1,jmax)
+!      write(55,*)11,(covar(11,j),j=1,jmax)
     end if    !!!!  end ModType q
     
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!   
@@ -332,7 +339,7 @@ module mle_mod
            end do
            finv(i)=-1.0*(dsum/(f(1)))
 !!  Needed --- if finv is zero, the construction of covariance matrix takes too long;
-           if (abs(finv(i)) .lt. fsmall) finv(i)=fsmall
+!           if (abs(finv(i)) .lt. fsmall) finv(i)=fsmall
          end do
 !!  test whether finv is the inverse of f
         if (iswitch_verbose .eq. 1) then
@@ -523,8 +530,9 @@ module mle_mod
         end do
 
         call makeMatrix(iroww,kmax+irowOffset,f,covar,ixx,0,mdmax,mdmax)
-        
- 
+!        call makeMatrix(iroww,kmax+irowOffset,f,covar,ixx,3,mdmax,mdmax)
+      
+!!!$OMP PARALLEL DO
         do  i=1,ixx
           do  j=1,i
           covinv(i,j)=covar(i,j)
@@ -533,9 +541,17 @@ module mle_mod
           end do
 
         end do
+!!!$OMP END PARALLEL DO
+!      write(55,*)(i,covar(i,i),i=1,jmax)
+!      write(55,*)1,(covar(1,j),j=1,jmax)
+!      write(55,*)2,(covar(2,j),j=1,jmax)
+!      write(55,*)10,(covar(10,j),j=1,jmax)
+!      write(55,*)11,(covar(11,j),j=1,jmax)
      end if   !!! done with computing covariance for c
 !!!!!!!!!!!!!!!!
      if ((ModType .eq. "c") .or. (ModType .eq. "a") .or. (ModType .eq. "n")) then
+  
+ 
 !  compute inverse covariance for modtype c and q
         call dpotrf('L',ixx,covinv,mdmax,nerror)
 
@@ -557,21 +573,23 @@ module mle_mod
           dett=dett+dlog(covinv(i,i))
         end do
 
-        call dpotri('L',ixx,covinv,md,nerror)
+        call dpotri('L',ixx,covinv,md,nerror)    !!!  takes the most time!
+
 
 
 !  fill in upper trianguangular part of matrix
-
+!!!$OMP PARALLEL DO
         do  i=1,ixx
           do j=i+1,ixx
           covinv(i,j)=covinv(j,i)
           end do
         end do
-
+!!!$OMP END PARALLEL DO
         jmaxTmp=jmax
         jmax=ixx
- 
+
         call model_fit(iswt,ModType,chi2)
+
         jmax=jmaxTmp
         call system_clock(count, count_rate, count_max)
         del_sec=float(count-count0)/float(count_rate)
