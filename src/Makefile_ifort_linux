@@ -24,7 +24,7 @@ BLAS = -I${MKLROOT}/include/intel64/ilp64 -i8  -I"${MKLROOT}/include" ${MKLROOT}
 NBLAS = -Wl,--start-group ${MKLROOT}/lib/intel64/libmkl_intel_ilp64.a ${MKLROOT}/lib/intel64/libmkl_intel_thread.a ${MKLROOT}/lib/intel64/libmkl_core.a -Wl,--end-group -liomp5 -lpthread -lm -ldl
 
 SRC = time_mod.f90  alloc_mod.f90 est_noise_mod.f90 filterfunc_mod.f90  psd_calc8.f90 bust_mod.f90  GetStuff_mod.f90  bust8.f90 \
-  adjust8.f90 genNoise_mod.f90  randnor.f gen_noise8.f90  mle_mod.f90   NedlerMeadSimplex_mod.f90  model_fit_A_mod.f90 est_noise8.01.f90 \
+  adjust8.f90 genNoise_mod.f90  randnor.f gen_noise8.f90  mle_mod.f90   NedlerMeadSimplex_mod.f90  model_fit_A_mod.f90 est_noise8.10.f90 \
   compare_wander_mod.f90 compare_wander8.01.f90
 
 #OBJ = ${SRC:.f90=.o} #substitute .f90 with .o
@@ -55,7 +55,7 @@ gen_noise8: $(OBJ4)
 	$(FC) $(FFT) $(NBLAS) -o $@ $(OBJ4)
 
 OBJ5 =   alloc_mod.o  est_noise_mod.o model_fit_A_mod.o  mle_mod.o filterfunc_mod.o  genNoise_mod.o randnor.o GetStuff_mod.o \
-        time_mod.o  NedlerMeadSimplex_mod.o est_noise8.01.o	
+        time_mod.o  NedlerMeadSimplex_mod.o est_noise8.10.o	
 ##est_noise8: $(OBJ5)
 #	$(FC) $(BLAS) $(FFT) -o $@ $(OBJ5)
 
@@ -63,7 +63,7 @@ OBJ5 =   alloc_mod.o  est_noise_mod.o model_fit_A_mod.o  mle_mod.o filterfunc_mo
 #  using Intel open MP threading as that gives best performance (cpu speed)
 est_noise8:
 	ifort -o est_noise8 alloc_mod.f90 est_noise_mod.f90 model_fit_A_mod.f90  mle_mod.f90 filterfunc_mod.f90  genNoise_mod.f90 randnor.f GetStuff_mod.f90 \
-        time_mod.f90  NedlerMeadSimplex_mod.f90 est_noise8.01.f90 dfft.o \
+        time_mod.f90  NedlerMeadSimplex_mod.f90 est_noise8.10.f90 dfft.o \
 	-Ofast \
 	 -I${MKLROOT}/include/intel64/ilp64 -i8  -I"${MKLROOT}/include" \
       ${MKLROOT}/lib/intel64/libmkl_blas95_ilp64.a ${MKLROOT}/lib/intel64/libmkl_lapack95_ilp64.a \
