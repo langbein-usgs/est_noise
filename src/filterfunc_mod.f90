@@ -346,7 +346,8 @@ module filterfunc_mod
     real(kind=real64) :: sum,tmp,sum1,sum2
     real(kind=real64), allocatable :: scr(:,:)
     
-    allocate(scr(nmax,nmax))
+!    allocate(scr(nmax+1,nmax+1))
+    allocate(scr(max+1,max+1))
 !    print*,' max nobs, mmax nmax', max, nobs, mmax, nmax
     if (iflip .lt. 2 ) then
         if (nobs .ne. max ) then
