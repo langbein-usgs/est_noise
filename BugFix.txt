@@ -2,21 +2,21 @@ Various bug fixes and feature creep.
 
 version 20160301  relative to 20151217
 In bust_5,  -- The median routine would stop if there was no data in the specified interval-- bust_5 would crash
-     Fixed by specifing a median of zero when there is no data in interval under examination
+     Fixed by specifying a median of zero when there is no data in interval under examination
 
 est_noise7.22 --  
- 1  For the legacy-mode (quadature covariance) AND when dec .ne. 0  AND when the exponential 
-   time constant is being estimated, there was an artifical offset introduced in the resid.out file in
+ 1  For the legacy-mode (quadrature covariance) AND when dec .ne. 0  AND when the exponential 
+   time constant is being estimated, there was an artificial offset introduced in the resid.out file in
    both the predicted and residuals...  This should be fixed as the A_orig matrix, prior to
    outputting the residual wasn't correctly being modified (modify_A routine) because the number of
    observations, ic was being correctly passed through the common statement;  Line numbers ~1735 changed
    in est_noise7.22
 
-2  Note the for intel compiled program on Mac, that estimating PL index yield an "illegal instruction"
+2  Note the for Intel compiled program on Mac, that estimating PL index yield an "illegal instruction"
    and program crashes.  Works OK with gfortran, though. This seems to occur using 2-color EDM data and
    independent of whether covariance is additive or quadrature. After fiddling with the dimensions
    of makeMatrix, and band_pass_filt subroutines, the programs had problems compiling either with gfortran
-   or intel, depending on the dimension statemments. With gfortran, compile errors consisted of
+   or Intel, depending on the dimension statements. With gfortran, compile errors consisted of
    "RIP relative reference out of range ".  So, for arrays that were originally dimensioned as 65536, I reduced
     them by a factor of two to 32768.  
 
@@ -25,13 +25,13 @@ est_noise7.22 --
    A)  the output has a lot of NaN in the columns representing the determinant and/or the misfit of
    of the data to the model (chi^2)  or B)  the MLE value is wildly different than simpler models of noise;
    that is a model with the BP component. With the "c" or cholesky option, BP noise modeling worked fine.
-   To try to get around this, I implimented DFT (and its inverse) to compute
+   To try to get around this, I implemented DFT (and its inverse) to compute
    the inverse filter (finv in funmin).  The apparent problem, I believe, is that the filter function of
-   noise composed of BP noise is oscilatory. Inverting that filter-function, especially by de-convolution, would
+   noise composed of BP noise is oscillatory. Inverting that filter-function, especially by de-convolution, would
    amplify those oscillations without bound (the near-zero crossing points, when inverted, become unbounded).
    The "badness" of the oscillations is tested by convolving
    the filter function with its inverse (a test feature in funmin) and it would go unbounded. I tested
-   various DFTs (with different tapers and no-taper). Although convoluting the inverse filter with the filter
+   various DFTs (with different tapers and no-taper). Although convolving the inverse filter with the filter
    provided a better match to the expected delta function, it wasn't always perfect.  Consequently, the
    results of modeling data error (some, but not all) would converge, but the MLEs and the amplitudes were not
    consistent with the results obtained from cholesky decomposition.  Consequently, I abandoned the DFT
@@ -40,7 +40,7 @@ est_noise7.22 --
    to the cholesky mode.  In addition, the example script, EstNoiseAll.sh has been modified --- it will run the "fast"
    version of the covariance for BP noise, but if that fails, it will rerun using cholesky decomposition.
 
-4  For the 'f' fast option of noise modeling and simultaneouly estimating the time-constants of exponentials
+4  For the 'f' fast option of noise modeling and simultaneously estimating the time-constants of exponentials
    or omori function, the code would not consistently converge.  It worked fine in the 'c', cholesky and 'n',
    legacy/quadrature mode.  This has been fixed.... For the 'f' version, the wrong A-matrix was being modified.
 
@@ -55,11 +55,11 @@ est_noise7.22
 3  This is an additional feature.  For both the white noise and the first colored noise, the program can, if desired
    provide a suggested input for the amplitudes of white and colored noise. It is ad-hoc, but is probably gets
    one in the neighborhood and, consequently, it could speed-up the computations as the initial guess is closer
-   to the trueth.  To invoke this feature, when either white or First power law amplitude is requested, enter
+   to the truth.  To invoke this feature, when either white or First power law amplitude is requested, enter
    "-99999.0 float".
 
 Version 20160601
-1  Fixed GMT formated output in est_noise
+1  Fixed GMT formatted output in est_noise
 2  Changed maximum variance allowable in compare_wander2 Changed maximum variance allowable in compare_wander
 3  Added new feature to EstNoiseAll.sh script to limit the number of noise models tested
    with est_noise.  This new feature is the -S argument.
@@ -121,7 +121,7 @@ Version 20220909  --  More fixes concerning GGM (or FOGM) with GM frequencies th
 Version 20221001 -- 
 1   Modified the scripts (cleanEst, EstNoise*, etc.) to use either
    GMT versions 5 or 6.  For version 6, it uses the "classic" mode.
-2  Recompiled fortran using the 'license free' version of intel Fortran and its MKL
+2  Recompiled Fortran using the 'license free' version of Intel Fortran and its MKL
    libraries.  Created a bin_linux directory that includes statically linked executables
    for linux using the Intel compiler and MKL.  I'm not able to perform the same for Macs.
 
@@ -178,7 +178,7 @@ All code went through a rewrite to bring the programs into compliance with "mode
   are compatible with the inputs and data formats of the older versions.
   
   Other changes include:
-  1)  Program can accomodate dates between 1800 and 2200 rather than 1960 to 2040
+  1)  Program can accommodate dates between 1800 and 2200 rather than 1960 to 2040
   2)  Fixed error bar calculation for the noise parameters so they are now believable.
   3)  New normalization for BP filter -- sums of squares of filter coefficients now equal 1.0
   4)  Changed compilation method; rather using a script, I now provide Makefile for
@@ -189,3 +189,20 @@ All code went through a rewrite to bring the programs into compliance with "mode
 
 Late January, 2025
 Fixed small bugs in est_noise code; some problems with array allocation.
+
+April 2025 -- new version est_noise8.10  
+1)  Noted the inverse filter function would "ring" with large PL-exponents -- That seemed
+    artificial as the inverse filter function should monotonically decrease to zero at long periods.
+    I identified a 'bug'; that being the some of the intermediate variables in the fract_diff code
+    were` specified as 32-bits; When I specified them to 64-bit, the ringing essentially disappeared.
+2)  Noted for PL noise without any white noise component gave different answers for the additive and
+    quadrature covariance --- the covariance matrix of these 2 processes should be the same.
+    For quadrature covariance, I originally specified that the 1st row of the covariance matrix
+    to be zero.  I've modified the code to align with the covariance matrix generated with additive
+    noise (cholesky method for inversion).
+3)  The most significant change is the addition of open MP to allow for some parallelization.
+    This is most effective in the convolution subroutine as there are nested do-loops which
+    lend themselves to computed in parallel. So, for the additive covariance model, the cpu
+    speed, at least in various tests, increase by at least a factor of two. Note that I did
+    add some OMP directives to the standard, cholesky methods but there was no significant change
+    in precessing speed.
